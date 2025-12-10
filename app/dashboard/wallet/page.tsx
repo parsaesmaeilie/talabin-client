@@ -7,6 +7,7 @@ export default function WalletPage() {
   const [user, setUser] = useState({
     userMoney: 5000000,
     userGold: 2.5,
+    userWithdrawableGold: 1.8,
     transactions: [
       { type: "واریز", amount: 1000000, date: "1401/02/10" },
       { type: "برداشت", amount: 500000, date: "1401/03/15" },
@@ -15,7 +16,7 @@ export default function WalletPage() {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-yellow-100 to-yellow-200 text-gray-900 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-yellow-50 to-yellow-100 text-gray-900 p-6">
       <div className="max-w-4xl mx-auto bg-white rounded-lg p-6 shadow-lg">
         <h1 className="text-3xl font-bold text-yellow-600 text-center mb-6">کیف پول</h1>
 
@@ -29,9 +30,9 @@ export default function WalletPage() {
           </div>
 
           <div>
-            <label className="text-sm font-medium text-black">موجودی طلا</label>
+            <label className="text-sm font-medium text-black">موجودی طلا/ طلای قابل برداشت</label>
             <div className="p-3 bg-yellow-50 text-black rounded-lg font-semibold">
-              {user.userGold.toFixed(2)} گرم
+             {user.userGold.toFixed(2)}  /  {user.userWithdrawableGold.toFixed(2)} گرم
             </div>
           </div>
         </div>

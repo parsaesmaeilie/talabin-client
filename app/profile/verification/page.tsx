@@ -25,6 +25,15 @@ export default function VerificationPage() {
             />
             {errors.nationalId && <p className="text-sm text-red-500">کد ملی باید شامل 10 رقم باشد</p>}
           </div>
+          <div>
+            <label className="block mb-1 text-sm font-medium text-gray-700">شماره همراه</label>
+            <input
+              {...register("phoneNumber", { required: "شماره همراه الزامی است", pattern: /^09[0-9]{9}$/ })}
+              placeholder="شماره همراه خود را وارد کنید"
+              className="w-full rounded-lg border border-gray-300 p-3 focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition text-gray-500"
+            />
+            {errors.phoneNumber && <p className="text-sm text-red-500">شماره همراه باید با 09 شروع و شامل 11 رقم باشد </p>}
+          </div>
 
           <div>
             <label className="block mb-1 text-sm font-medium text-gray-700">تاریخ تولد</label>

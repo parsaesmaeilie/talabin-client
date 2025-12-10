@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-yellow-100 to-yellow-200"  dir="rtl">
+    <div className="min-h-screen bg-gradient-to-br from-yellow-50 to-yellow-100"  dir="rtl">
 
       {/* سکشن معرفی */}
       <section className="text-center py-20 bg-gradient-to-br from-yellow-100 to-yellow-200">

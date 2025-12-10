@@ -66,13 +66,13 @@ export default function ProfilePage() {
             </div>
             <div className="mt-2 flex gap-4">
               {/* دکمه شارژ حساب */}
-              <Link href="/charge">
+              <Link href="dashboard/wallet/deposit">
                 <button className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition duration-300">
                   شارژ حساب
                 </button>
               </Link>
               {/* دکمه برداشت از حساب */}
-              <Link href="/withdraw">
+              <Link href="dashboard/wallet/withdraw">
                 <button className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-300">
                   برداشت از حساب
                 </button>

@@ -19,7 +19,7 @@ export default function DepositPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-yellow-100 to-yellow-200 text-gray-900 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-yellow-50 to-yellow-100 text-gray-900 p-6">
       <div className="max-w-md mx-auto bg-white rounded-lg p-6 shadow-lg">
         <h1 className="text-3xl font-bold text-yellow-600 text-center mb-6">شارژ حساب</h1>
 
