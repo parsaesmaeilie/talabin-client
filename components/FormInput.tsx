@@ -1,23 +1,44 @@
-interface FormInputProps {
-    label: string;
-    id: string;
-    type: string;
-    placeholder: string;
-  }
-  
-  export const FormInput: React.FC<FormInputProps> = ({ label, id, type, placeholder }) => (
-    <div>
-      <label htmlFor={id} className="block text-lg font-medium text-gray-800">
-        {label}
-      </label>
-      <input
-        type={type}
-        id={id}
-        name={id}
-        required
-        className="mt-2 p-3 w-full border border-gray-300 rounded-md focus:ring-yellow-500 focus:border-yellow-500 text-gray-800"
-        placeholder={placeholder}
-      />
-    </div>
-  );
+interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  label: string;
+  id: string;
+  hint?: string;
+  error?: string;
+}
+
+export const FormInput: React.FC<FormInputProps> = ({
+  label,
+  id,
+  hint,
+  error,
+  className = "",
+  ...props
+}) => (
+  <div className="form-group">
+    <label
+      htmlFor={id}
+      className="form-label"
+    >
+      {label}
+    </label>
+    <input
+      id={id}
+      name={id}
+      className={`form-input ${className}`}
+      {...props}
+    />
+    {hint && !error && (
+      <div className="form-hint">
+        {hint}
+      </div>
+    )}
+    {error && (
+      <div
+        className="text-xs mt-1.5"
+        style={{ color: "#E84545" }}
+      >
+        {error}
+      </div>
+    )}
+  </div>
+);
   

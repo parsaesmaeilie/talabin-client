@@ -1,71 +1,212 @@
-// app/dashboard/wallet/index.tsx
 "use client";
+
 import Link from "next/link";
-import { useState } from "react";
+import { Card } from "@/components/Card";
+import { Button } from "@/components/Button";
+import { Badge } from "@/components/Badge";
 
 export default function WalletPage() {
-  const [user, setUser] = useState({
-    userMoney: 5000000,
-    userGold: 2.5,
-    userWithdrawableGold: 1.8,
-    transactions: [
-      { type: "واریز", amount: 1000000, date: "1401/02/10" },
-      { type: "برداشت", amount: 500000, date: "1401/03/15" },
-      { type: "واریز", amount: 1500000, date: "1401/05/20" },
-    ],
-  });
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-yellow-50 to-yellow-100 text-gray-900 p-6">
-      <div className="max-w-4xl mx-auto bg-white rounded-lg p-6 shadow-lg">
-        <h1 className="text-3xl font-bold text-yellow-600 text-center mb-6">کیف پول</h1>
+    <div className="min-h-screen" style={{ padding: "20px 16px 80px" }}>
+      <div style={{ maxWidth: "700px", margin: "0 auto" }}>
+        <h1
+          style={{
+            fontSize: "20px",
+            fontWeight: 600,
+            margin: "0 0 6px",
+          }}
+        >
+          کیف پول
+        </h1>
+        <p
+          style={{
+            fontSize: "13px",
+            color: "var(--color-muted)",
+            margin: "0 0 20px",
+          }}
+        >
+          مدیریت موجودی تومان و طلای دیجیتال در طلابین
+        </p>
 
-        {/* نمایش موجودی کیف پول */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <div>
-            <label className="text-sm font-medium text-black">موجودی کیف پول</label>
-            <div className="p-3 bg-yellow-50 text-black rounded-lg font-semibold">
-              {user.userMoney.toLocaleString()} تومان
+      {/* Total Balance Card */}
+      <Card style={{ marginBottom: "12px" }}>
+        <div
+          style={{
+            fontSize: "12px",
+            color: "var(--color-muted)",
+            marginBottom: "8px",
+          }}
+        >
+          موجودی کل
+        </div>
+        <div style={{ marginTop: "6px" }}>
+          <span style={{ fontSize: "22px", fontWeight: 700 }}>۸,۳۵۰,۰۰۰</span>
+          <span
+            style={{
+              fontSize: "13px",
+              fontWeight: 400,
+              color: "var(--color-muted)",
+              marginRight: "6px",
+            }}
+          >
+            تومان (تقریبی)
+          </span>
+        </div>
+        <div
+          style={{
+            marginTop: "6px",
+            fontSize: "11px",
+            color: "var(--color-muted)",
+          }}
+        >
+          شامل طلای دیجیتال و موجودی نقدی
+        </div>
+      </Card>
+
+      {/* Balance Cards */}
+      <div className="grid-2" style={{ gap: "10px", marginBottom: "12px" }}>
+        <Card>
+          <div
+            style={{
+              fontSize: "12px",
+              color: "var(--color-muted)",
+              marginBottom: "6px",
+            }}
+          >
+            طلای دیجیتال
+          </div>
+          <div style={{ marginTop: "6px" }}>
+            <span style={{ fontSize: "18px", fontWeight: 700 }}>۲٫۳۴</span>
+            <span
+              style={{
+                fontSize: "12px",
+                fontWeight: 400,
+                color: "var(--color-muted)",
+                marginRight: "4px",
+              }}
+            >
+              گرم
+            </span>
+          </div>
+        </Card>
+
+        <Card>
+          <div
+            style={{
+              fontSize: "12px",
+              color: "var(--color-muted)",
+              marginBottom: "6px",
+            }}
+          >
+            موجودی تومان
+          </div>
+          <div style={{ marginTop: "6px" }}>
+            <span style={{ fontSize: "18px", fontWeight: 700 }}>
+              ۱,۳۵۰,۰۰۰
+            </span>
+            <span
+              style={{
+                fontSize: "12px",
+                fontWeight: 400,
+                color: "var(--color-muted)",
+                marginRight: "4px",
+              }}
+            >
+              تومان
+            </span>
+          </div>
+        </Card>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="grid-2" style={{ gap: "10px", marginBottom: "16px" }}>
+        <Button variant="primary" fullWidth asLink href="/dashboard/wallet/deposit">
+          واریز
+        </Button>
+        <Button variant="outline" fullWidth asLink href="/dashboard/wallet/withdraw">
+          برداشت
+        </Button>
+      </div>
+
+      {/* Recent Wallet History */}
+      <Card>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "8px",
+          }}
+        >
+          <span style={{ fontSize: "12px", color: "var(--color-muted)" }}>
+            تاریخچه اخیر کیف پول
+          </span>
+          <Link
+            href="/dashboard/wallet/history"
+            style={{ fontSize: "11px", color: "var(--color-muted)" }}
+          >
+            مشاهده همه
+          </Link>
+        </div>
+
+        <div
+          style={{
+            borderRadius: "var(--radius-md)",
+            border: "1px solid rgba(0,0,0,0.04)",
+            background: "#FBFAF7",
+            padding: "6px 8px",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              padding: "8px 4px",
+              borderBottom: "1px solid rgba(0,0,0,0.04)",
+              fontSize: "12px",
+            }}
+          >
+            <div>
+              <div>واریز تومان</div>
+              <div
+                style={{
+                  fontSize: "11px",
+                  color: "var(--color-muted)",
+                  marginTop: "3px",
+                }}
+              >
+                ۱,۰۰۰,۰۰۰ تومان • شبا بانکی
+              </div>
             </div>
+            <Badge variant="green">موفق</Badge>
           </div>
 
-          <div>
-            <label className="text-sm font-medium text-black">موجودی طلا/ طلای قابل برداشت</label>
-            <div className="p-3 bg-yellow-50 text-black rounded-lg font-semibold">
-             {user.userGold.toFixed(2)}  /  {user.userWithdrawableGold.toFixed(2)} گرم
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              padding: "8px 4px",
+              fontSize: "12px",
+            }}
+          >
+            <div>
+              <div>برداشت تومان</div>
+              <div
+                style={{
+                  fontSize: "11px",
+                  color: "var(--color-muted)",
+                  marginTop: "3px",
+                }}
+              >
+                ۵۰۰,۰۰۰ تومان • در انتظار بانک
+              </div>
             </div>
+            <Badge>در حال انجام</Badge>
           </div>
         </div>
-
-        {/* تاریخچه تراکنش‌ها */}
-        <h2 className="text-xl font-semibold text-yellow-600 mb-4">تاریخچه تراکنش‌ها</h2>
-        <div className="space-y-4">
-          {user.transactions.map((transaction, index) => (
-            <div key={index} className="p-4 bg-yellow-50 rounded-lg text-black">
-              <div className="flex justify-between">
-                <span className="font-semibold">{transaction.type}</span>
-                <span className="text-gray-700">{transaction.date}</span>
-              </div>
-              <div className="flex justify-between mt-2">
-                <span>{transaction.amount.toLocaleString()} تومان</span>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* دکمه‌های شارژ و برداشت */}
-        <div className="mt-6 flex gap-4 justify-center">
-          <Link href="/dashboard/wallet/deposit">
-            <button className="px-6 py-2 bg-yellow-500 text-black rounded-lg hover:bg-yellow-600 transition duration-300">
-              شارژ حساب
-            </button>
-          </Link>
-          <Link href="/dashboard/wallet/withdraw">
-            <button className="px-6 py-2 bg-yellow-500 text-black rounded-lg hover:bg-yellow-600 transition duration-300">
-              برداشت از حساب
-            </button>
-          </Link>
-        </div>
+      </Card>
       </div>
     </div>
   );

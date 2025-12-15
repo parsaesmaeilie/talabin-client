@@ -1,303 +1,218 @@
 "use client";
 
 import { useState } from "react";
-import { Line } from "react-chartjs-2";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
-
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend
-);
-
-const goldPrice = 11000000; // قیمت طلا
+import { Card } from "@/components/Card";
+import { Button } from "@/components/Button";
+import { Badge } from "@/components/Badge";
 
 export default function BuySell() {
-  const [isBuying, setIsBuying] = useState(true);
-  const [amount, setAmount] = useState(0);
-  const [goldAmount, setGoldAmount] = useState(0);
-  const [isByGold, setIsByGold] = useState(true);
+  const [activeTab, setActiveTab] = useState<"buy" | "sell">("buy");
+  const [amount, setAmount] = useState("");
 
-  const [userGold, setUserGold] = useState(10);
-  const [userMoney, setUserMoney] = useState(100000000);
-
-  // 🔥 تاریخچه معاملات
-  const [history, setHistory] = useState<
-    { type: string; gold: number; money: number; time: string }[]
-  >([{
-    type: "خرید",
-    gold: 2.5,
-    money: 2.5 * goldPrice,
-    time: "۱۴۰۳/۱۰/۲۰ - ۱۲:۳۰",
-  },
-  {
-    type: "فروش",
-    gold: 1.2,
-    money: 1.2 * goldPrice,
-    time: "۱۴۰۳/۱۰/۱۸ - ۱۶:۴۵",
-  },
-  {
-    type: "خرید",
-    gold: 0.75,
-    money: 0.75 * goldPrice,
-    time: "۱۴۰۳/۱۰/۱۵ - ۱۰:۱۰",
-  },]);
-
-  const handleAmountChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const inputAmount = parseFloat(event.target.value);
-    setAmount(inputAmount);
-
-    if (isByGold) setGoldAmount(inputAmount);
-    else setGoldAmount(inputAmount / goldPrice);
-  };
-
-  const toggleUnit = () => {
-    setIsByGold(!isByGold);
-    setAmount(0);
-    setGoldAmount(0);
-  };
-
-  const handleBuyWithAllMoney = () => {
-    const allGoldToBuy = userMoney / goldPrice;
-    setGoldAmount(allGoldToBuy);
-    setAmount(userMoney);
-  };
-
-  const handleSellAllGold = () => {
-    setAmount(userGold);
-    setGoldAmount(userGold);
-  };
-
-  // ⭐ انجام تراکنش + ثبت تاریخچه
-  const handleTransaction = () => {
-    if (goldAmount <= 0) return alert("مقدار وارد شده معتبر نیست");
-
-    const money = goldAmount * goldPrice;
-    const time = new Date().toLocaleString("fa-IR");
-
-    if (isBuying) {
-      if (money > userMoney) return alert("موجودی کافی نیست!");
-
-      setUserMoney(userMoney - money);
-      setUserGold(userGold + goldAmount);
-
-      setHistory([
-        { type: "خرید", gold: goldAmount, money, time },
-        ...history,
-      ]);
-    } else {
-      if (goldAmount > userGold) return alert("طلای کافی ندارید!");
-
-      setUserGold(userGold - goldAmount);
-      setUserMoney(userMoney + money);
-
-      setHistory([
-        { type: "فروش", gold: goldAmount, money, time },
-        ...history,
-      ]);
-    }
-
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
     alert("✔ عملیات انجام شد!");
   };
 
-  const data = {
-    labels: ["1", "2", "3", "4", "5", "6", "7"],
-    datasets: [
-      {
-        label: "قیمت طلا",
-        data: [
-          10000000, 10500000, 11000000, 11500000, 11000000, 10800000, 11000000,
-        ],
-        borderColor: "rgba(255, 159, 64, 1)",
-        backgroundColor: "rgba(255, 159, 64, 0.2)",
-        fill: true,
-      },
-    ],
-  };
-
   return (
-    <div className="max-w-6xl mx-auto p-6 mt-20 select-none">
-      <h1 className="text-2xl font-bold text-yellow-700 mb-6 text-center">
-        {isBuying ? "خرید طلا" : "فروش طلا"}
-      </h1>
+    <div className="min-h-screen" style={{ padding: "20px 16px 80px" }}>
+      <div style={{ maxWidth: "600px", margin: "0 auto" }}>
+        <h1
+          style={{
+            fontSize: "20px",
+            fontWeight: 600,
+            margin: "0 0 6px",
+          }}
+        >
+          خرید / فروش طلا
+        </h1>
+        <p
+          style={{
+            fontSize: "13px",
+            color: "var(--color-muted)",
+            margin: "0 0 20px",
+          }}
+        >
+          یک صفحه ساده برای ثبت سفارش خرید یا فروش
+        </p>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* سمت چپ */}
-        <div className="bg-white p-6 shadow-lg rounded-xl border border-yellow-100">
-          {/* خرید/فروش */}
-          <div className="flex justify-center mb-6">
-            <div className="relative inline-block w-full rounded-full bg-gray-200 overflow-hidden">
-              <div className="flex w-full">
-                <div
-                  onClick={() => setIsBuying(true)}
-                  className={`w-1/2 py-3 text-center cursor-pointer transition-all duration-300 rounded-l-full font-semibold text-lg ${
-                    isBuying
-                      ? "bg-yellow-500 text-white shadow-lg"
-                      : "bg-gray-300 text-gray-600 hover:bg-yellow-300"
-                  }`}
-                >
-                  خرید
-                </div>
-                <div
-                  onClick={() => setIsBuying(false)}
-                  className={`w-1/2 py-3 text-center cursor-pointer transition-all duration-300 rounded-r-full font-semibold text-lg ${
-                    !isBuying
-                      ? "bg-red-500 text-white shadow-lg"
-                      : "bg-gray-300 text-gray-600 hover:bg-red-300"
-                  }`}
-                >
-                  فروش
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* ورودی */}
-          <div className="flex items-center justify-between mb-4">
-            <div className="w-full">
-              <label className="block mb-2 text-lg text-gray-800">
-                {isByGold ? "مقدار طلا (گرم)" : "مبلغ (تومان)"}
-              </label>
-
-              <div className="w-full flex items-center justify-between">
-                <input
-                  type="number"
-                  value={amount}
-                  onChange={handleAmountChange}
-                  className="w-4/5 p-3 border border-gray-300 rounded-md text-black focus:ring-2 focus:ring-yellow-500"
-                  placeholder={
-                    isByGold
-                      ? "مقدار طلا را وارد کنید"
-                      : "مبلغ مورد نظر را وارد کنید"
-                  }
-                />
-
-                <div
-                  onClick={toggleUnit}
-                  className="w-1/5 py-3 text-center bg-yellow-500 text-white rounded-lg cursor-pointer hover:bg-yellow-600 transition-all duration-300"
-                >
-                  {isByGold ? "تومان" : "گرم"}
-                </div>
-              </div>
-
-              {/* موجودی */}
-              <div className="text-right mt-2 text-sm text-gray-700">
-                {isBuying ? (
-                  <div>موجودی کیف پول: {userMoney.toLocaleString()} تومان</div>
-                ) : (
-                  <div>موجودی طلا: {userGold.toFixed(2)} گرم</div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* محاسبه */}
-          {isByGold ? (
-            <div className="text-center text-lg font-semibold text-yellow-700">
-              {amount > 0
-                ? `مبلغ: ${(goldAmount * goldPrice).toLocaleString()} تومان`
-                : "مبلغ محاسبه نشده"}
-            </div>
-          ) : (
-            <div className="text-center text-lg font-semibold text-yellow-700">
-              {amount > 0
-                ? `مقدار طلا: ${goldAmount.toFixed(4)} گرم`
-                : "مقدار طلا محاسبه نشده"}
-            </div>
-          )}
-
-          {/* خرید با کل موجودی */}
-          {isBuying && (
+      {/* Price Card */}
+      <Card style={{ marginBottom: "16px" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            marginBottom: "6px",
+          }}
+        >
+          <div>
             <div
-              className="text-center mt-4 cursor-pointer text-blue-500 hover:underline"
-              onClick={handleBuyWithAllMoney}
+              style={{
+                fontSize: "12px",
+                color: "var(--color-muted)",
+                marginBottom: "6px",
+              }}
             >
-              خرید با کل موجودی
+              قیمت لحظه‌ای طلا
             </div>
-          )}
-
-          {/* فروش با کل موجودی */}
-          {!isBuying && (
-            <div
-              className="text-center mt-4 cursor-pointer text-blue-500 hover:underline"
-              onClick={handleSellAllGold}
-            >
-              فروش با کل موجودی
+            <div style={{ fontSize: "18px", fontWeight: 700 }}>
+              ۲,۹۹۰,۰۰۰
+              <span
+                style={{
+                  fontSize: "12px",
+                  fontWeight: 400,
+                  color: "var(--color-muted)",
+                  marginRight: "6px",
+                }}
+              >
+                تومان
+              </span>
             </div>
-          )}
-
-          {/* دکمه */}
-          <div className="mt-4">
-            <button
-              className="w-full bg-yellow-500 text-white py-3 rounded-lg hover:bg-yellow-600"
-              onClick={handleTransaction}
-            >
-              {isBuying ? "خرید طلا" : "فروش طلا"}
-            </button>
           </div>
+          <Badge variant="green">به‌روزرسانی لحظه‌ای</Badge>
         </div>
 
-        {/* سمت راست: نمودار */}
-        <div className="bg-white p-6 shadow-lg rounded-xl border border-yellow-100">
-          <h2 className="text-xl font-bold text-yellow-700 mb-4 text-center">
-            نمودار قیمت طلا
-          </h2>
-          <Line data={data} />
+        {/* Tabs */}
+        <div
+          className="grid-2"
+          style={{ gap: "6px", marginTop: "10px" }}
+        >
+          <button
+            className="btn"
+            onClick={() => setActiveTab("buy")}
+            style={{
+              background: activeTab === "buy" ? "var(--color-primary)" : "rgba(0,0,0,0.02)",
+              borderColor: activeTab === "buy" ? "var(--color-primary)" : "rgba(0,0,0,0.06)",
+              color: activeTab === "buy" ? "#1C1C1C" : "var(--color-muted)",
+              borderRadius: "var(--radius-md)",
+            }}
+          >
+            خرید
+          </button>
+          <button
+            className="btn"
+            onClick={() => setActiveTab("sell")}
+            style={{
+              background: activeTab === "sell" ? "var(--color-danger)" : "rgba(0,0,0,0.02)",
+              borderColor: activeTab === "sell" ? "var(--color-danger)" : "rgba(0,0,0,0.06)",
+              color: activeTab === "sell" ? "#FFFFFF" : "var(--color-muted)",
+              borderRadius: "var(--radius-md)",
+            }}
+          >
+            فروش
+          </button>
         </div>
-      </div>
 
-      {/* 🔥 تاریخچه معاملات */}
-      <div className="bg-white p-6 mt-10 shadow-lg rounded-xl border border-yellow-100">
-        <h2 className="text-xl font-bold text-yellow-700 mb-4 text-center">
-          تاریخچه معاملات
-        </h2>
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <label className="form-label">مبلغ به تومان</label>
+              <span style={{ fontSize: "11px", color: "var(--color-muted)" }}>
+                حداقل ۱۰۰,۰۰۰ تومان
+              </span>
+            </div>
+            <input
+              type="number"
+              className="form-input"
+              placeholder="مثلاً ۵۰۰,۰۰۰"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              min="100000"
+              step="1000"
+            />
+            <small className="form-hint">
+              می‌توانی بعداً این ورودی را به عددی واقعی و ماسک‌شده تبدیل کنی.
+            </small>
+          </div>
 
-        {history.length === 0 ? (
-          <div className="text-center text-gray-600">هنوز معامله‌ای انجام نشده</div>
-        ) : (
-          <table className="w-full text-center">
-  <thead>
-    <tr className="bg-yellow-200 text-gray-900">
-      <th className="py-2">نوع</th>
-      <th className="py-2">مقدار طلا (گرم)</th>
-      <th className="py-2">مبلغ (تومان)</th>
-      <th className="py-2">زمان</th>
-    </tr>
-  </thead>
+          {/* Summary */}
+          <div
+            style={{
+              marginTop: "14px",
+              borderRadius: "12px",
+              background: "var(--color-soft)",
+              padding: "10px 12px",
+              fontSize: "12px",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginBottom: "6px",
+              }}
+            >
+              <span>کارمزد (۰٫۵٪)</span>
+              <span>نمایشی – تومان</span>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginBottom: "6px",
+              }}
+            >
+              <span>مقدار تقریبی طلا</span>
+              <span>نمایشی – گرم</span>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+              }}
+            >
+              <span>مبلغ نهایی پرداخت</span>
+              <span>نمایشی</span>
+            </div>
+          </div>
 
-  <tbody>
-  {history.map((item, i) => (
-    <tr
-      key={i}
-      className={`text-gray-800 ${
-        item.type === "خرید" ? "bg-green-100" : "bg-red-100"
-      }`}
-    >
-      <td className="py-2">{item.type}</td>
-      <td className="py-2">{item.gold.toFixed(4)}</td>
-      <td className="py-2">{item.money.toLocaleString()}</td>
-      <td className="py-2">{item.time}</td>
-    </tr>
-  ))}
-</tbody>
+          <div style={{ display: "flex", gap: "10px", marginTop: "16px", flexWrap: "wrap" }}>
+            <Button
+              type="submit"
+              variant={activeTab === "buy" ? "success" : "danger"}
+              style={{ flex: "1", minWidth: "180px" }}
+            >
+              ادامه و ثبت سفارش
+            </Button>
 
+            <Button
+              type="button"
+              variant="outline"
+              style={{ flex: "1", minWidth: "180px" }}
+            >
+              مشاهده قوانین
+            </Button>
+          </div>
+        </form>
+      </Card>
 
-</table>
-
-        )}
+      {/* Info Card */}
+      <Card>
+        <div style={{ fontSize: "13px", fontWeight: 600, marginBottom: "8px" }}>
+          نکات مهم
+        </div>
+        <ul
+          style={{
+            fontSize: "12px",
+            lineHeight: 1.8,
+            color: "var(--color-muted)",
+            paddingRight: "18px",
+            margin: 0,
+          }}
+        >
+          <li>قیمت طلا به‌صورت لحظه‌ای به‌روزرسانی می‌شود</li>
+          <li>کارمزد خرید و فروش ۰٫۵٪ است</li>
+          <li>حداقل مبلغ خرید ۱۰۰,۰۰۰ تومان است</li>
+          <li>پس از ثبت سفارش، طلای شما در کیف پول ذخیره می‌شود</li>
+        </ul>
+      </Card>
       </div>
     </div>
   );

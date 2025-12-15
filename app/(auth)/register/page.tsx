@@ -1,9 +1,16 @@
 "use client";
 
 import { useForm } from "react-hook-form";
+import Link from "next/link";
+import { Button } from "@/components/Button";
 
 export default function RegisterPage() {
-  const { register, handleSubmit, formState: { errors },watch } = useForm();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    watch,
+  } = useForm();
 
   const onSubmit = (data: any) => {
     alert("✔ ثبت‌نام انجام شد!");
@@ -11,107 +18,214 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-yellow-50 to-yellow-100 p-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 border border-yellow-200" dir="rtl">
-        
-        <h1 className="text-2xl font-bold text-center mb-6 text-yellow-700">
-          ثبت‌نام در حساب کاربری
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <div
+        className="w-full max-w-md card"
+        style={{ padding: "32px 28px" }}
+      >
+        {/* Logo */}
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: "24px" }}>
+          <div
+            style={{
+              width: "48px",
+              height: "48px",
+              borderRadius: "14px",
+              background: "var(--color-primary)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "24px",
+              fontWeight: 700,
+              color: "#1C1C1C",
+            }}
+          >
+            ط
+          </div>
+        </div>
+
+        <h1
+          style={{
+            fontSize: "20px",
+            fontWeight: 700,
+            textAlign: "center",
+            marginBottom: "8px",
+          }}
+        >
+          ثبت‌نام در طلابین
         </h1>
+        <p
+          style={{
+            fontSize: "13px",
+            color: "var(--color-muted)",
+            textAlign: "center",
+            marginBottom: "24px",
+          }}
+        >
+          حساب کاربری خود را ایجاد کنید و از ۱۰۰ هزار تومان شروع کنید
+        </p>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div className="w-full flex items-center justify-between">
-          {/* نام */}
-          <div className="w-5/11 ">
-            <label className="block mb-1 text-sm font-medium text-gray-700">نام</label>
-            <input
-              {...register("firstName", { required: "نام الزامی است" })}
-              placeholder=" خود را وارد کنید"
-              className="w-full rounded-lg border border-gray-300 p-3 focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition text-gray-500"
-            />
-            {errors.firstName && <p className="text-sm text-red-500">{errors.firstName.message}</p>}
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="grid-2" style={{ gap: "12px" }}>
+            <div className="form-group" style={{ marginBottom: 0 }}>
+              <label className="form-label">نام</label>
+              <input
+                {...register("firstName", { required: "نام الزامی است" })}
+                className="form-input"
+                placeholder="نام خود را وارد کنید"
+              />
+              {errors.firstName && (
+                <span style={{ fontSize: "11px", color: "var(--color-danger)", marginTop: "4px", display: "block" }}>
+                  {errors.firstName.message as string}
+                </span>
+              )}
+            </div>
+
+            <div className="form-group" style={{ marginBottom: 0 }}>
+              <label className="form-label">نام خانوادگی</label>
+              <input
+                {...register("lastName", { required: "نام خانوادگی الزامی است" })}
+                className="form-input"
+                placeholder="نام خانوادگی"
+              />
+              {errors.lastName && (
+                <span style={{ fontSize: "11px", color: "var(--color-danger)", marginTop: "4px", display: "block" }}>
+                  {errors.lastName.message as string}
+                </span>
+              )}
+            </div>
           </div>
 
-          {/* نام خانوادگی */}
-          <div className="w-5/11 ">
-            <label className="block mb-1 text-sm font-medium text-gray-700">نام خانوادگی</label>
+          <div className="form-group">
+            <label className="form-label">شماره موبایل</label>
             <input
-              {...register("lastName", { required: "نام خانوادگی الزامی است" })}
-              placeholder="نام خانوادگی "
-              className="w-full rounded-lg border border-gray-300 p-3 focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition text-gray-500"
-            />
-            {errors.lastName && <p className="text-sm text-red-500">{errors.lastName.message}</p>}
-          </div>
-          </div>
-
-          {/* شماره موبایل */}
-          <div>
-            <label className="block mb-1 text-sm font-medium text-gray-700">شماره موبایل</label>
-            <input
-              {...register("phone", { required: "شماره موبایل الزامی است", pattern: /^[0-9]{11}$/ })}
+              {...register("phone", {
+                required: "شماره موبایل الزامی است",
+                pattern: /^[0-9]{11}$/,
+              })}
+              type="tel"
+              className="form-input"
               placeholder="09123456789"
-              className="w-full rounded-lg border border-gray-300 p-3 focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition text-gray-500"
+              dir="ltr"
+              style={{ textAlign: "right" }}
             />
-            {errors.phone && <p className="text-sm text-red-500">لطفا شماره موبایل معتبر وارد کنید</p>}
+            <small className="form-hint">
+              کد تایید به این شماره ارسال خواهد شد
+            </small>
+            {errors.phone && (
+              <span style={{ fontSize: "11px", color: "var(--color-danger)", marginTop: "4px", display: "block" }}>
+                لطفا شماره موبایل معتبر وارد کنید
+              </span>
+            )}
           </div>
 
-          {/* کد ملی */}
-          <div>
-            <label className="block mb-1 text-sm font-medium text-gray-700">کد ملی</label>
+          <div className="form-group">
+            <label className="form-label">کد ملی</label>
             <input
-              {...register("nationalId", { required: "کد ملی الزامی است", pattern: /^[0-9]{10}$/ })}
+              {...register("nationalId", {
+                required: "کد ملی الزامی است",
+                pattern: /^[0-9]{10}$/,
+              })}
+              type="text"
+              className="form-input"
               placeholder="کد ملی خود را وارد کنید"
-              className="w-full rounded-lg border border-gray-300 p-3 focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition text-gray-500"
+              dir="ltr"
+              style={{ textAlign: "right" }}
             />
-            {errors.nationalId && <p className="text-sm text-red-500">کد ملی باید شامل 10 رقم باشد</p>}
+            {errors.nationalId && (
+              <span style={{ fontSize: "11px", color: "var(--color-danger)", marginTop: "4px", display: "block" }}>
+                کد ملی باید شامل 10 رقم باشد
+              </span>
+            )}
           </div>
 
-
-
-          {/* رمز عبور */}
-          <div>
-            <label className="block mb-1 text-sm font-medium text-gray-700">رمز عبور</label>
+          <div className="form-group">
+            <label className="form-label">رمز عبور</label>
             <input
-              {...register("password", { required: "رمز عبور الزامی است", minLength: { value: 6, message: "رمز عبور باید حداقل 6 کاراکتر باشد" },
-                pattern: {
-                  value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{6,}$/,
-                  message: "رمز عبور باید شامل حداقل یک حرف بزرگ، یک حرف کوچک، یک عدد و یک علامت خاص باشد"
-                } })}
-              type="password"
-              placeholder="******"
-              className="w-full rounded-lg border border-gray-300 p-3 focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition text-gray-500"
-            />
-            {errors.password && <p className="text-sm text-red-500">{errors.password.message}</p>}
-          </div>
-
-          {/* تایید رمز عبور */}
-          <div>
-            <label className="block mb-1 text-sm font-medium text-gray-700">تایید رمز عبور</label>
-            <input
-              {...register("confirmPassword", { 
-                required: "تایید رمز عبور الزامی است", 
-                validate: (value) => value === watch("password") || "رمز عبور باید یکسان باشد"
+              {...register("password", {
+                required: "رمز عبور الزامی است",
+                minLength: {
+                  value: 6,
+                  message: "رمز عبور باید حداقل 6 کاراکتر باشد",
+                },
               })}
               type="password"
-              placeholder="تایید رمز عبور"
-              className="w-full rounded-lg border border-gray-300 p-3 focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition text-gray-500"
+              className="form-input"
+              placeholder="••••••••"
             />
-            {errors.confirmPassword && <p className="text-sm text-red-500">{errors.confirmPassword.message}</p>}
+            <small className="form-hint">
+              حداقل 6 کاراکتر، ترکیبی از حروف و اعداد
+            </small>
+            {errors.password && (
+              <span style={{ fontSize: "11px", color: "var(--color-danger)", marginTop: "4px", display: "block" }}>
+                {errors.password.message as string}
+              </span>
+            )}
           </div>
 
-          <button
-            type="submit"
-            className="w-full bg-yellow-500 hover:bg-yellow-600 text-white p-3 rounded-lg font-semibold shadow-md transition duration-300"
-          >
-            ثبت‌نام
-          </button>
+          <div className="form-group">
+            <label className="form-label">تایید رمز عبور</label>
+            <input
+              {...register("confirmPassword", {
+                required: "تایید رمز عبور الزامی است",
+                validate: (value) =>
+                  value === watch("password") || "رمز عبور باید یکسان باشد",
+              })}
+              type="password"
+              className="form-input"
+              placeholder="••••••••"
+            />
+            {errors.confirmPassword && (
+              <span style={{ fontSize: "11px", color: "var(--color-danger)", marginTop: "4px", display: "block" }}>
+                {errors.confirmPassword.message as string}
+              </span>
+            )}
+          </div>
+
+          <Button type="submit" variant="primary" fullWidth style={{ marginTop: "8px" }}>
+            ثبت‌نام و ادامه
+          </Button>
         </form>
 
-        <p className="text-center mt-4 text-sm text-gray-600">
-          حساب داری؟{" "}
-          <a href="/login" className="text-yellow-600 font-semibold hover:underline">
+        <div
+          style={{
+            marginTop: "24px",
+            paddingTop: "20px",
+            borderTop: "1px solid rgba(0,0,0,0.06)",
+            textAlign: "center",
+            fontSize: "13px",
+          }}
+        >
+          <span style={{ color: "var(--color-muted)" }}>قبلاً ثبت‌نام کرده‌اید؟ </span>
+          <Link
+            href="/login"
+            style={{
+              color: "var(--color-primary)",
+              fontWeight: 600,
+              textDecoration: "none",
+            }}
+          >
             ورود به حساب
-          </a>
-        </p>
+          </Link>
+        </div>
+
+        <div
+          style={{
+            marginTop: "20px",
+            textAlign: "center",
+            fontSize: "11px",
+            color: "var(--color-muted)",
+          }}
+        >
+          با ثبت‌نام،{" "}
+          <Link href="/terms" style={{ textDecoration: "underline" }}>
+            قوانین و مقررات
+          </Link>{" "}
+          و{" "}
+          <Link href="/privacy" style={{ textDecoration: "underline" }}>
+            حریم خصوصی
+          </Link>{" "}
+          طلابین را می‌پذیرید.
+        </div>
       </div>
     </div>
   );

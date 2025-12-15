@@ -1,5 +1,9 @@
 "use client";
+
 import { useState } from "react";
+import { Card } from "@/components/Card";
+import { Button } from "@/components/Button";
+import { Badge } from "@/components/Badge";
 
 export default function InstallmentBuyPage() {
   const goldPrice = 11000000; // قیمت لحظه‌ای طلا (مثال)
@@ -10,7 +14,7 @@ export default function InstallmentBuyPage() {
   const [approvedCredit, setApprovedCredit] = useState<number | null>(null);
   const [boughtGold, setBoughtGold] = useState<number | null>(null);
 
-  // ---- شبیه‌سازی درخواست به تامین‌کننده ----
+  // شبیه‌سازی درخواست به تامین‌کننده
   const requestFromSupplier = async (amount: number) => {
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -22,7 +26,7 @@ export default function InstallmentBuyPage() {
     });
   };
 
-  // ---- ارسال درخواست خرید قسطی ----
+  // ارسال درخواست خرید قسطی
   const handleInstallmentRequest = async () => {
     if (amount < 1000000) {
       alert("حداقل مبلغ درخواست ۱,۰۰۰,۰۰۰ تومان است");
@@ -35,67 +39,186 @@ export default function InstallmentBuyPage() {
     const response: any = await requestFromSupplier(amount);
 
     if (response.status === "approved") {
-      setStatusMsg("درخواست تایید شد ✔");
+      setStatusMsg("درخواست تایید شد");
       setApprovedCredit(response.creditAmount);
 
       // مقدار طلا
       const gold = response.creditAmount / goldPrice;
       setBoughtGold(gold);
     } else {
-      setStatusMsg("درخواست رد شد ❌");
+      setStatusMsg("درخواست رد شد");
     }
 
     setLoading(false);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-yellow-50 to-yellow-100 p-6">
-      <div className="max-w-lg mx-auto bg-white rounded-xl p-6 shadow-lg">
-        
-        <h1 className="text-2xl font-bold text-yellow-600 text-center mb-6">
+    <div className="min-h-screen" style={{ padding: "20px 16px 80px" }}>
+      <div style={{ maxWidth: "600px", margin: "0 auto" }}>
+        <h1
+          style={{
+            fontSize: "20px",
+            fontWeight: 600,
+            margin: "0 0 6px",
+          }}
+        >
           خرید قسطی طلا
         </h1>
-
-        {/* مبلغ */}
-        <label className="block text-black font-medium mb-2">مبلغ موردنظر (تومان)</label>
-        <input
-          type="number"
-          value={amount}
-          onChange={(e) => setAmount(parseInt(e.target.value))}
-          className="w-full p-3 border rounded-lg text-black"
-          placeholder="مثال: 20000000"
-        />
-
-        {/* دکمه ارسال */}
-        <button
-          onClick={handleInstallmentRequest}
-          className="w-full mt-4 bg-yellow-500 text-black py-3 rounded-lg hover:bg-yellow-600 transition"
-          disabled={loading}
+        <p
+          style={{
+            fontSize: "13px",
+            color: "var(--color-muted)",
+            margin: "0 0 20px",
+          }}
         >
-          {loading ? "در حال پردازش..." : "ارسال درخواست خرید قسطی"}
-        </button>
+          خرید طلا با تسهیلات قسطی
+        </p>
 
-        {/* پیام وضعیت */}
-        {statusMsg && (
-          <div className="mt-4 p-3 bg-yellow-50 text-black rounded-lg text-center">
+      <Card style={{ marginBottom: "12px" }}>
+        <div
+          style={{
+            fontSize: "12px",
+            color: "var(--color-muted)",
+            marginBottom: "8px",
+          }}
+        >
+          قیمت لحظه‌ای طلا
+        </div>
+        <div style={{ marginTop: "6px" }}>
+          <span style={{ fontSize: "22px", fontWeight: 700 }}>
+            {goldPrice.toLocaleString()}
+          </span>
+          <span
+            style={{
+              fontSize: "13px",
+              fontWeight: 400,
+              color: "var(--color-muted)",
+              marginRight: "6px",
+            }}
+          >
+            تومان (هر گرم)
+          </span>
+        </div>
+      </Card>
+
+      <Card style={{ marginBottom: "12px" }}>
+        <div className="form-group" style={{ marginBottom: 0 }}>
+          <label className="form-label">مبلغ موردنظر (تومان)</label>
+          <input
+            type="number"
+            value={amount}
+            onChange={(e) => setAmount(parseInt(e.target.value) || 0)}
+            className="form-input"
+            placeholder="مثال: 20,000,000"
+          />
+          <small className="form-hint">
+            حداقل مبلغ درخواست: ۱,۰۰۰,۰۰۰ تومان
+          </small>
+        </div>
+      </Card>
+
+      <Button
+        variant="primary"
+        onClick={handleInstallmentRequest}
+        disabled={loading}
+        style={{ marginBottom: "12px", width: "100%" }}
+      >
+        {loading ? "در حال پردازش..." : "ارسال درخواست خرید قسطی"}
+      </Button>
+
+      {statusMsg && (
+        <Card style={{ marginBottom: "12px" }}>
+          <div
+            style={{
+              fontSize: "13px",
+              textAlign: "center",
+              color: "var(--color-muted)",
+            }}
+          >
             {statusMsg}
           </div>
-        )}
+        </Card>
+      )}
 
-        {/* نتیجه تایید */}
-        {approvedCredit && (
-          <div className="mt-6 p-4 bg-green-50 rounded-lg text-black">
-            <h2 className="font-semibold">اعتبار تایید شده:</h2>
-            <p className="mt-1 text-lg font-bold text-green-700">
-              {approvedCredit.toLocaleString()} تومان
-            </p>
-
-            <h2 className="mt-4 font-semibold">میزان طلای خریداری‌شده:</h2>
-            <p className="mt-1 text-lg font-bold text-yellow-600">
-              {boughtGold?.toFixed(4)} گرم
-            </p>
+      {approvedCredit && (
+        <Card style={{ marginBottom: "12px" }}>
+          <div
+            style={{
+              fontSize: "12px",
+              color: "var(--color-muted)",
+              marginBottom: "12px",
+            }}
+          >
+            نتیجه درخواست
           </div>
-        )}
+
+          <div style={{ marginBottom: "12px" }}>
+            <div
+              style={{
+                fontSize: "12px",
+                color: "var(--color-muted)",
+                marginBottom: "4px",
+              }}
+            >
+              اعتبار تایید شده
+            </div>
+            <div
+              style={{
+                fontSize: "18px",
+                fontWeight: 700,
+                color: "var(--color-success)",
+              }}
+            >
+              {approvedCredit.toLocaleString()} تومان
+            </div>
+          </div>
+
+          <div>
+            <div
+              style={{
+                fontSize: "12px",
+                color: "var(--color-muted)",
+                marginBottom: "4px",
+              }}
+            >
+              میزان طلای خریداری‌شده
+            </div>
+            <div
+              style={{
+                fontSize: "18px",
+                fontWeight: 700,
+              }}
+            >
+              {boughtGold?.toFixed(4)} گرم
+            </div>
+          </div>
+        </Card>
+      )}
+
+      <Card>
+        <div
+          style={{
+            fontSize: "12px",
+            color: "var(--color-muted)",
+            marginBottom: "8px",
+          }}
+        >
+          نحوه کار خرید قسطی
+        </div>
+        <ul
+          style={{
+            fontSize: "13px",
+            lineHeight: 1.8,
+            margin: 0,
+            paddingRight: "18px",
+          }}
+        >
+          <li>درخواست خرید قسطی خود را ثبت کنید</li>
+          <li>پس از بررسی، میزان اعتبار تایید شده اعلام می‌شود</li>
+          <li>طلای خریداری شده به حساب شما واریز می‌گردد</li>
+          <li>اقساط ماهانه از حساب شما کسر خواهد شد</li>
+        </ul>
+      </Card>
       </div>
     </div>
   );

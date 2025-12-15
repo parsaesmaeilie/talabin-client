@@ -1,102 +1,243 @@
 "use client";
 
 import Link from "next/link";
+import { Card } from "@/components/Card";
+import { Button } from "@/components/Button";
+import { Badge } from "@/components/Badge";
 
 export default function ProfilePage() {
-  // فرض کنید اطلاعات کاربر از جایی مثل Context یا API دریافت می‌شود
-  const user = {
-    firstName: "علی",
-    lastName: "رضایی",
-    phone: "09123456789",
-    email: "ali@example.com",
-    nationalId: "1234567890",
-    registrationDate: "1400/01/01",
-    totalPurchases: 5,
-    userMoney: 5000000, // موجودی کیف پول (تومان)
-    userGold: 10.5 // موجودی طلا (گرم)
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-yellow-50 to-yellow-100 p-4 text-gray-900">
-      <div className="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-lg border border-yellow-200" dir="rtl">
-        <h1 className="text-2xl font-bold text-center mb-6 text-yellow-700">پروفایل کاربری</h1>
+    <div className="min-h-screen" style={{ padding: "16px 12px 80px" }}>
+      <h1
+        style={{
+          fontSize: "18px",
+          fontWeight: 600,
+          margin: "8px 0 6px",
+        }}
+      >
+        پروفایل و تنظیمات
+      </h1>
+      <p
+        style={{
+          fontSize: "13px",
+          color: "var(--color-muted)",
+          margin: "0 0 16px",
+        }}
+      >
+        اطلاعات حساب، امنیت، کارت‌ها و تنظیمات اعلان‌ها
+      </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* نام و نام خانوادگی */}
-          <div>
-            <label className="text-sm font-medium text-gray-900">نام</label>
-            <div className="p-3 bg-gray-100 rounded-lg">{user.firstName} {user.lastName}</div>
-          </div>
-
-          {/* شماره موبایل */}
-          <div>
-            <label className="text-sm font-medium text-gray-900">شماره موبایل</label>
-            <div className="p-3 bg-gray-100 rounded-lg">{user.phone}</div>
-          </div>
-
-          {/* ایمیل */}
-          <div>
-            <label className="text-sm font-medium text-gray-900">ایمیل</label>
-            <div className="p-3 bg-gray-100 rounded-lg">{user.email}</div>
-          </div>
-
-          {/* کد ملی */}
-          <div>
-            <label className="text-sm font-medium text-gray-900">کد ملی</label>
-            <div className="p-3 bg-gray-100 rounded-lg">{user.nationalId}</div>
-          </div>
-
-          {/* تاریخ ثبت نام */}
-          <div>
-            <label className="text-sm font-medium text-gray-900">تاریخ ثبت‌نام</label>
-            <div className="p-3 bg-gray-100 rounded-lg">{user.registrationDate}</div>
-          </div>
-
-          {/* تعداد کل خریدها */}
-          <div>
-            <label className="text-sm font-medium text-gray-900">تعداد کل خریدها</label>
-            <div className="p-3 bg-gray-100 rounded-lg">{user.totalPurchases}</div>
-          </div>
-
-          {/* موجودی کیف پول */}
-          <div>
-            <label className="text-sm font-medium text-black">موجودی کیف پول</label>
-            <div className="p-3 bg-gray-200 text-black rounded-lg font-semibold">
-              {user.userMoney.toLocaleString()} تومان
-            </div>
-            <div className="mt-2 flex gap-4">
-              {/* دکمه شارژ حساب */}
-              <Link href="dashboard/wallet/deposit">
-                <button className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition duration-300">
-                  شارژ حساب
-                </button>
-              </Link>
-              {/* دکمه برداشت از حساب */}
-              <Link href="dashboard/wallet/withdraw">
-                <button className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-300">
-                  برداشت از حساب
-                </button>
-              </Link>
-            </div>
-          </div>
-
-          {/* موجودی طلا */}
-          <div>
-            <label className="text-sm font-medium text-gray-900">موجودی طلا</label>
-            <div className="p-3 bg-gray-100 rounded-lg">{user.userGold.toFixed(2)} گرم</div>
-          </div>
-        </div>
-
-        {/* دکمه احراز هویت */}
-        <div className="flex justify-center mt-6">
+      {/* User Info Card */}
+      <Card style={{ marginBottom: "12px" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "12px",
+          }}
+        >
+          <span style={{ fontSize: "12px", color: "var(--color-muted)" }}>
+            مشخصات کاربر
+          </span>
           <Link
-            href="/profile/verification"
-            className="bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-4 rounded-lg font-semibold transition duration-300"
+            href="/profile/edit"
+            style={{ fontSize: "11px", color: "var(--color-muted)" }}
           >
-            احراز هویت
+            ویرایش
           </Link>
         </div>
-      </div>
+
+        <div style={{ marginBottom: "10px" }}>
+          <div
+            style={{
+              fontSize: "12px",
+              color: "var(--color-muted)",
+              marginBottom: "3px",
+            }}
+          >
+            نام و نام خانوادگی
+          </div>
+          <div style={{ fontSize: "13px" }}>علی رضایی</div>
+        </div>
+
+        <div>
+          <div
+            style={{
+              fontSize: "12px",
+              color: "var(--color-muted)",
+              marginBottom: "3px",
+            }}
+          >
+            شماره موبایل
+          </div>
+          <div style={{ fontSize: "13px" }}>۰۹۱۲ ۳۴۵ ۶۷۸۹</div>
+        </div>
+      </Card>
+
+      {/* Verification Status Card */}
+      <Card style={{ marginBottom: "12px" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "8px",
+          }}
+        >
+          <span style={{ fontSize: "12px", color: "var(--color-muted)" }}>
+            وضعیت احراز هویت
+          </span>
+          <Badge variant="green">تایید شده</Badge>
+        </div>
+
+        <div style={{ fontSize: "12px", color: "var(--color-muted)" }}>
+          در صورت نیاز به ویرایش اطلاعات هویتی، با پشتیبانی در تماس باش.
+        </div>
+      </Card>
+
+      {/* Bank Cards Card */}
+      <Card style={{ marginBottom: "12px" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "8px",
+          }}
+        >
+          <span style={{ fontSize: "12px", color: "var(--color-muted)" }}>
+            کارت‌های بانکی
+          </span>
+          <Link
+            href="/profile/cards"
+            style={{ fontSize: "11px", color: "var(--color-muted)" }}
+          >
+            مدیریت کارت‌ها
+          </Link>
+        </div>
+
+        <div
+          style={{
+            borderRadius: "var(--radius-md)",
+            border: "1px solid rgba(0,0,0,0.04)",
+            background: "#FBFAF7",
+            padding: "6px 8px",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              padding: "8px 4px",
+              borderBottom: "1px solid rgba(0,0,0,0.04)",
+              fontSize: "12px",
+            }}
+          >
+            <div>
+              <div>کارت پایان با ۶۵۳۲</div>
+              <div
+                style={{
+                  fontSize: "11px",
+                  color: "var(--color-muted)",
+                  marginTop: "3px",
+                }}
+              >
+                بانک ملت
+              </div>
+            </div>
+            <Badge>پیش‌فرض</Badge>
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              padding: "8px 4px",
+              fontSize: "12px",
+            }}
+          >
+            <div>افزودن کارت جدید</div>
+            <Badge>+</Badge>
+          </div>
+        </div>
+      </Card>
+
+      {/* Security Card */}
+      <Card style={{ marginBottom: "12px" }}>
+        <div
+          style={{
+            fontSize: "12px",
+            color: "var(--color-muted)",
+            marginBottom: "8px",
+          }}
+        >
+          امنیت حساب
+        </div>
+
+        <div
+          style={{
+            borderRadius: "var(--radius-md)",
+            border: "1px solid rgba(0,0,0,0.04)",
+            background: "#FBFAF7",
+            padding: "6px 8px",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              padding: "8px 4px",
+              borderBottom: "1px solid rgba(0,0,0,0.04)",
+              fontSize: "12px",
+            }}
+          >
+            <span>تغییر رمز عبور</span>
+            <span style={{ color: "var(--color-muted)" }}>••••••</span>
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              padding: "8px 4px",
+              borderBottom: "1px solid rgba(0,0,0,0.04)",
+              fontSize: "12px",
+            }}
+          >
+            <span>ورود دو مرحله‌ای</span>
+            <Badge variant="green">فعال</Badge>
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              padding: "8px 4px",
+              fontSize: "12px",
+            }}
+          >
+            <span>دستگاه‌های وارد شده</span>
+            <span style={{ color: "var(--color-muted)" }}>۲ دستگاه</span>
+          </div>
+        </div>
+      </Card>
+
+      {/* Logout Button */}
+      <Button
+        variant="outline"
+        fullWidth
+        asLink
+        href="/login"
+        style={{ marginTop: "10px" }}
+      >
+        خروج از حساب کاربری
+      </Button>
     </div>
   );
 }
