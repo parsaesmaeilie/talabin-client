@@ -28,7 +28,7 @@ export default function RegisterPage() {
               placeholder=" خود را وارد کنید"
               className="w-full rounded-lg border border-gray-300 p-3 focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition text-gray-500"
             />
-            {errors.firstName && <p className="text-sm text-red-500">{errors.firstName.message}</p>}
+            {errors.firstName && <p className="text-sm text-red-500">{String(errors.firstName.message)}</p>}
           </div>
 
           {/* نام خانوادگی */}
@@ -39,7 +39,7 @@ export default function RegisterPage() {
               placeholder="نام خانوادگی "
               className="w-full rounded-lg border border-gray-300 p-3 focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition text-gray-500"
             />
-            {errors.lastName && <p className="text-sm text-red-500">{errors.lastName.message}</p>}
+            {errors.lastName && <p className="text-sm text-red-500">{String(errors.lastName.message)}</p>}
           </div>
           </div>
 
@@ -80,7 +80,7 @@ export default function RegisterPage() {
               placeholder="******"
               className="w-full rounded-lg border border-gray-300 p-3 focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition text-gray-500"
             />
-            {errors.password && <p className="text-sm text-red-500">{errors.password.message}</p>}
+            {errors.password?.message && (<p className="text-sm text-red-500">{String(errors.password.message)}</p>)}
           </div>
 
           {/* تایید رمز عبور */}
@@ -95,7 +95,7 @@ export default function RegisterPage() {
               placeholder="تایید رمز عبور"
               className="w-full rounded-lg border border-gray-300 p-3 focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition text-gray-500"
             />
-            {errors.confirmPassword && <p className="text-sm text-red-500">{errors.confirmPassword.message}</p>}
+            {errors.confirmPassword?.message && <p className="text-sm text-red-500">{String(errors.confirmPassword.message)}</p>}
           </div>
 
           <button
