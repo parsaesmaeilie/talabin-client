@@ -22,7 +22,9 @@
       "Bash(venv/Scripts/python.exe:*)",
       "Bash(set:*)",
       "Bash(netstat:*)",
-      "Bash(findstr:*)"
+      "Bash(findstr:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
     ]
   }
 }
