@@ -4,12 +4,23 @@ Custom exception handlers for the API.
 from rest_framework.views import exception_handler
 from rest_framework.response import Response
 from rest_framework import status
+from django_ratelimit.exceptions import Ratelimited
 
 
 def custom_exception_handler(exc, context):
     """
     Custom exception handler that returns consistent error responses.
     """
+    # Handle rate limit exceptions
+    if isinstance(exc, Ratelimited):
+        return Response({
+            'success': False,
+            'error': {
+                'message': 'تعداد درخواست‌های شما از حد مجاز گذشته است. لطفاً بعداً تلاش کنید.',
+                'code': 'rate_limit_exceeded'
+            }
+        }, status=status.HTTP_429_TOO_MANY_REQUESTS)
+
     response = exception_handler(exc, context)
 
     if response is not None:

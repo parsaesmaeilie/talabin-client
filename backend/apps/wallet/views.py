@@ -7,6 +7,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.db import transaction
 from django.conf import settings
+from django_ratelimit.decorators import ratelimit
+from django.utils.decorators import method_decorator
 
 from .models import Wallet, WalletTransaction, BankAccount, DepositRequest, WithdrawalRequest
 from .serializers import (
@@ -137,6 +139,7 @@ class DepositViewSet(viewsets.ModelViewSet):
         """Return current user's deposits."""
         return DepositRequest.objects.filter(user=self.request.user)
 
+    @method_decorator(ratelimit(key='user', rate='20/h', method='POST'))
     @action(detail=False, methods=['post'])
     def create_deposit(self, request):
         """Create a new deposit request."""
@@ -176,6 +179,7 @@ class DepositViewSet(viewsets.ModelViewSet):
             'data': DepositRequestSerializer(deposit).data
         }, status=status.HTTP_201_CREATED)
 
+    @method_decorator(ratelimit(key='user', rate='10/h', method='POST'))
     @action(detail=True, methods=['post'])
     def upload_receipt(self, request, pk=None):
         """Upload deposit receipt."""
@@ -215,6 +219,7 @@ class WithdrawalViewSet(viewsets.ModelViewSet):
         """Return current user's withdrawals."""
         return WithdrawalRequest.objects.filter(user=self.request.user)
 
+    @method_decorator(ratelimit(key='user', rate='10/h', method='POST'))
     @action(detail=False, methods=['post'])
     @transaction.atomic
     def create_withdrawal(self, request):

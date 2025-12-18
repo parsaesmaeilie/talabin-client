@@ -5,6 +5,7 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 from apps.core.models import TimeStampedModel
+from apps.core.validators import validate_image_file_extension, validate_file_size
 
 
 class UserManager(BaseUserManager):
@@ -50,7 +51,13 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampedModel):
     national_id = models.CharField(max_length=10, blank=True, null=True, unique=True, verbose_name='کد ملی')
 
     # Profile fields
-    profile_image = models.ImageField(upload_to='profiles/', blank=True, null=True, verbose_name='تصویر پروفایل')
+    profile_image = models.ImageField(
+        upload_to='profiles/',
+        blank=True,
+        null=True,
+        verbose_name='تصویر پروفایل',
+        validators=[validate_image_file_extension, validate_file_size]
+    )
     date_of_birth = models.DateField(blank=True, null=True, verbose_name='تاریخ تولد')
 
     # Verification fields
@@ -61,8 +68,20 @@ class User(AbstractBaseUser, PermissionsMixin, TimeStampedModel):
         default='pending',
         verbose_name='وضعیت تایید هویت'
     )
-    id_card_image = models.ImageField(upload_to='id_cards/', blank=True, null=True, verbose_name='تصویر کارت ملی')
-    selfie_image = models.ImageField(upload_to='selfies/', blank=True, null=True, verbose_name='تصویر سلفی')
+    id_card_image = models.ImageField(
+        upload_to='id_cards/',
+        blank=True,
+        null=True,
+        verbose_name='تصویر کارت ملی',
+        validators=[validate_image_file_extension, validate_file_size]
+    )
+    selfie_image = models.ImageField(
+        upload_to='selfies/',
+        blank=True,
+        null=True,
+        verbose_name='تصویر سلفی',
+        validators=[validate_image_file_extension, validate_file_size]
+    )
 
     # Status fields
     is_active = models.BooleanField(default=True, verbose_name='فعال')

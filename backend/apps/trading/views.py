@@ -9,6 +9,8 @@ from django.db import transaction
 from django.utils import timezone
 from django.conf import settings
 from decimal import Decimal
+from django_ratelimit.decorators import ratelimit
+from django.utils.decorators import method_decorator
 
 from .models import Order
 from .serializers import OrderSerializer, CreateOrderSerializer, OrderSummarySerializer
@@ -74,6 +76,7 @@ class OrderViewSet(viewsets.ModelViewSet):
             'data': preview_data
         })
 
+    @method_decorator(ratelimit(key='user', rate='100/h', method='POST'))
     @action(detail=False, methods=['post'])
     @transaction.atomic
     def place_order(self, request):

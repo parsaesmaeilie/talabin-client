@@ -69,8 +69,10 @@ class Transaction(TimeStampedModel):
         db_table = 'transactions'
         ordering = ['-created_at']
         indexes = [
-            models.Index(fields=['user', '-created_at']),
-            models.Index(fields=['reference_id']),
+            models.Index(fields=['user', '-created_at'], name='trans_user_created_idx'),
+            models.Index(fields=['reference_id'], name='trans_ref_id_idx'),
+            models.Index(fields=['transaction_type', 'status'], name='trans_type_status_idx'),
+            models.Index(fields=['status', '-created_at'], name='trans_status_created_idx'),
         ]
 
     def __str__(self):

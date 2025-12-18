@@ -4,6 +4,7 @@ Wallet models for managing user balances.
 from django.db import models
 from django.conf import settings
 from apps.core.models import TimeStampedModel
+from apps.core.validators import validate_receipt_file
 from decimal import Decimal
 
 
@@ -227,7 +228,8 @@ class DepositRequest(TimeStampedModel):
         upload_to='deposits/',
         blank=True,
         null=True,
-        verbose_name='تصویر رسید'
+        verbose_name='تصویر رسید',
+        validators=[validate_receipt_file]
     )
     notes = models.TextField(blank=True, verbose_name='یادداشت')
 

@@ -10,6 +10,8 @@ from django.contrib.auth import authenticate
 from django.utils import timezone
 from datetime import timedelta
 from django.conf import settings
+from django_ratelimit.decorators import ratelimit
+from django.utils.decorators import method_decorator
 
 from .models import User, OTP, UserAddress
 from .serializers import (
@@ -19,6 +21,7 @@ from .serializers import (
 )
 from apps.core.utils import generate_otp, is_otp_expired
 from apps.core.exceptions import OTPExpiredException, InvalidOTPException
+from apps.core.sms import sms_service
 
 
 class AuthViewSet(viewsets.GenericViewSet):
@@ -26,6 +29,7 @@ class AuthViewSet(viewsets.GenericViewSet):
 
     permission_classes = [AllowAny]
 
+    @method_decorator(ratelimit(key='ip', rate='5/h', method='POST'))
     @action(detail=False, methods=['post'])
     def register(self, request):
         """Register a new user."""
@@ -50,18 +54,27 @@ class AuthViewSet(viewsets.GenericViewSet):
             expires_at=expires_at
         )
 
-        # TODO: Send OTP via SMS
-        # send_sms(user.phone_number, f'کد تایید شما: {otp_code}')
+        # Send OTP via SMS
+        sms_sent = sms_service.send_otp(
+            phone_number=str(user.phone_number),
+            otp_code=otp_code
+        )
+
+        if not sms_sent and not settings.DEBUG:
+            return Response({
+                'success': False,
+                'error': {'message': 'خطا در ارسال پیامک. لطفاً دوباره تلاش کنید.'}
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response({
             'success': True,
             'message': 'ثبت‌نام با موفقیت انجام شد. کد تایید به شماره شما ارسال شد.',
             'data': {
                 'phone_number': str(user.phone_number),
-                'otp_code': otp_code  # Remove in production
             }
         }, status=status.HTTP_201_CREATED)
 
+    @method_decorator(ratelimit(key='ip', rate='10/h', method='POST'))
     @action(detail=False, methods=['post'])
     def login(self, request):
         """Login user with phone and password."""
@@ -100,6 +113,7 @@ class AuthViewSet(viewsets.GenericViewSet):
             }
         })
 
+    @method_decorator(ratelimit(key='ip', rate='3/5m', method='POST'))
     @action(detail=False, methods=['post'])
     def send_otp(self, request):
         """Send OTP to phone number."""
@@ -121,17 +135,25 @@ class AuthViewSet(viewsets.GenericViewSet):
             expires_at=expires_at
         )
 
-        # TODO: Send OTP via SMS
-        # send_sms(phone_number, f'کد تایید شما: {otp_code}')
+        # Send OTP via SMS
+        sms_sent = sms_service.send_otp(
+            phone_number=str(phone_number),
+            otp_code=otp_code
+        )
+
+        if not sms_sent and not settings.DEBUG:
+            return Response({
+                'success': False,
+                'error': {'message': 'خطا در ارسال پیامک. لطفاً دوباره تلاش کنید.'}
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response({
             'success': True,
             'message': 'کد تایید ارسال شد',
-            'data': {
-                'otp_code': otp_code  # Remove in production
-            }
+            'data': {}
         })
 
+    @method_decorator(ratelimit(key='user_or_ip', rate='5/10m', method='POST'))
     @action(detail=False, methods=['post'])
     def verify_otp(self, request):
         """Verify OTP code."""
@@ -227,6 +249,7 @@ class UserViewSet(viewsets.ModelViewSet):
             'data': UserSerializer(request.user).data
         })
 
+    @method_decorator(ratelimit(key='user', rate='5/h', method='POST'))
     @action(detail=False, methods=['post'])
     def change_password(self, request):
         """Change user password."""

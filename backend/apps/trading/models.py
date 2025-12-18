@@ -87,6 +87,12 @@ class Order(TimeStampedModel):
         verbose_name_plural = 'سفارشات'
         db_table = 'orders'
         ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['user', '-created_at'], name='user_created_idx'),
+            models.Index(fields=['status', '-created_at'], name='status_created_idx'),
+            models.Index(fields=['order_type', 'status'], name='type_status_idx'),
+            models.Index(fields=['order_number'], name='order_number_idx'),
+        ]
 
     def __str__(self):
         return f"{self.get_order_type_display()} - {self.user.phone_number} - {self.order_number}"
