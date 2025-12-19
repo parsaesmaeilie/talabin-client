@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backend Connection Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-card {
+            background: white;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .success {
+            color: #22c55e;
+            font-weight: bold;
+        }
+        .error {
+            color: #ef4444;
+            font-weight: bold;
+        }
+        .loading {
+            color: #3b82f6;
+        }
+        pre {
+            background: #f3f4f6;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Backend Connection Test</h1>
+
+    <div class="test-card">
+        <h3>Test 1: Backend Root</h3>
+        <p id="test1-status" class="loading">Testing...</p>
+        <pre id="test1-result"></pre>
+    </div>
+
+    <div class="test-card">
+        <h3>Test 2: Gold Prices API</h3>
+        <p id="test2-status" class="loading">Testing...</p>
+        <pre id="test2-result"></pre>
+    </div>
+
+    <div class="test-card">
+        <h3>Test 3: Login Test</h3>
+        <p id="test3-status" class="loading">Testing...</p>
+        <pre id="test3-result"></pre>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000';
+
+        async function test1() {
+            try {
+                const response = await fetch(`${API_URL}/`);
+                const data = await response.json();
+                document.getElementById('test1-status').className = 'success';
+                document.getElementById('test1-status').textContent = '✓ Success';
+                document.getElementById('test1-result').textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('test1-status').className = 'error';
+                document.getElementById('test1-status').textContent = '✗ Failed';
+                document.getElementById('test1-result').textContent = error.message;
+            }
+        }
+
+        async function test2() {
+            try {
+                const response = await fetch(`${API_URL}/api/prices/gold/current/`);
+                const data = await response.json();
+                document.getElementById('test2-status').className = 'success';
+                document.getElementById('test2-status').textContent = '✓ Success';
+                document.getElementById('test2-result').textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('test2-status').className = 'error';
+                document.getElementById('test2-status').textContent = '✗ Failed';
+                document.getElementById('test2-result').textContent = error.message;
+            }
+        }
+
+        async function test3() {
+            try {
+                const response = await fetch(`${API_URL}/api/auth/login/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        phone_number: '+989123456789',
+                        password: 'admin123'
+                    })
+                });
+                const data = await response.json();
+                document.getElementById('test3-status').className = 'success';
+                document.getElementById('test3-status').textContent = '✓ Success';
+                document.getElementById('test3-result').textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('test3-status').className = 'error';
+                document.getElementById('test3-status').textContent = '✗ Failed';
+                document.getElementById('test3-result').textContent = error.message;
+            }
+        }
+
+        // Run tests
+        test1();
+        test2();
+        test3();
+    </script>
+</body>
+</html>

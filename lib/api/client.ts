@@ -50,7 +50,11 @@ class ApiClient {
       ...options.headers,
     };
 
-    if (this.token) {
+    // Don't send Authorization header for login/register endpoints
+    const publicEndpoints = ['/auth/login/', '/auth/register/', '/auth/send-otp/'];
+    const isPublicEndpoint = publicEndpoints.some(pe => endpoint.includes(pe));
+
+    if (this.token && !isPublicEndpoint) {
       headers['Authorization'] = `Bearer ${this.token}`;
     }
 

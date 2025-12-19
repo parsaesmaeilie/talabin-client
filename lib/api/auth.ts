@@ -44,6 +44,9 @@ export const authService = {
   },
 
   async login(data: LoginData): Promise<ApiResponse<LoginResponse>> {
+    // Clear any existing token before login to avoid 401 errors
+    apiClient.setToken(null);
+
     const response = await apiClient.post<LoginResponse>('/auth/login/', data);
 
     if (response.success && response.data?.tokens.access) {

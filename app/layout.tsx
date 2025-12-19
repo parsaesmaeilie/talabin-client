@@ -22,7 +22,7 @@ export default function RootLayout({
       </head>
       <body style={{ fontFamily: '"Vazirmatn", system-ui, -apple-system, BlinkMacSystemFont, sans-serif' }}>
         <Navbar />
-        <div className="pt-16 md:pt-20 select-none">{children}</div>
+        <div className="pt-16 md:pt-20 select-none page-transition">{children}</div>
       </body>
     </html>
   );

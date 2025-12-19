@@ -6,8 +6,31 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+from django.http import JsonResponse
+
+def api_root(request):
+    """Root endpoint showing API status and available endpoints"""
+    return JsonResponse({
+        'status': 'ok',
+        'message': 'Talabin API is running',
+        'version': '1.0.0',
+        'endpoints': {
+            'documentation': '/api/docs/',
+            'schema': '/api/schema/',
+            'admin': '/admin/',
+            'auth': '/api/auth/',
+            'wallet': '/api/wallet/',
+            'trading': '/api/trading/',
+            'transactions': '/api/transactions/',
+            'prices': '/api/prices/',
+            'installments': '/api/installments/',
+        }
+    })
 
 urlpatterns = [
+    # Root endpoint
+    path('', api_root, name='api-root'),
+
     # Admin
     path('admin/', admin.site.urls),
 

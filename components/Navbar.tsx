@@ -1,10 +1,62 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { authService } from "@/lib/api/auth";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    const checkAuth = () => {
+      const authenticated = authService.isAuthenticated();
+      const userData = authService.getUser();
+      setIsAuthenticated(authenticated);
+      setUser(userData);
+    };
+
+    checkAuth();
+
+    // Check auth on storage changes (e.g., login in another tab)
+    window.addEventListener('storage', checkAuth);
+    // Check auth on custom authChange event (e.g., login in same tab)
+    window.addEventListener('authChange', checkAuth);
+
+    return () => {
+      window.removeEventListener('storage', checkAuth);
+      window.removeEventListener('authChange', checkAuth);
+    };
+  }, []);
+
+  // Close user menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (showUserMenu && !target.closest('.user-menu-container')) {
+        setShowUserMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showUserMenu]);
+
+  const handleLogout = async () => {
+    try {
+      await authService.logout();
+      setIsAuthenticated(false);
+      setUser(null);
+      setShowUserMenu(false);
+      router.push('/');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
 
   return (
     <nav
@@ -115,53 +167,119 @@ export default function Navbar() {
           </svg>
         </button>
 
-        {/* دکمه‌های ورود و ثبت‌نام */}
+        {/* دکمه‌های ورود و ثبت‌نام یا منوی کاربر */}
         <div className="hidden md:flex items-center gap-2.5">
-          <Link
-            href="/login"
-            className="inline-flex items-center justify-center gap-1.5 text-xs md:text-sm font-medium transition-all"
-            style={{
-              borderRadius: '999px',
-              padding: '8px 14px',
-              border: '1px solid transparent',
-              background: 'rgba(28,28,28,0.02)',
-              borderColor: 'rgba(28,28,28,0.06)',
-              color: 'inherit',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'rgba(28,28,28,0.04)';
-              e.currentTarget.style.borderColor = 'rgba(28,28,28,0.16)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'rgba(28,28,28,0.02)';
-              e.currentTarget.style.borderColor = 'rgba(28,28,28,0.06)';
-            }}
-          >
-            ورود
-          </Link>
+          {!isAuthenticated ? (
+            <>
+              <Link
+                href="/login"
+                className="inline-flex items-center justify-center gap-1.5 text-xs md:text-sm font-medium transition-all"
+                style={{
+                  borderRadius: '999px',
+                  padding: '8px 14px',
+                  border: '1px solid transparent',
+                  background: 'rgba(28,28,28,0.02)',
+                  borderColor: 'rgba(28,28,28,0.06)',
+                  color: 'inherit',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(28,28,28,0.04)';
+                  e.currentTarget.style.borderColor = 'rgba(28,28,28,0.16)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(28,28,28,0.02)';
+                  e.currentTarget.style.borderColor = 'rgba(28,28,28,0.06)';
+                }}
+              >
+                ورود
+              </Link>
 
-          <Link
-            href="/register"
-            className="inline-flex items-center justify-center gap-1.5 text-xs md:text-sm font-medium transition-all"
-            style={{
-              borderRadius: '999px',
-              padding: '8px 14px',
-              border: '1px solid #FFC857',
-              background: '#FFC857',
-              color: '#1C1C1C',
-              boxShadow: '0 10px 18px rgba(255, 200, 87, 0.35)',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-1px)';
-              e.currentTarget.style.boxShadow = '0 14px 26px rgba(255, 200, 87, 0.45)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 10px 18px rgba(255, 200, 87, 0.35)';
-            }}
-          >
-            ثبت‌نام
-          </Link>
+              <Link
+                href="/register"
+                className="inline-flex items-center justify-center gap-1.5 text-xs md:text-sm font-medium transition-all"
+                style={{
+                  borderRadius: '999px',
+                  padding: '8px 14px',
+                  border: '1px solid #FFC857',
+                  background: '#FFC857',
+                  color: '#1C1C1C',
+                  boxShadow: '0 10px 18px rgba(255, 200, 87, 0.35)',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-1px)';
+                  e.currentTarget.style.boxShadow = '0 14px 26px rgba(255, 200, 87, 0.45)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 10px 18px rgba(255, 200, 87, 0.35)';
+                }}
+              >
+                ثبت‌نام
+              </Link>
+            </>
+          ) : (
+            <div className="relative user-menu-container">
+              <button
+                onClick={() => setShowUserMenu(!showUserMenu)}
+                className="inline-flex items-center justify-center gap-2 text-xs md:text-sm font-medium transition-all"
+                style={{
+                  borderRadius: '999px',
+                  padding: '8px 14px',
+                  border: '1px solid #FFC857',
+                  background: '#FFC857',
+                  color: '#1C1C1C',
+                  boxShadow: '0 4px 12px rgba(255, 200, 87, 0.25)',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.boxShadow = '0 6px 16px rgba(255, 200, 87, 0.35)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(255, 200, 87, 0.25)';
+                }}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                <span>{user?.full_name || user?.phone_number || 'کاربر'}</span>
+                <svg className={`w-4 h-4 transition-transform ${showUserMenu ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {showUserMenu && (
+                <div
+                  className="absolute left-0 mt-2 w-48 rounded-xl shadow-lg overflow-hidden"
+                  style={{
+                    background: 'rgba(250, 249, 246, 0.98)',
+                    backdropFilter: 'blur(12px)',
+                    border: '1px solid rgba(0,0,0,0.06)',
+                    boxShadow: '0 10px 40px rgba(0, 0, 0, 0.1)',
+                  }}
+                >
+                  <Link
+                    href="/profile"
+                    className="block px-4 py-3 text-sm transition-colors hover:bg-black/5"
+                    onClick={() => setShowUserMenu(false)}
+                  >
+                    پروفایل
+                  </Link>
+                  <Link
+                    href="/dashboard"
+                    className="block px-4 py-3 text-sm transition-colors hover:bg-black/5"
+                    onClick={() => setShowUserMenu(false)}
+                  >
+                    داشبورد
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full text-right px-4 py-3 text-sm transition-colors hover:bg-red-50 text-red-600"
+                  >
+                    خروج
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
@@ -217,20 +335,48 @@ export default function Navbar() {
             </Link>
 
             <div className="flex flex-col gap-2 mt-2 px-2">
-              <Link
-                href="/login"
-                className="btn btn-ghost text-center"
-                onClick={() => setIsOpen(false)}
-              >
-                ورود
-              </Link>
-              <Link
-                href="/register"
-                className="btn btn-primary text-center"
-                onClick={() => setIsOpen(false)}
-              >
-                ثبت‌نام
-              </Link>
+              {!isAuthenticated ? (
+                <>
+                  <Link
+                    href="/login"
+                    className="btn btn-ghost text-center"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    ورود
+                  </Link>
+                  <Link
+                    href="/register"
+                    className="btn btn-primary text-center"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    ثبت‌نام
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <div className="px-4 py-3 border-b" style={{ borderColor: 'rgba(0,0,0,0.06)' }}>
+                    <div className="text-sm font-medium">{user?.full_name || 'کاربر'}</div>
+                    <div className="text-xs" style={{ color: 'rgba(28, 28, 28, 0.5)' }}>{user?.phone_number}</div>
+                  </div>
+                  <Link
+                    href="/profile"
+                    className="px-4 py-2.5 rounded-lg transition-colors text-sm font-medium"
+                    style={{ color: 'rgba(28, 28, 28, 0.75)' }}
+                    onClick={() => setIsOpen(false)}
+                  >
+                    پروفایل
+                  </Link>
+                  <button
+                    onClick={() => {
+                      handleLogout();
+                      setIsOpen(false);
+                    }}
+                    className="px-4 py-2.5 rounded-lg transition-colors text-sm font-medium text-right text-red-600 hover:bg-red-50"
+                  >
+                    خروج
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>
