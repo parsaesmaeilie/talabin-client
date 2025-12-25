@@ -736,6 +736,43 @@ input:checked + .slider:before {
   }
 }
 
+@keyframes slideOutBottom {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-10px);
+  }
+  50% {
+    transform: translateX(0);
+  }
+  75% {
+    transform: translateX(10px);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+}
+
 .fade-in {
   animation: fadeIn 0.5s ease-out forwards;
 }
@@ -860,5 +897,483 @@ a:focus {
 
   .card:hover {
     transform: none;
+  }
+}
+
+/* ============================================
+   Bottom Navigation
+   ============================================ */
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #1C1C1C;
+  border-radius: 24px 24px 0 0;
+  padding: 12px 8px calc(12px + env(safe-area-inset-bottom));
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.bottom-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  text-decoration: none;
+  transition: all 0.2s;
+  cursor: pointer;
+  flex: 1;
+  max-width: 100px;
+}
+
+.bottom-nav-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.bottom-nav-item.active {
+  color: #FFC857;
+  background: rgba(255, 200, 87, 0.1);
+}
+
+.bottom-nav-icon {
+  font-size: 24px;
+  margin-bottom: 2px;
+}
+
+.bottom-nav-label {
+  font-size: 11px;
+  font-weight: 500;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.bottom-nav-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: #EF4444;
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 5px;
+  border-radius: 999px;
+  min-width: 16px;
+  text-align: center;
+}
+
+/* ============================================
+   Action Grid (Dark Card with Buttons)
+   ============================================ */
+
+.action-grid {
+  background: #1C1C1C;
+  border-radius: 24px;
+  padding: 20px 16px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin: 16px 0;
+}
+
+@media (max-width: 640px) {
+  .action-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+}
+
+.action-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 8px;
+  border-radius: 16px;
+  background: transparent;
+  border: none;
+  color: #FFFFFF;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+
+.action-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+.action-button-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  background: rgba(255, 200, 87, 0.15);
+  border-radius: 12px;
+}
+
+.action-button-label {
+  font-size: 12px;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+/* ============================================
+   Service Cards
+   ============================================ */
+
+.service-card {
+  background: #F5F5F5;
+  border-radius: 20px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: all 0.3s;
+  border: 1px solid transparent;
+  text-decoration: none;
+  color: inherit;
+}
+
+.service-card:hover {
+  background: #FFFFFF;
+  border-color: rgba(255, 200, 87, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.service-card-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+}
+
+.service-card-illustration {
+  width: 80px;
+  height: 80px;
+  flex-shrink: 0;
+}
+
+.service-card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1C1C1C;
+}
+
+.service-card-badge {
+  background: var(--color-warning);
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 999px;
+  margin-top: 4px;
+  display: inline-block;
+}
+
+@media (max-width: 640px) {
+  .service-card {
+    padding: 16px;
+  }
+
+  .service-card-illustration {
+    width: 60px;
+    height: 60px;
+  }
+}
+
+/* ============================================
+   Number Pad (Buy/Sell Page)
+   ============================================ */
+
+.number-pad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  padding: 20px;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.number-pad-button {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 600;
+  background: transparent;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #1C1C1C;
+  min-height: 60px;
+}
+
+.number-pad-button:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.number-pad-button:active {
+  background: rgba(0, 0, 0, 0.1);
+  transform: scale(0.95);
+}
+
+.number-pad-button.backspace {
+  font-size: 20px;
+}
+
+/* ============================================
+   Top Bar (Dashboard)
+   ============================================ */
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 0;
+  margin-bottom: 20px;
+}
+
+.top-bar-logo {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #FFC857;
+  border-radius: 12px;
+  font-weight: 700;
+  color: #1C1C1C;
+  font-size: 18px;
+}
+
+.top-bar-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.04);
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.top-bar-icon:hover {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.notification-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: #EF4444;
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 999px;
+  min-width: 18px;
+  text-align: center;
+}
+
+/* ============================================
+   Balance Card Enhancements
+   ============================================ */
+
+.balance-card {
+  background: white;
+  border-radius: 20px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+.balance-label {
+  font-size: 13px;
+  color: var(--color-muted);
+  margin-bottom: 4px;
+}
+
+.balance-amount {
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.balance-unit {
+  font-size: 12px;
+  color: var(--color-muted);
+  font-weight: 400;
+}
+
+/* ============================================
+   Illustration Containers
+   ============================================ */
+
+.illustration-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.illustration-img {
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.08));
+}
+
+/* ============================================
+   Tab Switcher (Buy/Sell)
+   ============================================ */
+
+.tab-switcher {
+  display: flex;
+  background: #F0F0F0;
+  border-radius: 999px;
+  padding: 4px;
+  gap: 4px;
+}
+
+.tab-button {
+  flex: 1;
+  padding: 10px 24px;
+  border-radius: 999px;
+  border: none;
+  background: transparent;
+  color: #1C1C1C;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tab-button.active {
+  background: #FFC857;
+  color: #1C1C1C;
+  box-shadow: 0 2px 8px rgba(255, 200, 87, 0.3);
+}
+
+/* ============================================
+   Animations
+   ============================================ */
+
+@keyframes slideInBottom {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.bottom-nav-enter {
+  animation: slideInBottom 0.3s ease-out;
+}
+
+.card-stagger {
+  animation: slideInUp 0.4s ease-out;
+  animation-fill-mode: backwards;
+}
+
+.card-stagger:nth-child(1) { animation-delay: 0.05s; }
+.card-stagger:nth-child(2) { animation-delay: 0.1s; }
+.card-stagger:nth-child(3) { animation-delay: 0.15s; }
+.card-stagger:nth-child(4) { animation-delay: 0.2s; }
+
+/* ============================================
+   Profile Menu Items
+   ============================================ */
+
+.profile-menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  transition: background 0.2s;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+}
+
+.profile-menu-item:hover {
+  background: rgba(0,0,0,0.02);
+}
+
+.profile-menu-item:last-child {
+  border-bottom: none;
+}
+
+.profile-menu-icon {
+  width: 24px;
+  height: 24px;
+  margin-left: 12px;
+}
+
+.profile-menu-label {
+  flex: 1;
+  font-size: 14px;
+}
+
+.profile-menu-arrow {
+  width: 20px;
+  height: 20px;
+  color: rgba(0,0,0,0.3);
+}
+
+/* ============================================
+   Page Transitions
+   ============================================ */
+
+.page-transition {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Smooth transitions for navigation */
+@media (prefers-reduced-motion: no-preference) {
+  * {
+    transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+    transition-duration: 150ms;
+    transition-timing-function: ease-out;
+  }
+
+  a, button {
+    transition-duration: 200ms;
   }
 }

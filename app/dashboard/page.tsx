@@ -1,208 +1,134 @@
-import { Card } from "@/components/Card";
-import { Button } from "@/components/Button";
-import { Badge } from "@/components/Badge";
 import Link from "next/link";
+import { TopBar } from "@/components/dashboard/TopBar";
+import { ActionGrid } from "@/components/dashboard/ActionGrid";
+import { HeroBanner } from "@/components/dashboard/HeroBanner";
+import { InstallmentCard } from "@/components/dashboard/InstallmentCard";
+import { PriceCard } from "@/components/dashboard/PriceCard";
+import { KYCBanner } from "@/components/dashboard/KYCBanner";
 
 export default function Dashboard() {
   return (
-    <div className="min-h-screen" style={{ padding: "20px 16px 80px" }}>
+    <div className="min-h-screen" style={{ padding: "20px 16px", background: "#F5F5F5" }}>
       <div style={{ maxWidth: "600px", margin: "0 auto" }}>
-        {/* Header */}
-        <h1 style={{ fontSize: "20px", fontWeight: 600, marginBottom: "6px" }}>
-          داشبورد
-        </h1>
-        <p
+        {/* Top Bar: Notification + Logo + Profile */}
+        <TopBar />
+
+        {/* KYC Banner - Show when not verified */}
+        <KYCBanner />
+
+        {/* Balance Card - Matching mockup exactly */}
+        <div
+          className="card"
           style={{
-            fontSize: "13px",
-            color: "var(--color-muted)",
-            marginBottom: "20px",
+            marginBottom: "16px",
+            padding: "16px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
           }}
         >
-          نمای کلی قیمت طلا، دارایی‌ها و دسترسی سریع
-        </p>
-
-        {/* Price Card */}
-        <Card style={{ marginBottom: "16px" }}>
-          <div
+          <button
             style={{
+              width: "32px",
+              height: "32px",
+              borderRadius: "8px",
+              border: "1px solid rgba(0,0,0,0.1)",
+              background: "white",
+              cursor: "pointer",
               display: "flex",
-              justifyContent: "space-between",
-              alignItems: "flex-start",
-              marginBottom: "10px",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "18px",
             }}
           >
-            <div>
-              <div style={{ fontSize: "12px", color: "var(--color-muted)" }}>
-                قیمت لحظه‌ای طلای ۱۸ عیار
-              </div>
-              <div style={{ fontSize: "22px", fontWeight: 700 }}>
-                ۲,۹۸۰,۰۰۰
-                <span
-                  style={{
-                    fontSize: "12px",
-                    color: "var(--color-muted)",
-                    marginRight: "6px",
-                  }}
-                >
-                  تومان
-                </span>
-              </div>
-            </div>
-            <Badge variant="green">+۰٫۸٪ امروز</Badge>
-          </div>
+            ☰
+          </button>
 
-          {/* Mini Chart */}
-          <div
-            style={{
-              height: "56px",
-              borderRadius: "12px",
-              background:
-                "linear-gradient(to left, rgba(255,200,87,0.08), rgba(84,65,255,0.12))",
-              marginBottom: "14px",
-            }}
-          />
-
-          <Button
-            variant="primary"
-            fullWidth
-            asLink
-            href="/dashboard/buy-sell"
-          >
-            شروع خرید یا فروش
-          </Button>
-        </Card>
-
-        {/* Balances */}
-        <div className="grid-2" style={{ gap: "10px", marginBottom: "16px" }}>
-          <Card>
-            <div style={{ fontSize: "12px", color: "var(--color-muted)" }}>
+          <div style={{ textAlign: "right", flex: 1, marginRight: "16px" }}>
+            <div style={{ fontSize: "16px", fontWeight: 600, marginBottom: "8px" }}>
               موجودی طلا
             </div>
-            <div style={{ fontSize: "20px", fontWeight: 700, marginTop: "6px" }}>
-              ۲٫۳۴
-              <span
-                style={{
-                  fontSize: "12px",
-                  color: "var(--color-muted)",
-                  marginRight: "4px",
-                }}
-              >
-                گرم
-              </span>
+            <div style={{ fontSize: "24px", fontWeight: 700, marginBottom: "4px" }}>
+              ۵ گرم
             </div>
-            <div
-              style={{
-                fontSize: "11px",
-                color: "var(--color-muted)",
-                marginTop: "4px",
-              }}
-            >
-              ≈ ۷,۰۰۰,۰۰۰ تومان
+            <div style={{ fontSize: "13px", color: "var(--color-muted)" }}>
+              معادل
+              <span style={{ marginRight: "4px" }}>۰ تومان</span>
             </div>
-          </Card>
-
-          <Card>
-            <div style={{ fontSize: "12px", color: "var(--color-muted)" }}>
-              موجودی تومان
-            </div>
-            <div style={{ fontSize: "20px", fontWeight: 700, marginTop: "6px" }}>
-              ۱,۳۵۰,۰۰۰
-              <span
-                style={{
-                  fontSize: "12px",
-                  color: "var(--color-muted)",
-                  marginRight: "4px",
-                }}
-              >
-                تومان
-              </span>
-            </div>
-            <div
-              style={{
-                fontSize: "11px",
-                color: "var(--color-muted)",
-                marginTop: "4px",
-              }}
-            >
-              آماده معامله
-            </div>
-          </Card>
+          </div>
         </div>
 
-        {/* Recent Transactions */}
-        <Card style={{ marginBottom: "16px" }}>
-          <div
+        {/* 4-Button Action Grid (Dark Card) */}
+        <ActionGrid />
+
+        {/* Hero Banner with Vault */}
+        <HeroBanner />
+
+        {/* Two-Column Cards */}
+        <div className="grid-2" style={{ gap: "16px", marginBottom: "16px" }}>
+          <InstallmentCard />
+          <PriceCard />
+        </div>
+
+        {/* Bottom Feature Cards */}
+        <div className="grid-2" style={{ gap: "16px" }}>
+          {/* Physical Charge Card */}
+          <Link
+            href="/dashboard/physical-charge"
+            className="card"
             style={{
               display: "flex",
-              justifyContent: "space-between",
-              marginBottom: "10px",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "24px 20px",
+              background: "linear-gradient(135deg, #FFF4E1 0%, #FFFFFF 100%)",
+              minHeight: "160px",
+              textDecoration: "none",
+              color: "inherit",
             }}
           >
-            <span style={{ fontSize: "12px", color: "var(--color-muted)" }}>
-              آخرین معاملات
-            </span>
-            <Link
-              href="/dashboard/transactions"
-              style={{ fontSize: "11px", color: "var(--color-muted)" }}
-            >
-              مشاهده همه
-            </Link>
-          </div>
-
-          {[
-            { title: "خرید طلا", desc: "۱ گرم • ۴,۰۰۰,۰۰۰ تومان", badge: "موفق", v: "green" },
-            { title: "فروش طلا", desc: "۰٫۵ گرم • ۲,۰۰۰,۰۰۰ تومان", badge: "تسویه شد" },
-            { title: "برداشت", desc: "۱,۰۰۰,۰۰۰ تومان", badge: "در انتظار" },
-          ].map((item, i) => (
+            <div style={{ fontSize: "64px", marginBottom: "12px" }}>🏦</div>
             <div
-              key={i}
               style={{
-                display: "flex",
-                justifyContent: "space-between",
-                padding: "10px 4px",
-                borderBottom: i !== 2 ? "1px solid rgba(0,0,0,0.04)" : "none",
-                fontSize: "12px",
+                fontSize: "15px",
+                fontWeight: 600,
+                textAlign: "center",
+                marginBottom: "4px",
               }}
             >
-              <div>
-                <div>{item.title}</div>
-                <div
-                  style={{
-                    fontSize: "11px",
-                    color: "var(--color-muted)",
-                    marginTop: "3px",
-                  }}
-                >
-                  {item.desc}
-                </div>
-              </div>
-              <Badge variant={item.v as any}>{item.badge}</Badge>
+              شارژ فیزیکی
             </div>
-          ))}
-        </Card>
+          </Link>
 
-        {/* Quick Actions */}
-        <div className="grid-2" style={{ gap: "10px" }}>
-          {[
-            { href: "/dashboard/buy-sell", icon: "📈", title: "خرید / فروش" },
-            { href: "/dashboard/wallet", icon: "💳", title: "کیف پول" },
-            { href: "/dashboard/wallet/deposit", icon: "💰", title: "واریز" },
-            { href: "/profile", icon: "👤", title: "پروفایل" },
-          ].map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="card"
-              style={{ textDecoration: "none" }}
+          {/* Savings Card */}
+          <Link
+            href="/dashboard/savings"
+            className="card"
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "24px 20px",
+              background: "linear-gradient(135deg, #F0FFF4 0%, #FFFFFF 100%)",
+              minHeight: "160px",
+              textDecoration: "none",
+              color: "inherit",
+            }}
+          >
+            <div style={{ fontSize: "64px", marginBottom: "12px" }}>💰</div>
+            <div
+              style={{
+                fontSize: "15px",
+                fontWeight: 600,
+                textAlign: "center",
+                marginBottom: "4px",
+              }}
             >
-              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                <div style={{ fontSize: "20px" }}>{item.icon}</div>
-                <div style={{ fontSize: "14px", fontWeight: 600 }}>
-                  {item.title}
-                </div>
-              </div>
-            </Link>
-          ))}
+              پس‌انداز
+            </div>
+          </Link>
         </div>
       </div>
     </div>
