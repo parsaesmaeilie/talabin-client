@@ -2,12 +2,13 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Badge } from "@/components/Badge";
+import Link from "next/link";
 import { TabSwitcher } from "@/components/buy-sell/TabSwitcher";
 import { NumberPad } from "@/components/buy-sell/NumberPad";
 import { tradingService, OrderPreview } from "@/lib/api/trading";
 import { pricesService, GoldPrice } from "@/lib/api/prices";
 import { walletService, Wallet } from "@/lib/api/wallet";
+import { BottomNav } from "@/src/shared/components/layout/BottomNav";
 
 export default function BuySell() {
   const router = useRouter();
@@ -122,24 +123,60 @@ export default function BuySell() {
   };
 
   return (
-    <div
-      className="min-h-screen"
-      style={{ padding: "20px 16px", background: "#F5F5F5" }}
-    >
-      <div style={{ maxWidth: "600px", margin: "0 auto" }}>
+    <div style={{ minHeight: "100vh", background: "#FAFAFA", paddingBottom: "100px" }}>
+      {/* Header */}
+      <div
+        style={{
+          background: "#FFFFFF",
+          padding: "16px",
+          display: "flex",
+          alignItems: "center",
+          gap: "12px",
+        }}
+      >
+        <Link href="/dashboard">
+          <div
+            style={{
+              width: "40px",
+              height: "40px",
+              borderRadius: "12px",
+              background: "#F5F5F5",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+            }}
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M15 19L8 12L15 5"
+                stroke="#1F1F1F"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+        </Link>
+        <h1 style={{ fontSize: "18px", fontWeight: 600, flex: 1, color: "#1F1F1F" }}>
+          {activeTab === "buy" ? "خرید طلا" : "فروش طلا"}
+        </h1>
+      </div>
+
+      {/* Content */}
+      <div style={{ padding: "16px" }}>
         {/* Success/Error Messages */}
         {success && (
           <div
-            className="slide-in-down"
             style={{
               padding: "12px 16px",
               marginBottom: "16px",
               borderRadius: "12px",
-              background: "rgba(16, 185, 129, 0.1)",
-              border: "1px solid rgba(16, 185, 129, 0.3)",
+              background: "#D1FAE5",
               color: "#059669",
               fontSize: "13px",
               textAlign: "center",
+              fontWeight: 500,
             }}
           >
             {success}
@@ -148,64 +185,59 @@ export default function BuySell() {
 
         {error && (
           <div
-            className="slide-in-down"
             style={{
               padding: "12px 16px",
               marginBottom: "16px",
               borderRadius: "12px",
-              background: "rgba(239, 68, 68, 0.1)",
-              border: "1px solid rgba(239, 68, 68, 0.3)",
+              background: "#FEE2E2",
               color: "#DC2626",
               fontSize: "13px",
               textAlign: "center",
+              fontWeight: 500,
             }}
           >
             {error}
           </div>
         )}
 
-        {/* Price Display - Matching mockup */}
+        {/* Price Display */}
         <div
-          className="card"
           style={{
-            marginBottom: "16px",
-            padding: "20px",
-            textAlign: "center",
             background: "#FFFFFF",
+            borderRadius: "20px",
+            padding: "20px",
+            marginBottom: "16px",
+            textAlign: "center",
+            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
           }}
         >
           <div style={{ marginBottom: "8px" }}>
-            <Badge variant="green">
+            <span
+              style={{
+                display: "inline-block",
+                padding: "4px 12px",
+                background: "#D1FAE5",
+                color: "#059669",
+                borderRadius: "8px",
+                fontSize: "12px",
+                fontWeight: 600,
+              }}
+            >
               قیمت لحظه‌ای
-            </Badge>
+            </span>
           </div>
-          <div
-            style={{
-              fontSize: "13px",
-              color: "var(--color-muted)",
-              marginBottom: "8px",
-            }}
-          >
+          <div style={{ fontSize: "13px", color: "#6B7280", marginBottom: "8px" }}>
             هر گرم طلا ۱۸ عیار
           </div>
-          <div style={{ fontSize: "32px", fontWeight: 700 }}>
+          <div style={{ fontSize: "32px", fontWeight: 700, color: "#1F1F1F" }}>
             {currentPrice
               ? toPersianNumber(
                   parseFloat(
-                    activeTab === "buy"
-                      ? currentPrice.sell_price
-                      : currentPrice.buy_price
+                    activeTab === "buy" ? currentPrice.sell_price : currentPrice.buy_price
                   ).toLocaleString("fa-IR")
                 )
               : "..."}
-            <span
-              style={{
-                fontSize: "16px",
-                fontWeight: 400,
-                color: "var(--color-muted)",
-                marginRight: "8px",
-              }}
-            >
+            <span style={{ fontSize: "16px", fontWeight: 400, color: "#6B7280", marginRight: "8px" }}>
               تومان
             </span>
           </div>
@@ -216,29 +248,27 @@ export default function BuySell() {
           <TabSwitcher activeTab={activeTab} onTabChange={setActiveTab} />
         </div>
 
-        {/* Input Fields - Matching mockup exactly */}
+        {/* Input Card */}
         <div
-          className="card"
-          style={{ marginBottom: "16px", padding: "20px", background: "#FFFFFF" }}
+          style={{
+            background: "#FFFFFF",
+            borderRadius: "20px",
+            padding: "20px",
+            marginBottom: "16px",
+            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
+          }}
         >
           {/* Amount Input */}
           <div
             style={{
               padding: "16px",
-              border: "2px solid rgba(0,0,0,0.1)",
+              border: "2px solid #F3F4F6",
               borderRadius: "16px",
               marginBottom: "12px",
-              background: "#FFFFFF",
+              background: "#FAFAFA",
             }}
           >
-            <div
-              style={{
-                fontSize: "12px",
-                color: "var(--color-muted)",
-                marginBottom: "8px",
-                textAlign: "right",
-              }}
-            >
+            <div style={{ fontSize: "12px", color: "#6B7280", marginBottom: "8px", textAlign: "right" }}>
               مبلغ پرداختی به تومان
             </div>
             <div
@@ -247,6 +277,7 @@ export default function BuySell() {
                 fontWeight: 600,
                 textAlign: "center",
                 minHeight: "36px",
+                color: "#1F1F1F",
               }}
             >
               {amount ? toPersianNumber(amount) : ""}
@@ -257,20 +288,13 @@ export default function BuySell() {
           <div
             style={{
               padding: "16px",
-              border: "2px solid rgba(0,0,0,0.1)",
+              border: "2px solid #F3F4F6",
               borderRadius: "16px",
               marginBottom: "20px",
-              background: "#FFFFFF",
+              background: "#FAFAFA",
             }}
           >
-            <div
-              style={{
-                fontSize: "12px",
-                color: "var(--color-muted)",
-                marginBottom: "8px",
-                textAlign: "right",
-              }}
-            >
+            <div style={{ fontSize: "12px", color: "#6B7280", marginBottom: "8px", textAlign: "right" }}>
               مقدار طلا به گرم
             </div>
             <div
@@ -279,6 +303,7 @@ export default function BuySell() {
                 fontWeight: 600,
                 textAlign: "center",
                 minHeight: "30px",
+                color: "#1F1F1F",
               }}
             >
               {preview ? toPersianNumber(preview.gold_amount.toFixed(4)) : ""}
@@ -286,10 +311,7 @@ export default function BuySell() {
           </div>
 
           {/* Number Pad */}
-          <NumberPad
-            onNumberClick={handleNumberClick}
-            onBackspace={handleBackspace}
-          />
+          <NumberPad onNumberClick={handleNumberClick} onBackspace={handleBackspace} />
 
           {/* Fee Display */}
           {preview && (
@@ -297,10 +319,11 @@ export default function BuySell() {
               style={{
                 marginTop: "20px",
                 padding: "12px",
-                background: "rgba(0,0,0,0.02)",
+                background: "#FEF3C7",
                 borderRadius: "12px",
                 textAlign: "center",
                 fontSize: "13px",
+                color: "#92400E",
               }}
             >
               کارمزد:{" "}
@@ -311,7 +334,7 @@ export default function BuySell() {
           )}
         </div>
 
-        {/* CTA Button - Large and prominent */}
+        {/* CTA Button */}
         <button
           onClick={handleSubmit}
           disabled={loading || !preview}
@@ -321,20 +344,19 @@ export default function BuySell() {
             fontSize: "17px",
             fontWeight: 700,
             color: "#FFFFFF",
-            background: loading || !preview ? "#999" : "#1C1C1C",
+            background: loading || !preview ? "#9CA3AF" : "#1F1F1F",
             border: "none",
             borderRadius: "16px",
             cursor: loading || !preview ? "not-allowed" : "pointer",
-            transition: "all 0.2s",
+            transition: "all 0.2s ease",
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
           }}
         >
-          {loading
-            ? "در حال انجام..."
-            : activeTab === "buy"
-            ? "خرید طلا"
-            : "فروش طلا"}
+          {loading ? "در حال انجام..." : activeTab === "buy" ? "خرید طلا" : "فروش طلا"}
         </button>
       </div>
+
+      <BottomNav />
     </div>
   );
 }
