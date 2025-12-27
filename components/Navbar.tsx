@@ -75,15 +75,15 @@ export default function Navbar() {
           <div
             className="flex items-center justify-center text-lg"
             style={{
-              width: '36px',
-              height: '36px',
-              borderRadius: '12px',
-              background: '#FFC857',
-              color: '#1C1C1C',
-              boxShadow: '0 4px 12px rgba(255, 200, 87, 0.3)',
+              width: '40px',
+              height: '40px',
             }}
           >
-            ط
+            <img
+              src="/logo.svg"
+              alt="Talabin Logo"
+              style={{ width: '100%', height: '100%' }}
+            />
           </div>
           <span style={{ color: '#1C1C1C' }}>طلابین</span>
         </Link>

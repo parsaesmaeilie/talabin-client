@@ -32,19 +32,18 @@ export const Footer: React.FC = () => {
             >
               <div
                 style={{
-                  width: "28px",
-                  height: "28px",
-                  borderRadius: "10px",
-                  background: "#FFC857",
+                  width: "32px",
+                  height: "32px",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontSize: "16px",
-                  fontWeight: 700,
-                  color: "#1C1C1C",
                 }}
               >
-                ط
+                <img
+                  src="/logo.svg"
+                  alt="Talabin Logo"
+                  style={{ width: "100%", height: "100%" }}
+                />
               </div>
               <div style={{ fontWeight: 700, fontSize: "14px", color: "#1C1C1C" }}>
                 طلا بین
