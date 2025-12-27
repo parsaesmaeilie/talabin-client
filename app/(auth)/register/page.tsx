@@ -1,28 +1,133 @@
 "use client";
 
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/Button";
+import { authService } from "@/src/features/auth";
+
+interface RegisterFormData {
+  firstName: string;
+  lastName: string;
+  phone: string;
+  password: string;
+  confirmPassword: string;
+}
 
 export default function RegisterPage() {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+
   const {
     register,
     handleSubmit,
     formState: { errors },
     watch,
-  } = useForm();
+  } = useForm<RegisterFormData>();
 
-  const onSubmit = (data: any) => {
-    alert("✔ ثبت‌نام انجام شد!");
-    console.log(data);
+  const onSubmit = async (data: RegisterFormData) => {
+    setIsLoading(true);
+    setError("");
+
+    try {
+      // Call backend API
+      const response = await authService.register({
+        phone_number: data.phone,
+        password: data.password,
+        password_confirm: data.confirmPassword,
+        first_name: data.firstName,
+        last_name: data.lastName,
+      });
+
+      if (response.success) {
+        // Show success message
+        const successDiv = document.createElement("div");
+        successDiv.className = "success-toast";
+        successDiv.textContent = "✔ ثبت‌نام با موفقیت انجام شد!";
+        successDiv.style.cssText = `
+          position: fixed;
+          top: 24px;
+          right: 24px;
+          left: 24px;
+          background: #4ADE80;
+          color: white;
+          padding: 16px 24px;
+          border-radius: 12px;
+          box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+          z-index: 9999;
+          animation: slideIn 0.3s ease-out;
+          font-weight: 600;
+          text-align: center;
+        `;
+        document.body.appendChild(successDiv);
+
+        // Add animation
+        const style = document.createElement("style");
+        style.textContent = `
+          @keyframes slideIn {
+            from {
+              transform: translateY(-100px);
+              opacity: 0;
+            }
+            to {
+              transform: translateY(0);
+              opacity: 1;
+            }
+          }
+          @keyframes slideOut {
+            from {
+              transform: translateY(0);
+              opacity: 1;
+            }
+            to {
+              transform: translateY(-100px);
+              opacity: 0;
+            }
+          }
+        `;
+        document.head.appendChild(style);
+
+        // Remove after 2 seconds with animation
+        setTimeout(() => {
+          successDiv.style.animation = "slideOut 0.3s ease-in";
+          setTimeout(() => {
+            document.body.removeChild(successDiv);
+
+            // Redirect to verify page with smooth transition
+            document.body.style.opacity = "1";
+            document.body.style.transition = "opacity 0.3s ease-out";
+            requestAnimationFrame(() => {
+              document.body.style.opacity = "0";
+              setTimeout(() => {
+                router.push(`/verify?phone=${encodeURIComponent(data.phone)}&type=registration`);
+              }, 300);
+            });
+          }, 300);
+        }, 2000);
+      } else {
+        // Show error
+        setError(response.error?.message || "خطا در ثبت‌نام. لطفا دوباره تلاش کنید.");
+      }
+    } catch (err) {
+      console.error("Registration error:", err);
+      setError("خطا در ارتباط با سرور. لطفا دوباره تلاش کنید.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4 animate-fade-in">
       <div
         className="w-full max-w-md card"
-        style={{ padding: "32px 28px" }}
+        style={{
+          padding: "32px 28px",
+          animation: "scaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)"
+        }}
       >
+
         {/* Logo */}
         <div style={{ display: "flex", justifyContent: "center", marginBottom: "24px" }}>
           <div
@@ -61,8 +166,25 @@ export default function RegisterPage() {
             marginBottom: "24px",
           }}
         >
-          حساب کاربری خود را ایجاد کنید و از ۱۰۰ هزار تومان شروع کنید
+          حساب کاربری خود را ایجاد کنید
         </p>
+
+        {error && (
+          <div
+            style={{
+              background: "#FEE2E2",
+              color: "#EF4444",
+              padding: "12px 16px",
+              borderRadius: "8px",
+              marginBottom: "16px",
+              fontSize: "13px",
+              textAlign: "center",
+              animation: "shake 0.4s ease-in-out",
+            }}
+          >
+            {error}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="grid-2" style={{ gap: "12px" }}>
@@ -72,10 +194,11 @@ export default function RegisterPage() {
                 {...register("firstName", { required: "نام الزامی است" })}
                 className="form-input"
                 placeholder="نام خود را وارد کنید"
+                disabled={isLoading}
               />
               {errors.firstName && (
                 <span style={{ fontSize: "11px", color: "var(--color-danger)", marginTop: "4px", display: "block" }}>
-                  {errors.firstName.message as string}
+                  {errors.firstName.message}
                 </span>
               )}
             </div>
@@ -86,10 +209,11 @@ export default function RegisterPage() {
                 {...register("lastName", { required: "نام خانوادگی الزامی است" })}
                 className="form-input"
                 placeholder="نام خانوادگی"
+                disabled={isLoading}
               />
               {errors.lastName && (
                 <span style={{ fontSize: "11px", color: "var(--color-danger)", marginTop: "4px", display: "block" }}>
-                  {errors.lastName.message as string}
+                  {errors.lastName.message}
                 </span>
               )}
             </div>
@@ -100,40 +224,24 @@ export default function RegisterPage() {
             <input
               {...register("phone", {
                 required: "شماره موبایل الزامی است",
-                pattern: /^[0-9]{11}$/,
+                pattern: {
+                  value: /^09[0-9]{9}$/,
+                  message: "شماره موبایل معتبر نیست"
+                },
               })}
               type="tel"
               className="form-input"
               placeholder="09123456789"
               dir="ltr"
               style={{ textAlign: "right" }}
+              disabled={isLoading}
             />
             <small className="form-hint">
               کد تایید به این شماره ارسال خواهد شد
             </small>
             {errors.phone && (
               <span style={{ fontSize: "11px", color: "var(--color-danger)", marginTop: "4px", display: "block" }}>
-                لطفا شماره موبایل معتبر وارد کنید
-              </span>
-            )}
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">کد ملی</label>
-            <input
-              {...register("nationalId", {
-                required: "کد ملی الزامی است",
-                pattern: /^[0-9]{10}$/,
-              })}
-              type="text"
-              className="form-input"
-              placeholder="کد ملی خود را وارد کنید"
-              dir="ltr"
-              style={{ textAlign: "right" }}
-            />
-            {errors.nationalId && (
-              <span style={{ fontSize: "11px", color: "var(--color-danger)", marginTop: "4px", display: "block" }}>
-                کد ملی باید شامل 10 رقم باشد
+                {errors.phone.message}
               </span>
             )}
           </div>
@@ -151,13 +259,14 @@ export default function RegisterPage() {
               type="password"
               className="form-input"
               placeholder="••••••••"
+              disabled={isLoading}
             />
             <small className="form-hint">
               حداقل 6 کاراکتر، ترکیبی از حروف و اعداد
             </small>
             {errors.password && (
               <span style={{ fontSize: "11px", color: "var(--color-danger)", marginTop: "4px", display: "block" }}>
-                {errors.password.message as string}
+                {errors.password.message}
               </span>
             )}
           </div>
@@ -168,21 +277,35 @@ export default function RegisterPage() {
               {...register("confirmPassword", {
                 required: "تایید رمز عبور الزامی است",
                 validate: (value) =>
-                  value === watch("password") || "رمز عبور باید یکسان باشد",
+                  value === watch("password") || "رمز عبور و تایید آن یکسان نیستند",
               })}
               type="password"
               className="form-input"
               placeholder="••••••••"
+              disabled={isLoading}
             />
             {errors.confirmPassword && (
               <span style={{ fontSize: "11px", color: "var(--color-danger)", marginTop: "4px", display: "block" }}>
-                {errors.confirmPassword.message as string}
+                {errors.confirmPassword.message}
               </span>
             )}
           </div>
 
-          <Button type="submit" variant="primary" fullWidth style={{ marginTop: "8px" }}>
-            ثبت‌نام و ادامه
+          <Button
+            type="submit"
+            variant="primary"
+            fullWidth
+            style={{ marginTop: "8px" }}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", justifyContent: "center" }}>
+                <div className="spinner" />
+                در حال ثبت‌نام...
+              </div>
+            ) : (
+              "ثبت‌نام و ادامه"
+            )}
           </Button>
         </form>
 
@@ -227,6 +350,51 @@ export default function RegisterPage() {
           طلابین را می‌پذیرید.
         </div>
       </div>
+
+      <style jsx>{`
+        @keyframes fade-in {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+
+        @keyframes scaleIn {
+          from {
+            transform: scale(0.95);
+            opacity: 0;
+          }
+          to {
+            transform: scale(1);
+            opacity: 1;
+          }
+        }
+
+        .animate-fade-in {
+          animation: fade-in 0.3s ease-out;
+        }
+
+        .spinner {
+          width: 16px;
+          height: 16px;
+          border: 2px solid rgba(0, 0, 0, 0.1);
+          border-top-color: currentColor;
+          border-radius: 50%;
+          animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+          20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+      `}</style>
     </div>
   );
 }
