@@ -2,340 +2,393 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Badge } from "@/components/Badge";
-
-type GoldPriceDetail = {
-  name: string;
-  currentRate: number;
-  highRate: number;
-  lowRate: number;
-  maxFluctuation: number;
-  maxFluctuationPercent: number;
-  openRate: number;
-  lastUpdate: string;
-  prevRate: number;
-  changePercent: number;
-  changeAmount: number;
-};
+import { pricesService, GoldPrice } from "@/lib/api/prices";
 
 export default function GoldPricesPage() {
-  const [prices, setPrices] = useState<GoldPriceDetail[]>([]);
+  const [currentPrice, setCurrentPrice] = useState<GoldPrice | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const samplePrices: GoldPriceDetail[] = [
-      {
-        name: "طلای ۱۸ عیار",
-        currentRate: 12699000,
-        highRate: 12721000,
-        lowRate: 12607900,
-        maxFluctuation: 39400,
-        maxFluctuationPercent: 0.28,
-        openRate: 12681600,
-        lastUpdate: "۱۹:۰۶:۱۷",
-        prevRate: 12679700,
-        changePercent: 0.05,
-        changeAmount: 6200,
-      },
-      {
-        name: "طلای ۲۱ عیار",
-        currentRate: 14850000,
-        highRate: 14890000,
-        lowRate: 14780000,
-        maxFluctuation: 60000,
-        maxFluctuationPercent: 0.40,
-        openRate: 14810000,
-        lastUpdate: "۱۹:۰۶:۲۲",
-        prevRate: 14820000,
-        changePercent: -0.05,
-        changeAmount: -7000,
-      },
-      {
-        name: "طلای ۲۴ عیار",
-        currentRate: 16950000,
-        highRate: 16990000,
-        lowRate: 16870000,
-        maxFluctuation: 120000,
-        maxFluctuationPercent: 0.71,
-        openRate: 16920000,
-        lastUpdate: "۱۹:۰۶:۳۰",
-        prevRate: 16930000,
-        changePercent: 0.12,
-        changeAmount: 20000,
-      },
-      {
-        name: "طلای آب‌شده",
-        currentRate: 16920000,
-        highRate: 16950000,
-        lowRate: 16850000,
-        maxFluctuation: 100000,
-        maxFluctuationPercent: 0.59,
-        openRate: 16890000,
-        lastUpdate: "۱۹:۰۶:۳۵",
-        prevRate: 16900000,
-        changePercent: 0.12,
-        changeAmount: 20000,
-      },
-      {
-        name: "انس جهانی طلا",
-        currentRate: 1960,
-        highRate: 1970,
-        lowRate: 1950,
-        maxFluctuation: 20,
-        maxFluctuationPercent: 1.02,
-        openRate: 1955,
-        lastUpdate: "۱۹:۰۶:۴۰",
-        prevRate: 1958,
-        changePercent: 0.10,
-        changeAmount: 2,
-      },
-      {
-        name: "سکه امامی",
-        currentRate: 13750000,
-        highRate: 13800000,
-        lowRate: 13720000,
-        maxFluctuation: 80000,
-        maxFluctuationPercent: 0.58,
-        openRate: 13730000,
-        lastUpdate: "۱۹:۰۶:۴۵",
-        prevRate: 13740000,
-        changePercent: 0.07,
-        changeAmount: 10000,
-      },
-      {
-        name: "ربع سکه",
-        currentRate: 4500000,
-        highRate: 4600000,
-        lowRate: 4450000,
-        maxFluctuation: 150000,
-        maxFluctuationPercent: 3.33,
-        openRate: 4480000,
-        lastUpdate: "۱۹:۰۶:۵۰",
-        prevRate: 4490000,
-        changePercent: 0.22,
-        changeAmount: 10000,
-      },
-      {
-        name: "سکه گرمی",
-        currentRate: 3000000,
-        highRate: 3050000,
-        lowRate: 2950000,
-        maxFluctuation: 100000,
-        maxFluctuationPercent: 3.33,
-        openRate: 2980000,
-        lastUpdate: "۱۹:۰۶:۵۵",
-        prevRate: 2990000,
-        changePercent: 0.33,
-        changeAmount: 10000,
-      },
-    ];
+    fetchPrices();
 
-    setPrices(samplePrices);
-
-    const interval = setInterval(() => setPrices(samplePrices), 60000);
+    // Auto-refresh every 30 seconds
+    const interval = setInterval(fetchPrices, 30000);
     return () => clearInterval(interval);
   }, []);
 
-  return (
-    <div style={{ minHeight: "100vh", background: "#FAFAFA" }}>
-      {/* Header */}
-      <div
-        style={{
-          background: "#FFFFFF",
-          padding: "16px",
-          display: "flex",
-          alignItems: "center",
-          gap: "12px",
-          marginBottom: "16px",
-        }}
-      >
-        <Link href="/dashboard">
-          <div
-            style={{
-              width: "40px",
-              height: "40px",
-              borderRadius: "12px",
-              background: "#F5F5F5",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "pointer",
-            }}
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M15 19L8 12L15 5"
-                stroke="#1F1F1F"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </div>
-        </Link>
-        <div style={{ flex: 1 }}>
-          <h1 style={{ fontSize: "18px", fontWeight: 600, margin: 0, color: "#1F1F1F" }}>
-            قیمت لحظه‌ای طلا و سکه
-          </h1>
-          <p style={{ fontSize: "11px", color: "#6B7280", margin: "2px 0 0" }}>
-            قیمت‌های به‌روز شده هر دقیقه
-          </p>
-        </div>
-      </div>
+  const fetchPrices = async () => {
+    try {
+      const response = await pricesService.getCurrentPrice();
 
-      {/* Content */}
-      <div style={{ padding: "0 16px 16px" }}>
+      if (response.success && response.data) {
+        setCurrentPrice(response.data);
+      }
+
+      setError(null);
+    } catch (err: any) {
+      console.error("Error fetching prices:", err);
+      setError("خطا در بارگذاری قیمت‌ها");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const toPersianNumber = (num: string) => {
+    const persianDigits = ["۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹"];
+    return num.replace(/\d/g, (digit) => persianDigits[parseInt(digit)]);
+  };
+
+  const ShimmerBox = ({ width = "100%", height = "20px", borderRadius = "8px" }: any) => (
+    <div
+      style={{
+        width,
+        height,
+        borderRadius,
+        background: "linear-gradient(90deg, #F5F5F5 25%, #E5E5E5 50%, #F5F5F5 75%)",
+        backgroundSize: "200% 100%",
+        animation: "shimmer 1.5s infinite",
+      }}
+    />
+  );
+
+  return (
+    <>
+      <style jsx>{`
+        @keyframes shimmer {
+          0% { background-position: 200% 0; }
+          100% { background-position: -200% 0; }
+        }
+      `}</style>
+
+      <div style={{ minHeight: "100vh", background: "#FAFAFA", paddingBottom: "100px" }}>
+        {/* Header */}
         <div
           style={{
-            display: "grid",
-            gridTemplateColumns: "1fr",
+            background: "#FFFFFF",
+            padding: "16px",
+            display: "flex",
+            alignItems: "center",
             gap: "12px",
+            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.04)",
           }}
         >
-          {prices.map((price, index) => (
+          <Link href="/dashboard">
             <div
-              key={index}
               style={{
-                background: "#FFFFFF",
-                borderRadius: "20px",
-                padding: "20px",
-                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
+                width: "40px",
+                height: "40px",
+                borderRadius: "12px",
+                background: "#F5F5F5",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
               }}
             >
-              <div
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M15 19L8 12L15 5"
+                  stroke="#1F1F1F"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
+          </Link>
+          <div style={{ flex: 1 }}>
+            <h1 style={{ fontSize: "18px", fontWeight: 600, margin: 0, color: "#1F1F1F" }}>
+              قیمت لحظه‌ای طلا
+            </h1>
+            <p style={{ fontSize: "11px", color: "#6B7280", margin: "2px 0 0" }}>
+              به‌روزرسانی هر ۳۰ ثانیه
+            </p>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div style={{ padding: "16px" }}>
+          {/* Error Message */}
+          {error && (
+            <div
+              style={{
+                padding: "12px 16px",
+                marginBottom: "16px",
+                borderRadius: "12px",
+                background: "#FEE2E2",
+                color: "#DC2626",
+                fontSize: "14px",
+                textAlign: "center",
+                fontWeight: 600,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <span>{error}</span>
+              <button
+                onClick={fetchPrices}
                 style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginBottom: "16px",
+                  background: "transparent",
+                  border: "none",
+                  color: "#DC2626",
+                  cursor: "pointer",
+                  fontSize: "12px",
+                  fontWeight: 600,
+                  textDecoration: "underline",
                 }}
               >
-                <h2
+                تلاش مجدد
+              </button>
+            </div>
+          )}
+
+          {/* Buy Price Card */}
+          <div
+            style={{
+              background: "linear-gradient(135deg, #10B981 0%, #059669 100%)",
+              borderRadius: "20px",
+              padding: "24px",
+              marginBottom: "16px",
+              boxShadow: "0 8px 20px rgba(16, 185, 129, 0.25)",
+              color: "#FFFFFF",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
+              <div style={{ fontSize: "24px" }}>🪙</div>
+              <h3 style={{ fontSize: "15px", fontWeight: 600, margin: 0, opacity: 0.9 }}>
+                قیمت خرید (فروش به شما)
+              </h3>
+            </div>
+
+            {loading ? (
+              <>
+                <ShimmerBox height="48px" borderRadius="12px" width="70%" />
+                <div style={{ height: "8px" }} />
+                <ShimmerBox height="20px" borderRadius="8px" width="50%" />
+              </>
+            ) : currentPrice ? (
+              <>
+                <div style={{ display: "flex", alignItems: "baseline", gap: "8px", marginBottom: "8px" }}>
+                  <span style={{ fontSize: "40px", fontWeight: 700 }}>
+                    {toPersianNumber(parseFloat(currentPrice.sell_price).toLocaleString("fa-IR"))}
+                  </span>
+                  <span style={{ fontSize: "16px", opacity: 0.9 }}>تومان</span>
+                </div>
+
+                <div
                   style={{
-                    fontSize: "16px",
-                    fontWeight: 600,
-                    margin: 0,
-                    color: "#1F1F1F",
+                    padding: "10px 14px",
+                    background: "rgba(255, 255, 255, 0.2)",
+                    borderRadius: "12px",
+                    fontSize: "12px",
+                    opacity: 0.95,
+                    backdropFilter: "blur(10px)",
                   }}
                 >
-                  {price.name}
-                </h2>
-                <Badge
-                  variant={price.changePercent >= 0 ? "green" : "red"}
+                  قیمت هر گرم طلای ۱۸ عیار
+                </div>
+              </>
+            ) : null}
+          </div>
+
+          {/* Sell Price Card */}
+          <div
+            style={{
+              background: "linear-gradient(135deg, #EF4444 0%, #DC2626 100%)",
+              borderRadius: "20px",
+              padding: "24px",
+              marginBottom: "16px",
+              boxShadow: "0 8px 20px rgba(239, 68, 68, 0.25)",
+              color: "#FFFFFF",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
+              <div style={{ fontSize: "24px" }}>💎</div>
+              <h3 style={{ fontSize: "15px", fontWeight: 600, margin: 0, opacity: 0.9 }}>
+                قیمت فروش (خرید از شما)
+              </h3>
+            </div>
+
+            {loading ? (
+              <>
+                <ShimmerBox height="48px" borderRadius="12px" width="70%" />
+                <div style={{ height: "8px" }} />
+                <ShimmerBox height="20px" borderRadius="8px" width="50%" />
+              </>
+            ) : currentPrice ? (
+              <>
+                <div style={{ display: "flex", alignItems: "baseline", gap: "8px", marginBottom: "8px" }}>
+                  <span style={{ fontSize: "40px", fontWeight: 700 }}>
+                    {toPersianNumber(parseFloat(currentPrice.buy_price).toLocaleString("fa-IR"))}
+                  </span>
+                  <span style={{ fontSize: "16px", opacity: 0.9 }}>تومان</span>
+                </div>
+
+                <div
+                  style={{
+                    padding: "10px 14px",
+                    background: "rgba(255, 255, 255, 0.2)",
+                    borderRadius: "12px",
+                    fontSize: "12px",
+                    opacity: 0.95,
+                    backdropFilter: "blur(10px)",
+                  }}
                 >
-                  {price.changePercent >= 0 ? "+" : ""}
-                  {price.changePercent}٪
-                </Badge>
+                  قیمت هر گرم طلای ۱۸ عیار
+                </div>
+              </>
+            ) : null}
+          </div>
+
+          {/* Spread Info */}
+          {currentPrice && (
+            <div
+              style={{
+                background: "#FFFFFF",
+                borderRadius: "16px",
+                padding: "20px",
+                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
+                marginBottom: "16px",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
+                <div style={{ fontSize: "20px" }}>📊</div>
+                <h3 style={{ fontSize: "15px", fontWeight: 600, margin: 0, color: "#1F1F1F" }}>
+                  اطلاعات بیشتر
+                </h3>
               </div>
 
-              <div
-                style={{
-                  background: "#FBFAF7",
-                  borderRadius: "12px",
-                  padding: "16px",
-                  marginBottom: "12px",
-                }}
-              >
+              <div style={{ display: "grid", gap: "8px" }}>
                 <div
                   style={{
-                    fontSize: "11px",
-                    color: "#6B7280",
-                    marginBottom: "6px",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    padding: "12px",
+                    background: "#FAFAFA",
+                    borderRadius: "12px",
                   }}
                 >
-                  نرخ فعلی
+                  <span style={{ fontSize: "13px", color: "#6B7280" }}>اختلاف خرید و فروش (اسپرد)</span>
+                  <span style={{ fontSize: "14px", fontWeight: 600, color: "#1F1F1F" }}>
+                    {toPersianNumber(currentPrice.spread.toFixed(2))}%
+                  </span>
                 </div>
+
                 <div
                   style={{
-                    fontSize: "22px",
-                    fontWeight: 700,
-                    color: "#1F1F1F",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    padding: "12px",
+                    background: "#FAFAFA",
+                    borderRadius: "12px",
                   }}
                 >
-                  {price.currentRate.toLocaleString("fa-IR")}
-                  <span
+                  <span style={{ fontSize: "13px", color: "#6B7280" }}>منبع قیمت</span>
+                  <span style={{ fontSize: "14px", fontWeight: 600, color: "#1F1F1F" }}>
+                    {currentPrice.source}
+                  </span>
+                </div>
+
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    padding: "12px",
+                    background: "#FAFAFA",
+                    borderRadius: "12px",
+                  }}
+                >
+                  <span style={{ fontSize: "13px", color: "#6B7280" }}>وضعیت</span>
+                  <div
                     style={{
-                      fontSize: "13px",
-                      fontWeight: 400,
-                      color: "#6B7280",
-                      marginRight: "6px",
+                      padding: "4px 12px",
+                      background: currentPrice.is_active ? "#D1FAE5" : "#FEE2E2",
+                      color: currentPrice.is_active ? "#059669" : "#DC2626",
+                      borderRadius: "8px",
+                      fontSize: "12px",
+                      fontWeight: 600,
                     }}
                   >
-                    {price.name === "انس جهانی طلا" ? "دلار" : "تومان"}
-                  </span>
+                    {currentPrice.is_active ? "✅ فعال" : "❌ غیرفعال"}
+                  </div>
                 </div>
-              </div>
 
-              <div
-                style={{
-                  display: "grid",
-                  gap: "8px",
-                  fontSize: "13px",
-                }}
-              >
                 <div
                   style={{
                     display: "flex",
                     justifyContent: "space-between",
-                    padding: "8px 12px",
-                    background: "#F9FAFB",
-                    borderRadius: "8px",
+                    padding: "12px",
+                    background: "#FAFAFA",
+                    borderRadius: "12px",
                   }}
                 >
-                  <span style={{ color: "#6B7280" }}>بالاترین</span>
-                  <span style={{ fontWeight: 500, color: "#1F1F1F" }}>
-                    {price.highRate.toLocaleString("fa-IR")}
-                  </span>
-                </div>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    padding: "8px 12px",
-                    background: "#F9FAFB",
-                    borderRadius: "8px",
-                  }}
-                >
-                  <span style={{ color: "#6B7280" }}>پایین‌ترین</span>
-                  <span style={{ fontWeight: 500, color: "#1F1F1F" }}>
-                    {price.lowRate.toLocaleString("fa-IR")}
-                  </span>
-                </div>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    padding: "8px 12px",
-                    background: "#F9FAFB",
-                    borderRadius: "8px",
-                  }}
-                >
-                  <span style={{ color: "#6B7280" }}>نوسان</span>
-                  <span style={{ fontWeight: 500, color: "#1F1F1F" }}>
-                    {price.maxFluctuation.toLocaleString("fa-IR")} (
-                    {price.maxFluctuationPercent}٪)
-                  </span>
-                </div>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    padding: "8px 12px",
-                    background: "#F9FAFB",
-                    borderRadius: "8px",
-                  }}
-                >
-                  <span style={{ color: "#6B7280" }}>
-                    آخرین به‌روزرسانی
-                  </span>
-                  <span style={{ fontSize: "12px", fontWeight: 500, color: "#1F1F1F" }}>
-                    {price.lastUpdate}
+                  <span style={{ fontSize: "13px", color: "#6B7280" }}>آخرین به‌روزرسانی</span>
+                  <span style={{ fontSize: "12px", fontWeight: 600, color: "#1F1F1F" }}>
+                    {new Date(currentPrice.created_at).toLocaleTimeString("fa-IR", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      second: "2-digit",
+                    })}
                   </span>
                 </div>
               </div>
             </div>
-          ))}
+          )}
+
+          {/* Quick Actions */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "12px" }}>
+            <Link href="/dashboard/buy-sell?type=buy" style={{ textDecoration: "none" }}>
+              <button
+                style={{
+                  width: "100%",
+                  padding: "18px",
+                  fontSize: "16px",
+                  fontWeight: 700,
+                  color: "#FFFFFF",
+                  background: "linear-gradient(135deg, #10B981 0%, #059669 100%)",
+                  border: "none",
+                  borderRadius: "16px",
+                  cursor: "pointer",
+                  boxShadow: "0 4px 12px rgba(16, 185, 129, 0.3)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "8px",
+                }}
+              >
+                <span>💰</span>
+                خرید طلا
+              </button>
+            </Link>
+
+            <Link href="/dashboard/buy-sell?type=sell" style={{ textDecoration: "none" }}>
+              <button
+                style={{
+                  width: "100%",
+                  padding: "18px",
+                  fontSize: "16px",
+                  fontWeight: 700,
+                  color: "#FFFFFF",
+                  background: "linear-gradient(135deg, #EF4444 0%, #DC2626 100%)",
+                  border: "none",
+                  borderRadius: "16px",
+                  cursor: "pointer",
+                  boxShadow: "0 4px 12px rgba(239, 68, 68, 0.3)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "8px",
+                }}
+              >
+                <span>💎</span>
+                فروش طلا
+              </button>
+            </Link>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

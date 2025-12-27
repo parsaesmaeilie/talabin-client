@@ -88,8 +88,8 @@ export default function BuySell() {
       if (response.success) {
         setSuccess(
           activeTab === "buy"
-            ? "خرید با موفقیت انجام شد!"
-            : "فروش با موفقیت انجام شد!"
+            ? "✅ خرید با موفقیت انجام شد!"
+            : "✅ فروش با موفقیت انجام شد!"
         );
         setAmount("");
         setPreview(null);
@@ -116,13 +116,30 @@ export default function BuySell() {
     setAmount((prev) => prev.slice(0, -1));
   };
 
+  const handleQuickAmount = (value: number) => {
+    setAmount(value.toString());
+  };
+
   const toPersianNumber = (num: string) => {
     const persianDigits = ["۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹"];
     return num.replace(/\d/g, (digit) => persianDigits[parseInt(digit)]);
   };
 
+  // Calculate gold amount in real-time (even for amounts < 100,000)
+  const calculateGoldAmount = () => {
+    if (!amount || !currentPrice) return 0;
+    const amountNum = parseFloat(amount);
+    const price = activeTab === "buy"
+      ? parseFloat(currentPrice.sell_price)
+      : parseFloat(currentPrice.buy_price);
+    return amountNum / price;
+  };
+
+  const goldAmount = calculateGoldAmount();
+  const isValidAmount = amount && parseFloat(amount) >= 100000;
+
   return (
-    <div style={{ minHeight: "100vh", background: "#FAFAFA" }}>
+    <div style={{ minHeight: "100vh", background: "#FAFAFA", paddingBottom: "100px" }}>
       {/* Header */}
       <div
         style={{
@@ -131,6 +148,7 @@ export default function BuySell() {
           display: "flex",
           alignItems: "center",
           gap: "12px",
+          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.04)",
         }}
       >
         <Link href="/dashboard">
@@ -173,9 +191,9 @@ export default function BuySell() {
               borderRadius: "12px",
               background: "#D1FAE5",
               color: "#059669",
-              fontSize: "13px",
+              fontSize: "14px",
               textAlign: "center",
-              fontWeight: 500,
+              fontWeight: 600,
             }}
           >
             {success}
@@ -190,45 +208,36 @@ export default function BuySell() {
               borderRadius: "12px",
               background: "#FEE2E2",
               color: "#DC2626",
-              fontSize: "13px",
+              fontSize: "14px",
               textAlign: "center",
-              fontWeight: 500,
+              fontWeight: 600,
             }}
           >
             {error}
           </div>
         )}
 
-        {/* Price Display */}
+        {/* Tab Switcher */}
+        <div style={{ marginBottom: "16px" }}>
+          <TabSwitcher activeTab={activeTab} onTabChange={setActiveTab} />
+        </div>
+
+        {/* Current Price Card */}
         <div
           style={{
-            background: "#FFFFFF",
+            background: activeTab === "buy" ? "linear-gradient(135deg, #10B981 0%, #059669 100%)" : "linear-gradient(135deg, #EF4444 0%, #DC2626 100%)",
             borderRadius: "20px",
-            padding: "20px",
+            padding: "24px",
             marginBottom: "16px",
             textAlign: "center",
-            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
+            boxShadow: "0 8px 20px rgba(0, 0, 0, 0.12)",
+            color: "#FFFFFF",
           }}
         >
-          <div style={{ marginBottom: "8px" }}>
-            <span
-              style={{
-                display: "inline-block",
-                padding: "4px 12px",
-                background: "#D1FAE5",
-                color: "#059669",
-                borderRadius: "8px",
-                fontSize: "12px",
-                fontWeight: 600,
-              }}
-            >
-              قیمت لحظه‌ای
-            </span>
+          <div style={{ fontSize: "13px", marginBottom: "8px", opacity: 0.9 }}>
+            قیمت {activeTab === "buy" ? "خرید" : "فروش"} هر گرم طلای ۱۸ عیار
           </div>
-          <div style={{ fontSize: "13px", color: "#6B7280", marginBottom: "8px" }}>
-            هر گرم طلا ۱۸ عیار
-          </div>
-          <div style={{ fontSize: "32px", fontWeight: 700, color: "#1F1F1F" }}>
+          <div style={{ fontSize: "36px", fontWeight: 700 }}>
             {currentPrice
               ? toPersianNumber(
                   parseFloat(
@@ -236,15 +245,81 @@ export default function BuySell() {
                   ).toLocaleString("fa-IR")
                 )
               : "..."}
-            <span style={{ fontSize: "16px", fontWeight: 400, color: "#6B7280", marginRight: "8px" }}>
-              تومان
-            </span>
+          </div>
+          <div style={{ fontSize: "14px", marginTop: "4px", opacity: 0.9 }}>
+            تومان
           </div>
         </div>
 
-        {/* Tab Switcher */}
+        {/* Wallet Balance */}
+        {wallet && (
+          <div
+            style={{
+              background: "#FFFFFF",
+              borderRadius: "16px",
+              padding: "16px",
+              marginBottom: "16px",
+              boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <div>
+              <div style={{ fontSize: "12px", color: "#6B7280", marginBottom: "4px" }}>
+                موجودی {activeTab === "buy" ? "تومان" : "طلا"}
+              </div>
+              <div style={{ fontSize: "16px", fontWeight: 600, color: "#1F1F1F" }}>
+                {activeTab === "buy"
+                  ? `${toPersianNumber(parseFloat(wallet.balance_irr).toLocaleString("fa-IR"))} تومان`
+                  : `${toPersianNumber(parseFloat(wallet.gold_balance).toFixed(4))} گرم`}
+              </div>
+            </div>
+            <div
+              style={{
+                width: "48px",
+                height: "48px",
+                borderRadius: "12px",
+                background: activeTab === "buy" ? "#D1FAE5" : "#FEE2E2",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "24px",
+              }}
+            >
+              {activeTab === "buy" ? "💰" : "⭐"}
+            </div>
+          </div>
+        )}
+
+        {/* Quick Amount Buttons */}
         <div style={{ marginBottom: "16px" }}>
-          <TabSwitcher activeTab={activeTab} onTabChange={setActiveTab} />
+          <div style={{ fontSize: "13px", color: "#6B7280", marginBottom: "8px", fontWeight: 500 }}>
+            مبالغ پیشنهادی:
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "8px" }}>
+            {[100000, 500000, 1000000, 5000000].map((value) => (
+              <button
+                key={value}
+                onClick={() => handleQuickAmount(value)}
+                style={{
+                  padding: "12px 8px",
+                  background: amount === value.toString() ? "#FFC857" : "#FFFFFF",
+                  border: amount === value.toString() ? "2px solid #E6A700" : "1px solid #E5E7EB",
+                  borderRadius: "12px",
+                  fontSize: "11px",
+                  fontWeight: 600,
+                  color: amount === value.toString() ? "#1F1F1F" : "#6B7280",
+                  cursor: "pointer",
+                  transition: "all 0.2s",
+                }}
+              >
+                {value >= 1000000
+                  ? `${toPersianNumber((value / 1000000).toString())}M`
+                  : `${toPersianNumber((value / 1000).toString())}K`}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Input Card */}
@@ -260,52 +335,58 @@ export default function BuySell() {
           {/* Amount Input */}
           <div
             style={{
-              padding: "16px",
+              padding: "20px",
               border: "2px solid #F3F4F6",
               borderRadius: "16px",
               marginBottom: "12px",
               background: "#FAFAFA",
             }}
           >
-            <div style={{ fontSize: "12px", color: "#6B7280", marginBottom: "8px", textAlign: "right" }}>
-              مبلغ پرداختی به تومان
+            <div style={{ fontSize: "12px", color: "#6B7280", marginBottom: "8px", textAlign: "center" }}>
+              مبلغ پرداختی (تومان)
+            </div>
+            <div
+              style={{
+                fontSize: "28px",
+                fontWeight: 700,
+                textAlign: "center",
+                minHeight: "40px",
+                color: amount ? "#1F1F1F" : "#D1D5DB",
+              }}
+            >
+              {amount ? toPersianNumber(parseFloat(amount).toLocaleString("fa-IR")) : "۰"}
+            </div>
+          </div>
+
+          {/* Gold Amount Display - NOW SHOWS ALWAYS */}
+          <div
+            style={{
+              padding: "20px",
+              border: `3px solid ${activeTab === "buy" ? "#10B981" : "#EF4444"}`,
+              borderRadius: "16px",
+              marginBottom: "20px",
+              background: activeTab === "buy" ? "#ECFDF5" : "#FEF2F2",
+            }}
+          >
+            <div style={{
+              fontSize: "12px",
+              color: activeTab === "buy" ? "#059669" : "#DC2626",
+              marginBottom: "8px",
+              textAlign: "center",
+              fontWeight: 600,
+            }}>
+              🪙 مقدار طلا (گرم)
             </div>
             <div
               style={{
                 fontSize: "24px",
-                fontWeight: 600,
+                fontWeight: 700,
                 textAlign: "center",
                 minHeight: "36px",
-                color: "#1F1F1F",
+                color: activeTab === "buy" ? "#059669" : "#DC2626",
               }}
             >
-              {amount ? toPersianNumber(amount) : ""}
-            </div>
-          </div>
-
-          {/* Gold Amount Display */}
-          <div
-            style={{
-              padding: "16px",
-              border: "2px solid #F3F4F6",
-              borderRadius: "16px",
-              marginBottom: "20px",
-              background: "#FAFAFA",
-            }}
-          >
-            <div style={{ fontSize: "12px", color: "#6B7280", marginBottom: "8px", textAlign: "right" }}>
-              مقدار طلا به گرم
-            </div>
-            <div
-              style={{
-                fontSize: "20px",
-                fontWeight: 600,
-                textAlign: "center",
-                minHeight: "30px",
-                color: "#1F1F1F",
-              }}
-            >
-              {preview ? toPersianNumber(preview.gold_amount.toFixed(4)) : ""}
+              {goldAmount > 0 ? toPersianNumber(goldAmount.toFixed(4)) : "۰.۰۰۰۰"}
             </div>
           </div>
 
@@ -323,36 +404,73 @@ export default function BuySell() {
                 textAlign: "center",
                 fontSize: "13px",
                 color: "#92400E",
+                fontWeight: 600,
               }}
             >
-              کارمزد:{" "}
-              <span style={{ fontWeight: 600 }}>
+              💳 کارمزد:{" "}
+              <span style={{ fontWeight: 700 }}>
                 {toPersianNumber(preview.fee.toLocaleString("fa-IR"))} تومان
               </span>
             </div>
           )}
         </div>
 
-        {/* CTA Button */}
+        {/* Submit Button - ALWAYS VISIBLE */}
         <button
           onClick={handleSubmit}
-          disabled={loading || !preview}
+          disabled={loading || !isValidAmount}
           style={{
             width: "100%",
-            padding: "18px",
-            fontSize: "17px",
+            padding: "20px",
+            fontSize: "18px",
             fontWeight: 700,
             color: "#FFFFFF",
-            background: loading || !preview ? "#9CA3AF" : "#1F1F1F",
+            background: loading
+              ? "#9CA3AF"
+              : !isValidAmount
+              ? "linear-gradient(135deg, #6B7280 0%, #4B5563 100%)"
+              : activeTab === "buy"
+              ? "linear-gradient(135deg, #10B981 0%, #059669 100%)"
+              : "linear-gradient(135deg, #EF4444 0%, #DC2626 100%)",
             border: "none",
             borderRadius: "16px",
-            cursor: loading || !preview ? "not-allowed" : "pointer",
-            transition: "all 0.2s ease",
-            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+            cursor: loading || !isValidAmount ? "not-allowed" : "pointer",
+            transition: "all 0.3s ease",
+            boxShadow: "0 8px 20px rgba(0, 0, 0, 0.2)",
+            display: "block",
+            position: "relative",
           }}
         >
-          {loading ? "در حال انجام..." : activeTab === "buy" ? "خرید طلا" : "فروش طلا"}
+          {loading ? (
+            <span>⏳ در حال پردازش...</span>
+          ) : !amount ? (
+            <span>مبلغ مورد نظر را وارد کنید</span>
+          ) : !isValidAmount ? (
+            <span>⚠️ حداقل مبلغ ۱۰۰,۰۰۰ تومان</span>
+          ) : activeTab === "buy" ? (
+            <span>✅ تایید و خرید طلا</span>
+          ) : (
+            <span>✅ تایید و فروش طلا</span>
+          )}
         </button>
+
+        {/* Helper Text */}
+        {!isValidAmount && amount && parseFloat(amount) < 100000 && (
+          <div
+            style={{
+              marginTop: "12px",
+              padding: "12px",
+              background: "#FEF3C7",
+              borderRadius: "12px",
+              textAlign: "center",
+              fontSize: "13px",
+              color: "#92400E",
+              fontWeight: 500,
+            }}
+          >
+            ⚠️ برای ثبت سفارش، حداقل ۱۰۰,۰۰۰ تومان وارد کنید
+          </div>
+        )}
       </div>
     </div>
   );
