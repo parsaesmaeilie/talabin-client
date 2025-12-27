@@ -139,16 +139,20 @@ export default function BuySell() {
   const isValidAmount = amount && parseFloat(amount) >= 100000;
 
   return (
-    <div style={{ minHeight: "100vh", background: "#FAFAFA", paddingBottom: "100px" }}>
+    <div style={{ minHeight: "100vh", background: "#FAFAFA", paddingBottom: "120px" }} className="fade-in">
       {/* Header */}
       <div
         style={{
           background: "#FFFFFF",
-          padding: "16px",
+          padding: "clamp(12px, 3vw, 16px)",
           display: "flex",
           alignItems: "center",
           gap: "12px",
           boxShadow: "0 2px 8px rgba(0, 0, 0, 0.04)",
+          position: "sticky",
+          top: 0,
+          zIndex: 10,
+          transition: "all 0.3s ease",
         }}
       >
         <Link href="/dashboard">
@@ -181,19 +185,21 @@ export default function BuySell() {
       </div>
 
       {/* Content */}
-      <div style={{ padding: "16px" }}>
+      <div style={{ padding: "clamp(12px, 3vw, 16px)", maxWidth: "600px", margin: "0 auto" }}>
         {/* Success/Error Messages */}
         {success && (
           <div
+            className="slide-in-down"
             style={{
               padding: "12px 16px",
               marginBottom: "16px",
               borderRadius: "12px",
               background: "#D1FAE5",
               color: "#059669",
-              fontSize: "14px",
+              fontSize: "clamp(13px, 3vw, 14px)",
               textAlign: "center",
               fontWeight: 600,
+              transition: "all 0.3s ease",
             }}
           >
             {success}
@@ -202,15 +208,17 @@ export default function BuySell() {
 
         {error && (
           <div
+            className="slide-in-down"
             style={{
               padding: "12px 16px",
               marginBottom: "16px",
               borderRadius: "12px",
               background: "#FEE2E2",
               color: "#DC2626",
-              fontSize: "14px",
+              fontSize: "clamp(13px, 3vw, 14px)",
               textAlign: "center",
               fontWeight: 600,
+              transition: "all 0.3s ease",
             }}
           >
             {error}
@@ -224,20 +232,23 @@ export default function BuySell() {
 
         {/* Current Price Card */}
         <div
+          className="scale-in"
           style={{
             background: activeTab === "buy" ? "linear-gradient(135deg, #10B981 0%, #059669 100%)" : "linear-gradient(135deg, #EF4444 0%, #DC2626 100%)",
-            borderRadius: "20px",
-            padding: "24px",
+            borderRadius: "clamp(16px, 4vw, 20px)",
+            padding: "clamp(20px, 5vw, 24px)",
             marginBottom: "16px",
             textAlign: "center",
             boxShadow: "0 8px 20px rgba(0, 0, 0, 0.12)",
             color: "#FFFFFF",
+            transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+            transform: "translateZ(0)",
           }}
         >
-          <div style={{ fontSize: "13px", marginBottom: "8px", opacity: 0.9 }}>
+          <div style={{ fontSize: "clamp(12px, 3vw, 13px)", marginBottom: "8px", opacity: 0.9 }}>
             قیمت {activeTab === "buy" ? "خرید" : "فروش"} هر گرم طلای ۱۸ عیار
           </div>
-          <div style={{ fontSize: "36px", fontWeight: 700 }}>
+          <div style={{ fontSize: "clamp(28px, 8vw, 36px)", fontWeight: 700, lineHeight: 1.2 }}>
             {currentPrice
               ? toPersianNumber(
                   parseFloat(
@@ -246,7 +257,7 @@ export default function BuySell() {
                 )
               : "..."}
           </div>
-          <div style={{ fontSize: "14px", marginTop: "4px", opacity: 0.9 }}>
+          <div style={{ fontSize: "clamp(13px, 3vw, 14px)", marginTop: "4px", opacity: 0.9 }}>
             تومان
           </div>
         </div>
@@ -254,22 +265,33 @@ export default function BuySell() {
         {/* Wallet Balance */}
         {wallet && (
           <div
+            className="slide-in-up"
             style={{
               background: "#FFFFFF",
-              borderRadius: "16px",
-              padding: "16px",
+              borderRadius: "clamp(14px, 3.5vw, 16px)",
+              padding: "clamp(14px, 3.5vw, 16px)",
               marginBottom: "16px",
               boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
+              transition: "transform 0.3s ease, box-shadow 0.3s ease",
+              cursor: "pointer",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "translateY(-2px)";
+              e.currentTarget.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.1)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.06)";
             }}
           >
             <div>
-              <div style={{ fontSize: "12px", color: "#6B7280", marginBottom: "4px" }}>
+              <div style={{ fontSize: "clamp(11px, 2.5vw, 12px)", color: "#6B7280", marginBottom: "4px" }}>
                 موجودی {activeTab === "buy" ? "تومان" : "طلا"}
               </div>
-              <div style={{ fontSize: "16px", fontWeight: 600, color: "#1F1F1F" }}>
+              <div style={{ fontSize: "clamp(15px, 3.5vw, 16px)", fontWeight: 600, color: "#1F1F1F" }}>
                 {activeTab === "buy"
                   ? `${toPersianNumber(parseFloat(wallet.balance_irr).toLocaleString("fa-IR"))} تومان`
                   : `${toPersianNumber(parseFloat(wallet.gold_balance).toFixed(4))} گرم`}
@@ -277,14 +299,15 @@ export default function BuySell() {
             </div>
             <div
               style={{
-                width: "48px",
-                height: "48px",
+                width: "clamp(44px, 10vw, 48px)",
+                height: "clamp(44px, 10vw, 48px)",
                 borderRadius: "12px",
                 background: activeTab === "buy" ? "#D1FAE5" : "#FEE2E2",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                fontSize: "24px",
+                fontSize: "clamp(20px, 5vw, 24px)",
+                transition: "transform 0.3s ease",
               }}
             >
               {activeTab === "buy" ? "💰" : "⭐"}
@@ -294,24 +317,44 @@ export default function BuySell() {
 
         {/* Quick Amount Buttons */}
         <div style={{ marginBottom: "16px" }}>
-          <div style={{ fontSize: "13px", color: "#6B7280", marginBottom: "8px", fontWeight: 500 }}>
+          <div style={{ fontSize: "clamp(12px, 3vw, 13px)", color: "#6B7280", marginBottom: "8px", fontWeight: 500 }}>
             مبالغ پیشنهادی:
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "8px" }}>
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(70px, 1fr))",
+            gap: "clamp(6px, 2vw, 8px)"
+          }}>
             {[100000, 500000, 1000000, 5000000].map((value) => (
               <button
                 key={value}
                 onClick={() => handleQuickAmount(value)}
                 style={{
-                  padding: "12px 8px",
+                  padding: "clamp(10px, 3vw, 12px) clamp(6px, 2vw, 8px)",
                   background: amount === value.toString() ? "#FFC857" : "#FFFFFF",
                   border: amount === value.toString() ? "2px solid #E6A700" : "1px solid #E5E7EB",
-                  borderRadius: "12px",
-                  fontSize: "11px",
+                  borderRadius: "clamp(10px, 2.5vw, 12px)",
+                  fontSize: "clamp(10px, 2.5vw, 11px)",
                   fontWeight: 600,
                   color: amount === value.toString() ? "#1F1F1F" : "#6B7280",
                   cursor: "pointer",
-                  transition: "all 0.2s",
+                  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                  transform: amount === value.toString() ? "scale(1.05)" : "scale(1)",
+                  boxShadow: amount === value.toString() ? "0 4px 8px rgba(252, 176, 69, 0.3)" : "none",
+                  minHeight: "44px",
+                  touchAction: "manipulation",
+                }}
+                onMouseEnter={(e) => {
+                  if (amount !== value.toString()) {
+                    e.currentTarget.style.transform = "scale(1.05)";
+                    e.currentTarget.style.borderColor = "#D1D5DB";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (amount !== value.toString()) {
+                    e.currentTarget.style.transform = "scale(1)";
+                    e.currentTarget.style.borderColor = "#E5E7EB";
+                  }
                 }}
               >
                 {value >= 1000000
@@ -419,10 +462,11 @@ export default function BuySell() {
         <button
           onClick={handleSubmit}
           disabled={loading || !isValidAmount}
+          className="pulse"
           style={{
             width: "100%",
-            padding: "20px",
-            fontSize: "18px",
+            padding: "clamp(16px, 4vw, 20px)",
+            fontSize: "clamp(16px, 4vw, 18px)",
             fontWeight: 700,
             color: "#FFFFFF",
             background: loading
@@ -433,12 +477,39 @@ export default function BuySell() {
               ? "linear-gradient(135deg, #10B981 0%, #059669 100%)"
               : "linear-gradient(135deg, #EF4444 0%, #DC2626 100%)",
             border: "none",
-            borderRadius: "16px",
+            borderRadius: "clamp(14px, 3.5vw, 16px)",
             cursor: loading || !isValidAmount ? "not-allowed" : "pointer",
-            transition: "all 0.3s ease",
-            boxShadow: "0 8px 20px rgba(0, 0, 0, 0.2)",
+            transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+            boxShadow: isValidAmount && !loading
+              ? "0 8px 20px rgba(0, 0, 0, 0.2)"
+              : "0 4px 8px rgba(0, 0, 0, 0.1)",
             display: "block",
             position: "relative",
+            minHeight: "56px",
+            touchAction: "manipulation",
+            transform: "translateZ(0)",
+          }}
+          onMouseEnter={(e) => {
+            if (isValidAmount && !loading) {
+              e.currentTarget.style.transform = "translateY(-2px) scale(1.02)";
+              e.currentTarget.style.boxShadow = "0 12px 28px rgba(0, 0, 0, 0.25)";
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (isValidAmount && !loading) {
+              e.currentTarget.style.transform = "translateY(0) scale(1)";
+              e.currentTarget.style.boxShadow = "0 8px 20px rgba(0, 0, 0, 0.2)";
+            }
+          }}
+          onTouchStart={(e) => {
+            if (isValidAmount && !loading) {
+              e.currentTarget.style.transform = "scale(0.98)";
+            }
+          }}
+          onTouchEnd={(e) => {
+            if (isValidAmount && !loading) {
+              e.currentTarget.style.transform = "scale(1)";
+            }
           }}
         >
           {loading ? (

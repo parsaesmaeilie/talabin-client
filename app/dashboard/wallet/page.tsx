@@ -141,16 +141,20 @@ export default function WalletPage() {
         }
       `}</style>
 
-      <div style={{ minHeight: "100vh", background: "#FAFAFA", paddingBottom: "100px" }}>
+      <div style={{ minHeight: "100vh", background: "#FAFAFA", paddingBottom: "120px" }} className="fade-in">
         {/* Header */}
         <div
           style={{
             background: "#FFFFFF",
-            padding: "16px",
+            padding: "clamp(12px, 3vw, 16px)",
             display: "flex",
             alignItems: "center",
             gap: "12px",
             boxShadow: "0 2px 8px rgba(0, 0, 0, 0.04)",
+            position: "sticky",
+            top: 0,
+            zIndex: 10,
+            transition: "all 0.3s ease",
           }}
         >
           <Link href="/dashboard">
@@ -183,22 +187,24 @@ export default function WalletPage() {
         </div>
 
         {/* Content */}
-        <div style={{ padding: "16px" }}>
+        <div style={{ padding: "clamp(12px, 3vw, 16px)", maxWidth: "800px", margin: "0 auto" }}>
           {/* Error Message */}
           {error && (
             <div
+              className="slide-in-down"
               style={{
                 padding: "12px 16px",
                 marginBottom: "16px",
                 borderRadius: "12px",
                 background: "#FEE2E2",
                 color: "#DC2626",
-                fontSize: "14px",
+                fontSize: "clamp(13px, 3vw, 14px)",
                 textAlign: "center",
                 fontWeight: 600,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
+                transition: "all 0.3s ease",
               }}
             >
               <span>{error}</span>
@@ -209,9 +215,11 @@ export default function WalletPage() {
                   border: "none",
                   color: "#DC2626",
                   cursor: "pointer",
-                  fontSize: "12px",
+                  fontSize: "clamp(11px, 2.5vw, 12px)",
                   fontWeight: 600,
                   textDecoration: "underline",
+                  minHeight: "44px",
+                  touchAction: "manipulation",
                 }}
               >
                 تلاش مجدد
@@ -221,13 +229,16 @@ export default function WalletPage() {
 
           {/* Total Balance Card */}
           <div
+            className="scale-in"
             style={{
               background: "linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%)",
-              borderRadius: "20px",
-              padding: "24px",
+              borderRadius: "clamp(16px, 4vw, 20px)",
+              padding: "clamp(20px, 5vw, 24px)",
               marginBottom: "16px",
               boxShadow: "0 8px 20px rgba(251, 191, 36, 0.25)",
               color: "#FFFFFF",
+              transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+              transform: "translateZ(0)",
             }}
           >
             <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>

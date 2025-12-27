@@ -85,16 +85,20 @@ export default function DashboardPage() {
         }
       `}</style>
 
-      <div style={{ minHeight: "100vh", background: "#FAFAFA", paddingBottom: "100px" }}>
+      <div style={{ minHeight: "100vh", background: "#FAFAFA", paddingBottom: "120px" }} className="fade-in">
         {/* Header */}
         <div
           style={{
             background: "#FFFFFF",
-            padding: "16px",
+            padding: "clamp(12px, 3vw, 16px)",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
             boxShadow: "0 2px 8px rgba(0, 0, 0, 0.04)",
+            position: "sticky",
+            top: 0,
+            zIndex: 10,
+            transition: "all 0.3s ease",
           }}
         >
           <Link href="/notifications" style={{ position: "relative" }}>
@@ -210,22 +214,24 @@ export default function DashboardPage() {
         </div>
 
         {/* Content */}
-        <div style={{ padding: "16px" }}>
+        <div style={{ padding: "clamp(12px, 3vw, 16px)", maxWidth: "800px", margin: "0 auto" }}>
           {/* Error Message */}
           {error && (
             <div
+              className="slide-in-down"
               style={{
                 padding: "12px 16px",
                 marginBottom: "16px",
                 borderRadius: "12px",
                 background: "#FEE2E2",
                 color: "#DC2626",
-                fontSize: "14px",
+                fontSize: "clamp(13px, 3vw, 14px)",
                 textAlign: "center",
                 fontWeight: 600,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
+                transition: "all 0.3s ease",
               }}
             >
               <span>{error}</span>
@@ -236,9 +242,11 @@ export default function DashboardPage() {
                   border: "none",
                   color: "#DC2626",
                   cursor: "pointer",
-                  fontSize: "12px",
+                  fontSize: "clamp(11px, 2.5vw, 12px)",
                   fontWeight: 600,
                   textDecoration: "underline",
+                  minHeight: "44px",
+                  touchAction: "manipulation",
                 }}
               >
                 تلاش مجدد
@@ -248,13 +256,16 @@ export default function DashboardPage() {
 
           {/* Balance Card */}
           <div
+            className="scale-in"
             style={{
               background: "linear-gradient(135deg, #10B981 0%, #059669 100%)",
-              borderRadius: "20px",
-              padding: "24px",
+              borderRadius: "clamp(16px, 4vw, 20px)",
+              padding: "clamp(20px, 5vw, 24px)",
               marginBottom: "16px",
               boxShadow: "0 8px 20px rgba(16, 185, 129, 0.25)",
               color: "#FFFFFF",
+              transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+              transform: "translateZ(0)",
             }}
           >
             <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
@@ -294,11 +305,11 @@ export default function DashboardPage() {
               </>
             ) : (
               <>
-                <div style={{ display: "flex", alignItems: "baseline", gap: "8px", marginBottom: "8px" }}>
-                  <span style={{ fontSize: "40px", fontWeight: 700 }}>
+                <div style={{ display: "flex", alignItems: "baseline", gap: "8px", marginBottom: "8px", flexWrap: "wrap" }}>
+                  <span style={{ fontSize: "clamp(32px, 8vw, 40px)", fontWeight: 700, lineHeight: 1.2 }}>
                     {wallet ? toPersianNumber(parseFloat(wallet.gold_balance).toFixed(4)) : "۰"}
                   </span>
-                  <span style={{ fontSize: "18px", opacity: 0.9 }}>گرم</span>
+                  <span style={{ fontSize: "clamp(16px, 4vw, 18px)", opacity: 0.9 }}>گرم</span>
                 </div>
 
                 <div
@@ -323,15 +334,17 @@ export default function DashboardPage() {
 
           {/* Quick Actions Grid */}
           <div
+            className="slide-in-up"
             style={{
               background: "#1F1F1F",
-              borderRadius: "24px",
-              padding: "20px",
+              borderRadius: "clamp(20px, 5vw, 24px)",
+              padding: "clamp(16px, 4vw, 20px)",
               marginBottom: "16px",
               display: "grid",
-              gridTemplateColumns: "repeat(2, 1fr)",
-              gap: "16px",
+              gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
+              gap: "clamp(12px, 3vw, 16px)",
               boxShadow: "0 4px 16px rgba(0, 0, 0, 0.1)",
+              transition: "all 0.3s ease",
             }}
           >
             <Link
@@ -340,29 +353,40 @@ export default function DashboardPage() {
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-                gap: "12px",
+                gap: "clamp(10px, 2.5vw, 12px)",
                 textDecoration: "none",
-                padding: "16px 12px",
-                borderRadius: "16px",
+                padding: "clamp(14px, 3.5vw, 16px) clamp(10px, 2.5vw, 12px)",
+                borderRadius: "clamp(14px, 3.5vw, 16px)",
                 background: "rgba(16, 185, 129, 0.1)",
-                transition: "all 0.2s",
+                transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                minHeight: "100px",
+                touchAction: "manipulation",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "translateY(-4px) scale(1.05)";
+                e.currentTarget.style.background = "rgba(16, 185, 129, 0.2)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "translateY(0) scale(1)";
+                e.currentTarget.style.background = "rgba(16, 185, 129, 0.1)";
               }}
             >
               <div
                 style={{
-                  width: "48px",
-                  height: "48px",
-                  borderRadius: "12px",
+                  width: "clamp(44px, 10vw, 48px)",
+                  height: "clamp(44px, 10vw, 48px)",
+                  borderRadius: "clamp(10px, 2.5vw, 12px)",
                   background: "linear-gradient(135deg, #10B981 0%, #059669 100%)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontSize: "24px",
+                  fontSize: "clamp(20px, 5vw, 24px)",
+                  transition: "transform 0.3s ease",
                 }}
               >
                 💰
               </div>
-              <span style={{ color: "#FFFFFF", fontSize: "14px", fontWeight: 600 }}>
+              <span style={{ color: "#FFFFFF", fontSize: "clamp(13px, 3vw, 14px)", fontWeight: 600 }}>
                 خرید طلا
               </span>
             </Link>
