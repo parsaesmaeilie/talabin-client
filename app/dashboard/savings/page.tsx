@@ -26,63 +26,65 @@ export default function SavingsPage() {
   };
 
   return (
-    <div
-      className="min-h-screen"
-      style={{ padding: "20px 16px 100px", background: "#F5F5F5" }}
-    >
-      <div style={{ maxWidth: "600px", margin: "0 auto" }}>
-        {/* Header */}
+    <div style={{ minHeight: "100vh", background: "#FAFAFA" }}>
+      {/* Header */}
+      <div
+        style={{
+          background: "#FFFFFF",
+          padding: "16px",
+          display: "flex",
+          alignItems: "center",
+          gap: "12px",
+          marginBottom: "16px",
+        }}
+      >
+        <Link href="/dashboard">
+          <div
+            style={{
+              width: "40px",
+              height: "40px",
+              borderRadius: "12px",
+              background: "#F5F5F5",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+            }}
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M15 19L8 12L15 5"
+                stroke="#1F1F1F"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+        </Link>
+        <h1 style={{ fontSize: "18px", fontWeight: 600, flex: 1, color: "#1F1F1F" }}>
+          پس‌انداز طلا
+        </h1>
         <div
+          onClick={() => setShowAddModal(!showAddModal)}
           style={{
+            width: "40px",
+            height: "40px",
+            borderRadius: "12px",
+            background: "#F5F5F5",
             display: "flex",
             alignItems: "center",
-            justifyContent: "space-between",
-            marginBottom: "24px",
+            justifyContent: "center",
+            fontSize: "20px",
+            cursor: "pointer",
           }}
         >
-          <Link
-            href="/dashboard"
-            style={{
-              width: "40px",
-              height: "40px",
-              borderRadius: "12px",
-              background: "#FFFFFF",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: "20px",
-              cursor: "pointer",
-              textDecoration: "none",
-            }}
-          >
-            ←
-          </Link>
-          <h1
-            style={{
-              fontSize: "18px",
-              fontWeight: 700,
-              margin: 0,
-            }}
-          >
-            پس‌انداز طلا
-          </h1>
-          <div
-            onClick={() => setShowAddModal(!showAddModal)}
-            style={{
-              width: "40px",
-              height: "40px",
-              borderRadius: "12px",
-              background: "#FFFFFF",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: "20px",
-              cursor: "pointer",
-            }}
-          >
-            ✏️
-          </div>
+          ✏️
         </div>
+      </div>
+
+      {/* Content */}
+      <div style={{ padding: "0 16px 16px" }}>
 
         {/* Balance Card */}
         <div
