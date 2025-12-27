@@ -165,13 +165,15 @@ export default function DashboardPage() {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              fontSize: "24px",
-              fontWeight: 700,
-              color: "#1F1F1F",
               boxShadow: "0 4px 12px rgba(253, 176, 34, 0.3)",
+              padding: "8px",
             }}
           >
-            ط
+            <img
+              src="/logo.svg"
+              alt="Talabin"
+              style={{ width: "100%", height: "100%", objectFit: "contain" }}
+            />
           </div>
 
           <Link href="/profile">
