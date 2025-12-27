@@ -66,19 +66,18 @@ export default function LoginPage() {
         <div style={{ display: "flex", justifyContent: "center", marginBottom: "24px" }}>
           <div
             style={{
-              width: "48px",
-              height: "48px",
-              borderRadius: "14px",
-              background: "var(--color-primary)",
+              width: "64px",
+              height: "64px",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              fontSize: "24px",
-              fontWeight: 700,
-              color: "#1C1C1C",
             }}
           >
-            ط
+            <img
+              src="/logo.svg"
+              alt="Talabin Logo"
+              style={{ width: "100%", height: "100%" }}
+            />
           </div>
         </div>
 

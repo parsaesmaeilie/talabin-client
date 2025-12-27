@@ -297,7 +297,7 @@ export default function DashboardPage() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "12px", marginBottom: "16px" }}>
           {/* Installment Card */}
           <Link
-            href="/dashboard/installments"
+            href="/dashboard/installment"
             style={{
               background: "#FFFFFF",
               borderRadius: "20px",

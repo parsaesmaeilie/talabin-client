@@ -91,29 +91,61 @@ export default function WalletPage() {
     }
   };
   return (
-    <div className="min-h-screen" style={{ padding: "20px 16px 80px" }}>
-      <div style={{ maxWidth: "700px", margin: "0 auto" }}>
-        <h1
-          style={{
-            fontSize: "20px",
-            fontWeight: 600,
-            margin: "0 0 6px",
-          }}
-        >
+    <div style={{ minHeight: "100vh", background: "#FAFAFA" }}>
+      {/* Header */}
+      <div
+        style={{
+          background: "#FFFFFF",
+          padding: "16px",
+          display: "flex",
+          alignItems: "center",
+          gap: "12px",
+          marginBottom: "16px",
+        }}
+      >
+        <Link href="/dashboard">
+          <div
+            style={{
+              width: "40px",
+              height: "40px",
+              borderRadius: "12px",
+              background: "#F5F5F5",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+            }}
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M15 19L8 12L15 5"
+                stroke="#1F1F1F"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+        </Link>
+        <h1 style={{ fontSize: "18px", fontWeight: 600, flex: 1, color: "#1F1F1F" }}>
           کیف پول
         </h1>
-        <p
-          style={{
-            fontSize: "13px",
-            color: "var(--color-muted)",
-            margin: "0 0 20px",
-          }}
-        >
-          مدیریت موجودی تومان و طلای دیجیتال در طلابین
-        </p>
+      </div>
+
+      {/* Content */}
+      <div style={{ padding: "0 16px 16px" }}>
 
       {/* Total Balance Card */}
-      <Card style={{ marginBottom: "12px" }} className={loading ? "" : "scale-in"}>
+      <div
+        style={{
+          background: "#FFFFFF",
+          borderRadius: "20px",
+          padding: "20px",
+          marginBottom: "16px",
+          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
+        }}
+        className={loading ? "" : "scale-in"}
+      >
         {loading ? (
           <div style={{ textAlign: "center", padding: "20px" }}>
             <div className="skeleton" style={{ height: "60px", width: "100%" }}></div>
@@ -159,99 +191,122 @@ export default function WalletPage() {
             خطا در بارگذاری اطلاعات
           </div>
         )}
-      </Card>
+      </div>
 
       {/* Balance Cards */}
-      <div className="grid-2" style={{ gap: "10px", marginBottom: "12px" }}>
-        <Card className={loading ? "" : "scale-in"}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "12px", marginBottom: "16px" }}>
+        <div
+          style={{
+            background: "#FFFFFF",
+            borderRadius: "20px",
+            padding: "20px",
+            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
+          }}
+          className={loading ? "" : "scale-in"}
+        >
           {loading ? (
             <div className="skeleton" style={{ height: "50px", width: "100%" }}></div>
           ) : wallet ? (
             <>
-              <div
-                style={{
-                  fontSize: "12px",
-                  color: "var(--color-muted)",
-                  marginBottom: "6px",
-                }}
-              >
+              <div style={{ fontSize: "12px", color: "#6B7280", marginBottom: "8px" }}>
                 طلای دیجیتال
               </div>
-              <div style={{ marginTop: "6px" }}>
-                <span style={{ fontSize: "18px", fontWeight: 700 }}>
+              <div style={{ display: "flex", alignItems: "baseline", gap: "4px" }}>
+                <span style={{ fontSize: "20px", fontWeight: 700, color: "#1F1F1F" }}>
                   {parseFloat(wallet.available_gold_balance).toFixed(4)}
                 </span>
-                <span
-                  style={{
-                    fontSize: "12px",
-                    fontWeight: 400,
-                    color: "var(--color-muted)",
-                    marginRight: "4px",
-                  }}
-                >
-                  گرم
-                </span>
+                <span style={{ fontSize: "13px", color: "#6B7280" }}>گرم</span>
               </div>
               {parseFloat(wallet.frozen_gold_balance) > 0 && (
-                <div style={{ fontSize: "10px", color: "var(--color-muted)", marginTop: "4px" }}>
+                <div style={{ fontSize: "10px", color: "#6B7280", marginTop: "4px" }}>
                   مسدود شده: {parseFloat(wallet.frozen_gold_balance).toFixed(4)} گرم
                 </div>
               )}
             </>
           ) : null}
-        </Card>
+        </div>
 
-        <Card className={loading ? "" : "scale-in"}>
+        <div
+          style={{
+            background: "#FFFFFF",
+            borderRadius: "20px",
+            padding: "20px",
+            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
+          }}
+          className={loading ? "" : "scale-in"}
+        >
           {loading ? (
             <div className="skeleton" style={{ height: "50px", width: "100%" }}></div>
           ) : wallet ? (
             <>
-              <div
-                style={{
-                  fontSize: "12px",
-                  color: "var(--color-muted)",
-                  marginBottom: "6px",
-                }}
-              >
+              <div style={{ fontSize: "12px", color: "#6B7280", marginBottom: "8px" }}>
                 موجودی تومان
               </div>
-              <div style={{ marginTop: "6px" }}>
-                <span style={{ fontSize: "18px", fontWeight: 700 }}>
+              <div style={{ display: "flex", alignItems: "baseline", gap: "4px" }}>
+                <span style={{ fontSize: "20px", fontWeight: 700, color: "#1F1F1F" }}>
                   {parseFloat(wallet.available_balance_irr).toLocaleString('fa-IR')}
                 </span>
-                <span
-                  style={{
-                    fontSize: "12px",
-                    fontWeight: 400,
-                    color: "var(--color-muted)",
-                    marginRight: "4px",
-                  }}
-                >
-                  تومان
-                </span>
+                <span style={{ fontSize: "13px", color: "#6B7280" }}>تومان</span>
               </div>
               {parseFloat(wallet.frozen_balance_irr) > 0 && (
-                <div style={{ fontSize: "10px", color: "var(--color-muted)", marginTop: "4px" }}>
+                <div style={{ fontSize: "10px", color: "#6B7280", marginTop: "4px" }}>
                   مسدود شده: {parseFloat(wallet.frozen_balance_irr).toLocaleString('fa-IR')} تومان
                 </div>
               )}
             </>
           ) : null}
-        </Card>
+        </div>
       </div>
 
       {/* Action Buttons */}
-      <div className="grid-2" style={{ gap: "10px", marginBottom: "16px" }}>
-        <Button variant="primary" fullWidth asLink href="/dashboard/wallet/deposit">
-          واریز
-        </Button>
-        <Button variant="outline" fullWidth asLink href="/dashboard/wallet/withdraw">
-          برداشت
-        </Button>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "12px", marginBottom: "16px" }}>
+        <Link href="/dashboard/wallet/deposit" style={{ textDecoration: "none" }}>
+          <button
+            style={{
+              width: "100%",
+              padding: "16px",
+              fontSize: "15px",
+              fontWeight: 600,
+              color: "#1F1F1F",
+              background: "#FDB022",
+              border: "none",
+              borderRadius: "16px",
+              cursor: "pointer",
+              boxShadow: "0 4px 12px rgba(253, 176, 34, 0.3)",
+            }}
+          >
+            واریز
+          </button>
+        </Link>
+        <Link href="/dashboard/wallet/withdraw" style={{ textDecoration: "none" }}>
+          <button
+            style={{
+              width: "100%",
+              padding: "16px",
+              fontSize: "15px",
+              fontWeight: 600,
+              color: "#1F1F1F",
+              background: "#FFFFFF",
+              border: "2px solid #F3F4F6",
+              borderRadius: "16px",
+              cursor: "pointer",
+            }}
+          >
+            برداشت
+          </button>
+        </Link>
       </div>
 
       {/* Recent Wallet History */}
-      <Card className={loading ? "" : "scale-in"}>
+      <div
+        style={{
+          background: "#FFFFFF",
+          borderRadius: "20px",
+          padding: "20px",
+          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
+        }}
+        className={loading ? "" : "scale-in"}
+      >
         <div
           style={{
             display: "flex",
@@ -346,7 +401,7 @@ export default function WalletPage() {
             هیچ تراکنشی یافت نشد
           </div>
         )}
-      </Card>
+      </div>
       </div>
     </div>
   );
