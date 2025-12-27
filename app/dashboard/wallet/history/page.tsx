@@ -129,55 +129,57 @@ export default function TransactionHistoryPage() {
   };
 
   return (
-    <div
-      className="min-h-screen"
-      style={{ padding: "20px 16px 100px", background: "#F5F5F5" }}
-    >
-      <div style={{ maxWidth: "600px", margin: "0 auto" }}>
-        {/* Header */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            marginBottom: "24px",
-          }}
-        >
-          <Link
-            href="/dashboard/wallet"
+    <div style={{ minHeight: "100vh", background: "#FAFAFA" }}>
+      {/* Header */}
+      <div
+        style={{
+          background: "#FFFFFF",
+          padding: "16px",
+          display: "flex",
+          alignItems: "center",
+          gap: "12px",
+          marginBottom: "16px",
+        }}
+      >
+        <Link href="/dashboard/wallet">
+          <div
             style={{
               width: "40px",
               height: "40px",
               borderRadius: "12px",
-              background: "#FFFFFF",
+              background: "#F5F5F5",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              fontSize: "20px",
               cursor: "pointer",
-              textDecoration: "none",
             }}
           >
-            ←
-          </Link>
-          <h1
-            style={{
-              fontSize: "18px",
-              fontWeight: 700,
-              margin: 0,
-            }}
-          >
-            تاریخچه تراکنش‌ها
-          </h1>
-          <div style={{ width: "40px" }} />
-        </div>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M15 19L8 12L15 5"
+                stroke="#1F1F1F"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+        </Link>
+        <h1 style={{ fontSize: "18px", fontWeight: 600, flex: 1, color: "#1F1F1F" }}>
+          تاریخچه تراکنش‌ها
+        </h1>
+      </div>
 
+      {/* Content */}
+      <div style={{ padding: "0 16px 16px" }}>
         {/* Search Box */}
         <div
-          className="card"
           style={{
+            background: "#FFFFFF",
+            borderRadius: "20px",
+            padding: "16px",
             marginBottom: "16px",
-            padding: "12px 16px",
+            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
           }}
         >
           <input
@@ -190,10 +192,12 @@ export default function TransactionHistoryPage() {
             placeholder="جستجو با کد پیگیری یا مبلغ..."
             style={{
               width: "100%",
-              padding: "10px 14px",
-              border: "1px solid rgba(0,0,0,0.1)",
+              padding: "12px 16px",
+              border: "2px solid #F3F4F6",
               borderRadius: "12px",
               fontSize: "14px",
+              background: "#FAFAFA",
+              color: "#1F1F1F",
               outline: "none",
             }}
           />
@@ -201,10 +205,12 @@ export default function TransactionHistoryPage() {
 
         {/* Filters */}
         <div
-          className="card"
           style={{
+            background: "#FFFFFF",
+            borderRadius: "20px",
+            padding: "20px",
             marginBottom: "16px",
-            padding: "16px",
+            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
           }}
         >
           <div style={{ marginBottom: "12px" }}>
@@ -347,7 +353,7 @@ export default function TransactionHistoryPage() {
         <div
           style={{
             fontSize: "13px",
-            color: "var(--color-muted)",
+            color: "#6B7280",
             marginBottom: "12px",
             textAlign: "center",
           }}
@@ -361,11 +367,12 @@ export default function TransactionHistoryPage() {
             filteredTransactions.map((transaction, index) => (
               <div
                 key={transaction.id}
-                className="card"
                 style={{
-                  padding: "16px",
+                  background: "#FFFFFF",
+                  borderRadius: "20px",
+                  padding: "20px",
+                  boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
                   cursor: "pointer",
-                  animation: `slideInUp 0.3s ease-out ${index * 0.05}s backwards`,
                 }}
                 onClick={() => {
                   // TODO: Open transaction detail modal
@@ -442,18 +449,19 @@ export default function TransactionHistoryPage() {
             ))
           ) : (
             <div
-              className="card"
               style={{
+                background: "#FFFFFF",
+                borderRadius: "20px",
                 padding: "40px 20px",
                 textAlign: "center",
-                color: "var(--color-muted)",
+                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
               }}
             >
               <div style={{ fontSize: "48px", marginBottom: "16px" }}>📭</div>
-              <div style={{ fontSize: "14px", fontWeight: 600, marginBottom: "4px" }}>
+              <div style={{ fontSize: "14px", fontWeight: 600, marginBottom: "4px", color: "#1F1F1F" }}>
                 تراکنشی یافت نشد
               </div>
-              <div style={{ fontSize: "12px" }}>
+              <div style={{ fontSize: "12px", color: "#6B7280" }}>
                 فیلترها را تغییر دهید یا جستجوی دیگری انجام دهید
               </div>
             </div>
