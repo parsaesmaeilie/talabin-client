@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function NewPasswordPage() {
+function NewPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const phoneNumber = searchParams.get("phone") || "";
@@ -471,5 +471,13 @@ export default function NewPasswordPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function NewPasswordPage() {
+  return (
+    <Suspense fallback={<div>در حال بارگذاری...</div>}>
+      <NewPasswordForm />
+    </Suspense>
   );
 }

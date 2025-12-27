@@ -175,10 +175,7 @@ export default function BuySell() {
           }}
         >
           <div style={{ marginBottom: "8px" }}>
-            <Badge
-              variant="green"
-              style={{ fontSize: "11px", padding: "4px 10px" }}
-            >
+            <Badge variant="green">
               قیمت لحظه‌ای
             </Badge>
           </div>

@@ -429,7 +429,7 @@ function RequestModal({
               marginBottom: "8px",
             }}
           >
-            موجودی کیف‌طلا: {toPersianNumber(availableGold)} گرم
+            موجودی کیف‌طلا: {toPersianNumber(availableGold.toString())} گرم
           </div>
         </div>
 
@@ -496,7 +496,7 @@ function RequestModal({
                 cursor: "pointer",
               }}
             >
-              {toPersianNumber(quickAmount)} گرم
+              {toPersianNumber(quickAmount.toString())} گرم
             </button>
           ))}
         </div>

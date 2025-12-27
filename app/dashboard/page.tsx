@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { TopBar } from "@/components/dashboard/TopBar";
 import { ActionGrid } from "@/components/dashboard/ActionGrid";
@@ -5,10 +7,12 @@ import { HeroBanner } from "@/components/dashboard/HeroBanner";
 import { InstallmentCard } from "@/components/dashboard/InstallmentCard";
 import { PriceCard } from "@/components/dashboard/PriceCard";
 import { KYCBanner } from "@/components/dashboard/KYCBanner";
+import { AuthGuard } from "@/components/AuthGuard";
 
 export default function Dashboard() {
   return (
-    <div className="min-h-screen" style={{ padding: "20px 16px", background: "#F5F5F5" }}>
+    <AuthGuard>
+      <div className="min-h-screen" style={{ padding: "20px 16px", background: "#F5F5F5" }}>
       <div style={{ maxWidth: "600px", margin: "0 auto" }}>
         {/* Top Bar: Notification + Logo + Profile */}
         <TopBar />
@@ -132,5 +136,6 @@ export default function Dashboard() {
         </div>
       </div>
     </div>
+    </AuthGuard>
   );
 }

@@ -8,6 +8,8 @@ import { Button } from "@/components/Button";
 import { Badge } from "@/components/Badge";
 import { Icon } from "@/components/Icon";
 import { KYCStatus } from "@/components/kyc/KYCStatus";
+import { authService } from "@/lib/api/auth";
+import { AuthGuard } from "@/components/AuthGuard";
 
 const menuItems = [
   { id: "details", label: "مشخصات کاربری", icon: "personalcard", href: "/profile/details" },
@@ -22,11 +24,28 @@ const menuItems = [
 ];
 
 export default function ProfilePage() {
+  const router = useRouter();
   // Mock KYC status - in real app this would come from API
-  const kycStatus = "not_started" as const; // can be: not_started, pending, verified, rejected
+  const [kycStatus, setKycStatus] = useState<"not_started" | "pending" | "verified" | "rejected">("not_started");
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const handleLogout = async () => {
+    try {
+      setIsLoggingOut(true);
+      await authService.logout();
+      window.dispatchEvent(new Event('authChange'));
+      router.push('/login');
+    } catch (error) {
+      console.error('Logout failed:', error);
+      router.push('/login');
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50" style={{ padding: "20px 16px" }}>
+    <AuthGuard>
+      <div className="min-h-screen bg-gray-50" style={{ padding: "20px 16px" }}>
       <div style={{ maxWidth: "600px", margin: "0 auto" }}>
         {/* Header */}
         <div style={{ display: "flex", alignItems: "center", marginBottom: "20px", gap: "12px" }}>
@@ -166,12 +185,13 @@ export default function ProfilePage() {
             fontSize: "15px",
             fontWeight: 600,
           }}
-          asLink
-          href="/login"
+          onClick={handleLogout}
+          disabled={isLoggingOut}
         >
-          خروج از حساب کاربری
+          {isLoggingOut ? "در حال خروج..." : "خروج از حساب کاربری"}
         </Button>
       </div>
     </div>
+    </AuthGuard>
   );
 }

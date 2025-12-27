@@ -3,10 +3,14 @@ import { Section } from "@/components/Section";
 import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
 import { Footer } from "@/components/Footer";
+import Navbar from "@/components/Navbar";
 
 export default function Home() {
   return (
     <div className="min-h-screen">
+      {/* Navigation Bar */}
+      <Navbar />
+
       {/* Hero Section */}
       <Hero />
 

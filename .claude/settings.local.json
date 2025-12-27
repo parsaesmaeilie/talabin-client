@@ -54,7 +54,11 @@
       "Bash(xcopy:*)",
       "Bash(npm run dev:frontend:*)",
       "Bash(npm run:*)",
-      "Bash(timeout /t 5)"
+      "Bash(timeout /t 5)",
+      "Bash(wc:*)",
+      "Bash(tree:*)",
+      "Bash(if exist \"app\\\\verify-otp\" git rm -r app/verify-otp)",
+      "Bash(git mv:*)"
     ]
   }
 }

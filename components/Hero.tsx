@@ -216,7 +216,7 @@ export const Hero: React.FC = () => {
               </div>
             </div>
 
-            <Button variant="primary" fullWidth style={{ marginTop: "6px" }}>
+            <Button variant="primary" fullWidth style={{ marginTop: "6px" }} asLink href="/login">
               ورود به معامله لحظه‌ای
             </Button>
           </aside>
