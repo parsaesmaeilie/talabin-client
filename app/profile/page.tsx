@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { authService } from "@/lib/api/auth";
 import { AuthGuard } from "@/components/AuthGuard";
-import { BottomNav } from "@/src/shared/components/layout/BottomNav";
 
 const menuItems = [
   {
@@ -303,7 +302,7 @@ export default function ProfilePage() {
 
   return (
     <AuthGuard>
-      <div style={{ minHeight: "100vh", background: "#FAFAFA", paddingBottom: "100px" }}>
+      <div style={{ minHeight: "100vh", background: "#FAFAFA" }}>
         {/* Header */}
         <div
           style={{
@@ -500,8 +499,6 @@ export default function ProfilePage() {
             {isLoggingOut ? "در حال خروج..." : "خروج از حساب کاربری"}
           </button>
         </div>
-
-        <BottomNav />
       </div>
     </AuthGuard>
   );

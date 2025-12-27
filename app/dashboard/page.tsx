@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { BottomNav } from "@/src/shared/components/layout/BottomNav";
 import { authService } from "@/src/features/auth";
 
 export default function DashboardPage() {
@@ -20,7 +19,7 @@ export default function DashboardPage() {
   }, [router]);
 
   return (
-    <div style={{ minHeight: "100vh", background: "#FAFAFA", paddingBottom: "100px" }}>
+    <div style={{ minHeight: "100vh", background: "#FAFAFA" }}>
       {/* Header */}
       <div
         style={{
@@ -415,8 +414,6 @@ export default function DashboardPage() {
           </div>
         </Link>
       </div>
-
-      <BottomNav />
     </div>
   );
 }

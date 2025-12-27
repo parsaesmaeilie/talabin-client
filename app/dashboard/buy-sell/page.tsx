@@ -8,7 +8,6 @@ import { NumberPad } from "@/components/buy-sell/NumberPad";
 import { tradingService, OrderPreview } from "@/lib/api/trading";
 import { pricesService, GoldPrice } from "@/lib/api/prices";
 import { walletService, Wallet } from "@/lib/api/wallet";
-import { BottomNav } from "@/src/shared/components/layout/BottomNav";
 
 export default function BuySell() {
   const router = useRouter();
@@ -123,7 +122,7 @@ export default function BuySell() {
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: "#FAFAFA", paddingBottom: "100px" }}>
+    <div style={{ minHeight: "100vh", background: "#FAFAFA" }}>
       {/* Header */}
       <div
         style={{
@@ -355,8 +354,6 @@ export default function BuySell() {
           {loading ? "در حال انجام..." : activeTab === "buy" ? "خرید طلا" : "فروش طلا"}
         </button>
       </div>
-
-      <BottomNav />
     </div>
   );
 }

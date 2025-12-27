@@ -1,4 +1,4 @@
-import { BottomNavigation } from "@/components/BottomNavigation";
+import { BottomNav } from "@/src/shared/components/layout/BottomNav";
 
 export default function DashboardLayout({
   children,
@@ -7,9 +7,8 @@ export default function DashboardLayout({
 }) {
   return (
     <>
-      {/* Add padding-bottom to prevent content from being hidden by bottom nav */}
-      <div style={{ paddingBottom: "100px" }}>{children}</div>
-      <BottomNavigation />
+      {children}
+      <BottomNav />
     </>
   );
 }
