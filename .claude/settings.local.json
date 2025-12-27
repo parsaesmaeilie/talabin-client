@@ -58,7 +58,12 @@
       "Bash(wc:*)",
       "Bash(tree:*)",
       "Bash(if exist \"app\\\\verify-otp\" git rm -r app/verify-otp)",
-      "Bash(git mv:*)"
+      "Bash(git mv:*)",
+      "Bash(git reset:*)",
+      "Bash(cat:*)",
+      "Bash(taskkill:*)",
+      "Bash(timeout /t 2)",
+      "Bash(if exist \".next\\\\dev\\\\lock\" del \".next\\\\dev\\\\lock\")"
     ]
   }
 }
