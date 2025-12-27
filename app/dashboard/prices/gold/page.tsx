@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card } from "@/components/Card";
+import Link from "next/link";
 import { Badge } from "@/components/Badge";
 
 type GoldPriceDetail = {
@@ -136,154 +136,205 @@ export default function GoldPricesPage() {
   }, []);
 
   return (
-    <div className="min-h-screen" style={{ padding: "16px 12px 80px" }}>
-      <h1
+    <div style={{ minHeight: "100vh", background: "#FAFAFA" }}>
+      {/* Header */}
+      <div
         style={{
-          fontSize: "18px",
-          fontWeight: 600,
-          margin: "8px 0 6px",
+          background: "#FFFFFF",
+          padding: "16px",
+          display: "flex",
+          alignItems: "center",
+          gap: "12px",
+          marginBottom: "16px",
         }}
       >
-        قیمت لحظه‌ای طلا و سکه
-      </h1>
-      <p
-        style={{
-          fontSize: "13px",
-          color: "var(--color-muted)",
-          margin: "0 0 16px",
-        }}
-      >
-        قیمت‌های به‌روز شده هر دقیقه
-      </p>
+        <Link href="/dashboard">
+          <div
+            style={{
+              width: "40px",
+              height: "40px",
+              borderRadius: "12px",
+              background: "#F5F5F5",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+            }}
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M15 19L8 12L15 5"
+                stroke="#1F1F1F"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+        </Link>
+        <div style={{ flex: 1 }}>
+          <h1 style={{ fontSize: "18px", fontWeight: 600, margin: 0, color: "#1F1F1F" }}>
+            قیمت لحظه‌ای طلا و سکه
+          </h1>
+          <p style={{ fontSize: "11px", color: "#6B7280", margin: "2px 0 0" }}>
+            قیمت‌های به‌روز شده هر دقیقه
+          </p>
+        </div>
+      </div>
 
-      <div className="grid grid-3" style={{ gap: "12px" }}>
-        {prices.map((price, index) => (
-          <Card key={index} style={{ padding: "16px 14px" }}>
+      {/* Content */}
+      <div style={{ padding: "0 16px 16px" }}>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr",
+            gap: "12px",
+          }}
+        >
+          {prices.map((price, index) => (
             <div
+              key={index}
               style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: "12px",
-              }}
-            >
-              <h2
-                style={{
-                  fontSize: "15px",
-                  fontWeight: 600,
-                  margin: 0,
-                }}
-              >
-                {price.name}
-              </h2>
-              <Badge
-                variant={price.changePercent >= 0 ? "green" : "red"}
-              >
-                {price.changePercent >= 0 ? "+" : ""}
-                {price.changePercent}٪
-              </Badge>
-            </div>
-
-            <div
-              style={{
-                background: "var(--color-soft)",
-                borderRadius: "var(--radius-md)",
-                padding: "12px 10px",
-                marginBottom: "10px",
+                background: "#FFFFFF",
+                borderRadius: "20px",
+                padding: "20px",
+                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
               }}
             >
               <div
                 style={{
-                  fontSize: "11px",
-                  color: "var(--color-muted)",
-                  marginBottom: "4px",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: "16px",
                 }}
               >
-                نرخ فعلی
-              </div>
-              <div
-                style={{
-                  fontSize: "18px",
-                  fontWeight: 700,
-                }}
-              >
-                {price.currentRate.toLocaleString()}
-                <span
+                <h2
                   style={{
-                    fontSize: "11px",
-                    fontWeight: 400,
-                    color: "var(--color-muted)",
-                    marginRight: "4px",
+                    fontSize: "16px",
+                    fontWeight: 600,
+                    margin: 0,
+                    color: "#1F1F1F",
                   }}
                 >
-                  {price.name === "انس جهانی طلا" ? "دلار" : "تومان"}
-                </span>
+                  {price.name}
+                </h2>
+                <Badge
+                  variant={price.changePercent >= 0 ? "green" : "red"}
+                >
+                  {price.changePercent >= 0 ? "+" : ""}
+                  {price.changePercent}٪
+                </Badge>
               </div>
-            </div>
 
-            <div
-              style={{
-                display: "grid",
-                gap: "6px",
-                fontSize: "12px",
-              }}
-            >
               <div
                 style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  padding: "6px 8px",
-                  background: "rgba(0,0,0,0.02)",
-                  borderRadius: "var(--radius-sm)",
+                  background: "#FBFAF7",
+                  borderRadius: "12px",
+                  padding: "16px",
+                  marginBottom: "12px",
                 }}
               >
-                <span style={{ color: "var(--color-muted)" }}>بالاترین</span>
-                <span>{price.highRate.toLocaleString()}</span>
+                <div
+                  style={{
+                    fontSize: "11px",
+                    color: "#6B7280",
+                    marginBottom: "6px",
+                  }}
+                >
+                  نرخ فعلی
+                </div>
+                <div
+                  style={{
+                    fontSize: "22px",
+                    fontWeight: 700,
+                    color: "#1F1F1F",
+                  }}
+                >
+                  {price.currentRate.toLocaleString("fa-IR")}
+                  <span
+                    style={{
+                      fontSize: "13px",
+                      fontWeight: 400,
+                      color: "#6B7280",
+                      marginRight: "6px",
+                    }}
+                  >
+                    {price.name === "انس جهانی طلا" ? "دلار" : "تومان"}
+                  </span>
+                </div>
               </div>
+
               <div
                 style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  padding: "6px 8px",
-                  background: "rgba(0,0,0,0.02)",
-                  borderRadius: "var(--radius-sm)",
+                  display: "grid",
+                  gap: "8px",
+                  fontSize: "13px",
                 }}
               >
-                <span style={{ color: "var(--color-muted)" }}>پایین‌ترین</span>
-                <span>{price.lowRate.toLocaleString()}</span>
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  padding: "6px 8px",
-                  background: "rgba(0,0,0,0.02)",
-                  borderRadius: "var(--radius-sm)",
-                }}
-              >
-                <span style={{ color: "var(--color-muted)" }}>نوسان</span>
-                <span>
-                  {price.maxFluctuation.toLocaleString()} (
-                  {price.maxFluctuationPercent}٪)
-                </span>
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  padding: "6px 8px",
-                  background: "rgba(0,0,0,0.02)",
-                  borderRadius: "var(--radius-sm)",
-                }}
-              >
-                <span style={{ color: "var(--color-muted)" }}>
-                  آخرین به‌روزرسانی
-                </span>
-                <span style={{ fontSize: "11px" }}>{price.lastUpdate}</span>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    padding: "8px 12px",
+                    background: "#F9FAFB",
+                    borderRadius: "8px",
+                  }}
+                >
+                  <span style={{ color: "#6B7280" }}>بالاترین</span>
+                  <span style={{ fontWeight: 500, color: "#1F1F1F" }}>
+                    {price.highRate.toLocaleString("fa-IR")}
+                  </span>
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    padding: "8px 12px",
+                    background: "#F9FAFB",
+                    borderRadius: "8px",
+                  }}
+                >
+                  <span style={{ color: "#6B7280" }}>پایین‌ترین</span>
+                  <span style={{ fontWeight: 500, color: "#1F1F1F" }}>
+                    {price.lowRate.toLocaleString("fa-IR")}
+                  </span>
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    padding: "8px 12px",
+                    background: "#F9FAFB",
+                    borderRadius: "8px",
+                  }}
+                >
+                  <span style={{ color: "#6B7280" }}>نوسان</span>
+                  <span style={{ fontWeight: 500, color: "#1F1F1F" }}>
+                    {price.maxFluctuation.toLocaleString("fa-IR")} (
+                    {price.maxFluctuationPercent}٪)
+                  </span>
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    padding: "8px 12px",
+                    background: "#F9FAFB",
+                    borderRadius: "8px",
+                  }}
+                >
+                  <span style={{ color: "#6B7280" }}>
+                    آخرین به‌روزرسانی
+                  </span>
+                  <span style={{ fontSize: "12px", fontWeight: 500, color: "#1F1F1F" }}>
+                    {price.lastUpdate}
+                  </span>
+                </div>
               </div>
             </div>
-          </Card>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );

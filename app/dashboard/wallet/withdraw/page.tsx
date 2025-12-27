@@ -2,17 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Card } from "@/components/Card";
-import { Button } from "@/components/Button";
-import { Badge } from "@/components/Badge";
 
 export default function WithdrawPage() {
   const [amount, setAmount] = useState(0);
   const [shaba, setShaba] = useState("");
-
   const [amountError, setAmountError] = useState("");
   const [shabaError, setShabaError] = useState("");
-
   const [success, setSuccess] = useState(false);
 
   const isShabaValid = (shaba: string) => /^[0-9]{24}$/.test(shaba);
@@ -40,150 +35,245 @@ export default function WithdrawPage() {
   };
 
   return (
-    <div className="min-h-screen" style={{ padding: "20px 16px 80px" }}>
-      <div style={{ maxWidth: "600px", margin: "0 auto" }}>
-      <h1
+    <div style={{ minHeight: "100vh", background: "#FAFAFA" }}>
+      {/* Header */}
+      <div
         style={{
-          fontSize: "20px",
-          fontWeight: 600,
-          margin: "8px 0 6px",
+          background: "#FFFFFF",
+          padding: "16px",
+          display: "flex",
+          alignItems: "center",
+          gap: "12px",
+          marginBottom: "16px",
         }}
       >
-        برداشت از حساب
-      </h1>
-      <p
-        style={{
-          fontSize: "13px",
-          color: "var(--color-muted)",
-          margin: "0 0 16px",
-        }}
-      >
-        برداشت تومان از کیف پول
-      </p>
-
-      <Card style={{ marginBottom: "12px", background: "var(--color-warning-bg)" }}>
-        <div
-          style={{
-            fontSize: "12px",
-            color: "var(--color-warning)",
-            lineHeight: 1.7,
-          }}
-        >
-          ⚠️ حساب مقصد باید به نام مالک اکانت باشد؛ در غیر این صورت تراکنش
-          انجام نخواهد شد.
-        </div>
-      </Card>
-
-      <Card style={{ marginBottom: "12px" }}>
-        <div className="form-group">
-          <label className="form-label">مبلغ برداشت (تومان)</label>
-          <input
-            type="number"
-            value={amount}
-            onChange={(e) => setAmount(parseInt(e.target.value) || 0)}
-            className="form-input"
-            placeholder="مثلاً 500000"
-          />
-          {amountError && (
-            <small
-              className="form-hint"
-              style={{ color: "var(--color-danger)" }}
-            >
-              {amountError}
-            </small>
-          )}
-        </div>
-
-        <div className="form-group" style={{ marginBottom: 0 }}>
-          <label className="form-label">شماره شبا (بدون IR)</label>
-          <input
-            type="text"
-            value={shaba}
-            onChange={(e) => setShaba(e.target.value)}
-            className="form-input"
-            placeholder="مثلاً 123456789012345678901234"
-            maxLength={24}
-          />
-          {shabaError && (
-            <small
-              className="form-hint"
-              style={{ color: "var(--color-danger)" }}
-            >
-              {shabaError}
-            </small>
-          )}
-          <small className="form-hint">24 رقم بدون IR</small>
-        </div>
-      </Card>
-
-      <Button
-        variant="danger"
-        fullWidth
-        onClick={handleWithdraw}
-        style={{ marginBottom: "12px" }}
-      >
-        برداشت از حساب
-      </Button>
-
-      {success && (
-        <Card style={{ marginBottom: "12px" }}>
+        <Link href="/dashboard/wallet">
           <div
             style={{
-              fontSize: "13px",
+              width: "40px",
+              height: "40px",
+              borderRadius: "12px",
+              background: "#F5F5F5",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+            }}
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M15 19L8 12L15 5"
+                stroke="#1F1F1F"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+        </Link>
+        <h1 style={{ fontSize: "18px", fontWeight: 600, flex: 1, color: "#1F1F1F" }}>
+          برداشت تومان
+        </h1>
+      </div>
+
+      {/* Content */}
+      <div style={{ padding: "0 16px 16px" }}>
+        {/* Warning Card */}
+        <div
+          style={{
+            background: "#FEF3C7",
+            borderRadius: "20px",
+            padding: "16px",
+            marginBottom: "16px",
+            display: "flex",
+            gap: "12px",
+            alignItems: "flex-start",
+          }}
+        >
+          <div style={{ fontSize: "20px" }}>⚠️</div>
+          <div
+            style={{
+              fontSize: "12px",
+              color: "#92400E",
+              lineHeight: 1.7,
+            }}
+          >
+            حساب مقصد باید به نام مالک اکانت باشد؛ در غیر این صورت تراکنش انجام نخواهد شد.
+          </div>
+        </div>
+
+        {/* Success Message */}
+        {success && (
+          <div
+            style={{
+              background: "#D1FAE5",
+              borderRadius: "20px",
+              padding: "16px",
+              marginBottom: "16px",
               textAlign: "center",
-              color: "var(--color-success)",
+              color: "#059669",
+              fontSize: "13px",
               fontWeight: 600,
             }}
           >
             ✓ تراکنش با موفقیت انجام شد
           </div>
-        </Card>
-      )}
+        )}
 
-      <Card>
+        {/* Form Card */}
         <div
           style={{
-            fontSize: "12px",
-            color: "var(--color-muted)",
-            marginBottom: "8px",
+            background: "#FFFFFF",
+            borderRadius: "20px",
+            padding: "20px",
+            marginBottom: "16px",
+            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
           }}
         >
-          نکات مهم
-        </div>
-        <ul
-          style={{
-            fontSize: "13px",
-            lineHeight: 1.8,
-            margin: 0,
-            paddingRight: "18px",
-            color: "var(--color-text-light)",
-          }}
-        >
-          <li>حداقل مبلغ برداشت ۵۰ هزار تومان است</li>
-          <li>برداشت معمولاً ظرف ۲۴ ساعت انجام می‌شود</li>
-          <li>حساب مقصد باید به نام خود شما باشد</li>
-          <li>کارمزد برداشت: رایگان</li>
-        </ul>
-      </Card>
+          <div style={{ marginBottom: "16px" }}>
+            <label
+              style={{
+                fontSize: "12px",
+                color: "#6B7280",
+                display: "block",
+                marginBottom: "8px",
+              }}
+            >
+              مبلغ برداشت (تومان)
+            </label>
+            <input
+              type="number"
+              value={amount === 0 ? "" : amount}
+              onChange={(e) => setAmount(parseInt(e.target.value) || 0)}
+              style={{
+                width: "100%",
+                padding: "12px 16px",
+                fontSize: "15px",
+                border: "2px solid #F3F4F6",
+                borderRadius: "12px",
+                background: "#FAFAFA",
+                color: "#1F1F1F",
+                outline: "none",
+              }}
+              placeholder="مثلاً 500000"
+            />
+            {amountError && (
+              <div
+                style={{
+                  fontSize: "12px",
+                  color: "#DC2626",
+                  marginTop: "8px",
+                }}
+              >
+                {amountError}
+              </div>
+            )}
+          </div>
 
-      <div
-        style={{
-          marginTop: "16px",
-          textAlign: "center",
-        }}
-      >
-        <Link href="/dashboard/wallet">
-          <span
+          <div>
+            <label
+              style={{
+                fontSize: "12px",
+                color: "#6B7280",
+                display: "block",
+                marginBottom: "8px",
+              }}
+            >
+              شماره شبا (بدون IR)
+            </label>
+            <input
+              type="text"
+              value={shaba}
+              onChange={(e) => setShaba(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "12px 16px",
+                fontSize: "15px",
+                border: "2px solid #F3F4F6",
+                borderRadius: "12px",
+                background: "#FAFAFA",
+                color: "#1F1F1F",
+                outline: "none",
+              }}
+              placeholder="مثلاً 123456789012345678901234"
+              maxLength={24}
+            />
+            {shabaError && (
+              <div
+                style={{
+                  fontSize: "12px",
+                  color: "#DC2626",
+                  marginTop: "8px",
+                }}
+              >
+                {shabaError}
+              </div>
+            )}
+            <div
+              style={{
+                fontSize: "11px",
+                color: "#6B7280",
+                marginTop: "8px",
+              }}
+            >
+              24 رقم بدون IR
+            </div>
+          </div>
+        </div>
+
+        {/* Withdraw Button */}
+        <button
+          onClick={handleWithdraw}
+          style={{
+            width: "100%",
+            padding: "16px",
+            fontSize: "15px",
+            fontWeight: 600,
+            color: "#FFFFFF",
+            background: "#DC2626",
+            border: "none",
+            borderRadius: "16px",
+            cursor: "pointer",
+            marginBottom: "16px",
+            boxShadow: "0 4px 12px rgba(220, 38, 38, 0.3)",
+          }}
+        >
+          برداشت از حساب
+        </button>
+
+        {/* Important Notes Card */}
+        <div
+          style={{
+            background: "#FFFFFF",
+            borderRadius: "20px",
+            padding: "20px",
+            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
+          }}
+        >
+          <div
             style={{
-              fontSize: "13px",
-              color: "var(--color-primary)",
-              fontWeight: 600,
+              fontSize: "12px",
+              color: "#6B7280",
+              marginBottom: "12px",
             }}
           >
-            بازگشت به کیف پول
-          </span>
-        </Link>
-      </div>
+            نکات مهم
+          </div>
+          <ul
+            style={{
+              fontSize: "13px",
+              lineHeight: 1.8,
+              margin: 0,
+              paddingRight: "18px",
+              color: "#1F1F1F",
+            }}
+          >
+            <li>حداقل مبلغ برداشت ۵۰ هزار تومان است</li>
+            <li>برداشت معمولاً ظرف ۲۴ ساعت انجام می‌شود</li>
+            <li>حساب مقصد باید به نام خود شما باشد</li>
+            <li>کارمزد برداشت: رایگان</li>
+          </ul>
+        </div>
       </div>
     </div>
   );
