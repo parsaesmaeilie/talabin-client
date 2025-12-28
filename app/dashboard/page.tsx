@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { authService } from "@/src/features/auth";
 import { walletService, Wallet } from "@/lib/api/wallet";
 import { pricesService, GoldPrice } from "@/lib/api/prices";
@@ -105,32 +106,56 @@ export default function DashboardPage() {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "20px" }}>
             {/* خرید طلا */}
             <Link href="/dashboard/buy-sell?type=buy" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "12px", textDecoration: "none" }}>
-              <div style={{ width: "56px", height: "56px", borderRadius: "14px", background: "rgba(251, 176, 34, 0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "32px" }}>
-                💰
+              <div style={{ width: "56px", height: "56px", borderRadius: "14px", background: "rgba(251, 176, 34, 0.12)", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", overflow: "hidden" }}>
+                <Image
+                  src="/assets/illustrations/IMG_7855 1-013.png"
+                  alt="Buy Gold"
+                  width={48}
+                  height={48}
+                  style={{ objectFit: "contain" }}
+                />
               </div>
               <span style={{ fontSize: "13px", color: "#FFFFFF", textAlign: "center", fontWeight: 500 }}>خریدطلا</span>
             </Link>
 
             {/* فروش طلا */}
             <Link href="/dashboard/buy-sell?type=sell" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "12px", textDecoration: "none" }}>
-              <div style={{ width: "56px", height: "56px", borderRadius: "14px", background: "rgba(251, 176, 34, 0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "32px" }}>
-                💎
+              <div style={{ width: "56px", height: "56px", borderRadius: "14px", background: "rgba(251, 176, 34, 0.12)", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", overflow: "hidden" }}>
+                <Image
+                  src="/assets/illustrations/IMG_7813 1-009.png"
+                  alt="Sell Gold"
+                  width={48}
+                  height={48}
+                  style={{ objectFit: "contain" }}
+                />
               </div>
               <span style={{ fontSize: "13px", color: "#FFFFFF", textAlign: "center", fontWeight: 500 }}>فروش‌طلا</span>
             </Link>
 
             {/* کسب درآمد */}
             <Link href="/dashboard/savings" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "12px", textDecoration: "none" }}>
-              <div style={{ width: "56px", height: "56px", borderRadius: "14px", background: "rgba(251, 176, 34, 0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "32px" }}>
-                ⭐
+              <div style={{ width: "56px", height: "56px", borderRadius: "14px", background: "rgba(251, 176, 34, 0.12)", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", overflow: "hidden" }}>
+                <Image
+                  src="/assets/illustrations/IMG_7882 1-004.png"
+                  alt="Earn Income"
+                  width={48}
+                  height={48}
+                  style={{ objectFit: "contain" }}
+                />
               </div>
               <span style={{ fontSize: "13px", color: "#FFFFFF", textAlign: "center", fontWeight: 500 }}>کسب‌درآمد</span>
             </Link>
 
             {/* شارژ فیزیکی */}
             <Link href="/dashboard/physical-receipt" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "12px", textDecoration: "none" }}>
-              <div style={{ width: "56px", height: "56px", borderRadius: "14px", background: "rgba(251, 176, 34, 0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "32px" }}>
-                📦
+              <div style={{ width: "56px", height: "56px", borderRadius: "14px", background: "rgba(251, 176, 34, 0.12)", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", overflow: "hidden" }}>
+                <Image
+                  src="/assets/illustrations/IMG_7820 1-002.png"
+                  alt="Physical Charge"
+                  width={48}
+                  height={48}
+                  style={{ objectFit: "contain" }}
+                />
               </div>
               <span style={{ fontSize: "13px", color: "#FFFFFF", textAlign: "center", fontWeight: 500 }}>شارژ فیزیکی</span>
             </Link>
@@ -140,8 +165,14 @@ export default function DashboardPage() {
         {/* Featured Vault Card */}
         <div style={{ background: "linear-gradient(135deg, #FFF7E6 0%, #FFFBF0 100%)", borderRadius: "28px", padding: "28px 24px", marginBottom: "16px", display: "flex", alignItems: "center", gap: "20px", boxShadow: "0 4px 16px rgba(0, 0, 0, 0.06)" }}>
           {/* Vault Icon */}
-          <div style={{ width: "110px", height: "110px", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "90px" }}>
-            🔒
+          <div style={{ width: "110px", height: "110px", flexShrink: 0, position: "relative" }}>
+            <Image
+              src="/assets/illustrations/Rectangle 975-010.png"
+              alt="Vault"
+              width={110}
+              height={110}
+              style={{ objectFit: "contain" }}
+            />
           </div>
 
           {/* Text */}
@@ -156,8 +187,14 @@ export default function DashboardPage() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "16px", marginBottom: "16px" }}>
           {/* Installment Card */}
           <Link href="/dashboard/installment" style={{ background: "#FFFFFF", borderRadius: "24px", padding: "24px 20px", textDecoration: "none", minHeight: "200px", display: "flex", flexDirection: "column", boxShadow: "0 2px 12px rgba(0, 0, 0, 0.06)" }}>
-            <div style={{ marginBottom: "auto", display: "flex", justifyContent: "center", alignItems: "center", height: "120px", fontSize: "90px" }}>
-              📅
+            <div style={{ marginBottom: "auto", display: "flex", justifyContent: "center", alignItems: "center", height: "120px", position: "relative" }}>
+              <Image
+                src="/assets/illustrations/IMG_7814 1-008.png"
+                alt="Installment"
+                width={120}
+                height={120}
+                style={{ objectFit: "contain" }}
+              />
             </div>
             <div style={{ fontSize: "16px", fontWeight: 700, color: "#1F2937", textAlign: "center" }}>
               خرید قسطی
@@ -187,29 +224,40 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Physical Charge Card */}
-        <Link href="/dashboard/physical-receipt" style={{ background: "#FFFFFF", borderRadius: "24px", padding: "24px", marginBottom: "16px", display: "flex", alignItems: "center", gap: "20px", textDecoration: "none", boxShadow: "0 2px 12px rgba(0, 0, 0, 0.06)" }}>
-          <div style={{ width: "80px", height: "80px", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "64px" }}>
-            🔌
-          </div>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: "17px", fontWeight: 700, color: "#1F2937", marginBottom: "4px", textAlign: "right" }}>
+        {/* Two Column Bottom Cards */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "16px", marginBottom: "16px" }}>
+          {/* Physical Charge Card */}
+          <Link href="/dashboard/physical-receipt" style={{ background: "#FFFFFF", borderRadius: "24px", padding: "24px 20px", textDecoration: "none", minHeight: "200px", display: "flex", flexDirection: "column", boxShadow: "0 2px 12px rgba(0, 0, 0, 0.06)" }}>
+            <div style={{ marginBottom: "auto", display: "flex", justifyContent: "center", alignItems: "center", height: "120px", position: "relative" }}>
+              <Image
+                src="/assets/illustrations/IMG_7818 2-003.png"
+                alt="Physical Charge"
+                width={120}
+                height={120}
+                style={{ objectFit: "contain" }}
+              />
+            </div>
+            <div style={{ fontSize: "16px", fontWeight: 700, color: "#1F2937", textAlign: "center" }}>
               شارژ فیزیکی
             </div>
-          </div>
-        </Link>
+          </Link>
 
-        {/* Earnings/Savings Card */}
-        <Link href="/dashboard/savings" style={{ background: "#FFFFFF", borderRadius: "24px", padding: "24px", display: "flex", alignItems: "center", gap: "20px", textDecoration: "none", boxShadow: "0 2px 12px rgba(0, 0, 0, 0.06)" }}>
-          <div style={{ width: "80px", height: "80px", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "64px" }}>
-            💰
-          </div>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: "17px", fontWeight: 700, color: "#1F2937", marginBottom: "4px", textAlign: "right" }}>
+          {/* Earnings/Savings Card */}
+          <Link href="/dashboard/savings" style={{ background: "#FFFFFF", borderRadius: "24px", padding: "24px 20px", textDecoration: "none", minHeight: "200px", display: "flex", flexDirection: "column", boxShadow: "0 2px 12px rgba(0, 0, 0, 0.06)" }}>
+            <div style={{ marginBottom: "auto", display: "flex", justifyContent: "center", alignItems: "center", height: "120px", position: "relative" }}>
+              <Image
+                src="/assets/illustrations/IMG_7812 1-005.png"
+                alt="Earn Income"
+                width={120}
+                height={120}
+                style={{ objectFit: "contain" }}
+              />
+            </div>
+            <div style={{ fontSize: "16px", fontWeight: 700, color: "#1F2937", textAlign: "center" }}>
               کسب درآمد
             </div>
-          </div>
-        </Link>
+          </Link>
+        </div>
       </div>
     </div>
   );

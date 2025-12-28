@@ -4,6 +4,7 @@ import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
 import { Footer } from "@/components/Footer";
 import Navbar from "@/components/Navbar";
+import Image from "next/image";
 
 export default function Home() {
   return (
@@ -312,18 +313,22 @@ export default function Home() {
             {
               title: "ثبت‌نام و احراز هویت",
               desc: "در کمتر از چند دقیقه حساب کاربری بساز و مراحل احراز هویت آنلاین را تکمیل کن.",
+              icon: "Rectangle 1073-006.png",
             },
             {
               title: "واریز تومان",
               desc: "با کارت بانکی‌ات حساب را شارژ کن تا آماده خرید طلای دیجیتال شوی.",
+              icon: "Rectangle 1076-007.png",
             },
             {
               title: "خرید طلای دیجیتال",
               desc: "مقدار دلخواه طلا را با کارمزد ۰٫۵٪ و قیمت لحظه‌ای بخرد؛ هر ساعت شبانه‌روز.",
+              icon: "Rectangle 2-011.png",
             },
             {
               title: "فروش یا دریافت فیزیکی",
               desc: "هر زمان خواستی می‌توانی طلای خودت را بفروشی یا درخواست دریافت فیزیکی ثبت کنی.",
+              icon: "Rectangle 974-012.png",
             },
           ].map((step, idx) => (
             <Card
@@ -352,7 +357,24 @@ export default function Home() {
               >
                 {idx + 1}
               </div>
-              <Card.Body style={{ paddingTop: "28px" }}>
+              <Card.Body style={{ paddingTop: "16px" }}>
+                {/* Icon */}
+                <div
+                  style={{
+                    position: "relative",
+                    width: "48px",
+                    height: "48px",
+                    marginBottom: "12px",
+                  }}
+                >
+                  <Image
+                    src={`/assets/illustrations/${step.icon}`}
+                    alt=""
+                    width={48}
+                    height={48}
+                    style={{ objectFit: "contain" }}
+                  />
+                </div>
                 <div style={{ fontSize: "14px", fontWeight: 600, marginBottom: "5px" }}>
                   {step.title}
                 </div>
@@ -395,34 +417,93 @@ export default function Home() {
             background: "var(--color-dark)",
             color: "#FFFFFF",
             borderRadius: "var(--radius-xl)",
-            padding: "18px 16px 20px",
+            padding: "24px 20px",
             display: "grid",
-            gridTemplateColumns: "minmax(0, 1.4fr) minmax(0, 1fr)",
-            gap: "18px",
+            gridTemplateColumns: "minmax(0, 1.2fr) minmax(0, 1fr)",
+            gap: "24px",
             alignItems: "center",
             boxShadow: "var(--shadow-soft)",
+            position: "relative",
+            overflow: "hidden",
           }}
         >
-          <div>
-            <h2 style={{ fontSize: "18px", fontWeight: 600, margin: "0 0 6px" }}>
+          {/* Background decorative images */}
+          <div
+            style={{
+              position: "absolute",
+              top: "-50px",
+              right: "-50px",
+              width: "200px",
+              height: "200px",
+              opacity: 0.05,
+              zIndex: 0,
+            }}
+          >
+            <Image
+              src="/assets/illustrations/Rectangle 975-010.png"
+              alt=""
+              fill
+              style={{ objectFit: "contain" }}
+            />
+          </div>
+
+          <div style={{ position: "relative", zIndex: 1 }}>
+            <h2 style={{ fontSize: "20px", fontWeight: 600, margin: "0 0 8px" }}>
               اپلیکیشن طلابین
             </h2>
-            <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.8)", margin: "0 0 10px" }}>
+            <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.8)", margin: "0 0 16px", lineHeight: 1.8 }}>
               تجربه معامله طلا در موبایل؛ قیمت‌های لحظه‌ای، اعلان‌های هوشمند و مدیریت
               آسان سبد سرمایه‌گذاری.
             </p>
+
+            {/* App preview images grid */}
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(3, 1fr)",
+                gap: "10px",
+                marginBottom: "16px",
+              }}
+            >
+              {[
+                "IMG_7814 1-008.png",
+                "IMG_7813 1-009.png",
+                "IMG_7855 1-013.png",
+              ].map((img, idx) => (
+                <div
+                  key={idx}
+                  style={{
+                    position: "relative",
+                    aspectRatio: "3/4",
+                    borderRadius: "12px",
+                    overflow: "hidden",
+                    border: "2px solid rgba(255,255,255,0.1)",
+                    background: "rgba(255,255,255,0.05)",
+                  }}
+                >
+                  <Image
+                    src={`/assets/illustrations/${img}`}
+                    alt=""
+                    fill
+                    style={{ objectFit: "cover" }}
+                  />
+                </div>
+              ))}
+            </div>
 
             <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
               <a
                 href="#"
                 style={{
                   borderRadius: "999px",
-                  padding: "8px 14px",
+                  padding: "10px 16px",
                   border: "1px solid rgba(255,255,255,0.4)",
                   fontSize: "12px",
                   display: "inline-flex",
                   alignItems: "center",
                   gap: "6px",
+                  transition: "all 0.2s",
+                  background: "rgba(255,255,255,0.05)",
                 }}
               >
                 <span>📱</span>
@@ -432,12 +513,14 @@ export default function Home() {
                 href="#"
                 style={{
                   borderRadius: "999px",
-                  padding: "8px 14px",
+                  padding: "10px 16px",
                   border: "1px solid rgba(255,255,255,0.4)",
                   fontSize: "12px",
                   display: "inline-flex",
                   alignItems: "center",
                   gap: "6px",
+                  transition: "all 0.2s",
+                  background: "rgba(255,255,255,0.05)",
                 }}
               >
                 <span>🍎</span>
@@ -450,14 +533,18 @@ export default function Home() {
             style={{
               borderRadius: "18px",
               border: "1px dashed rgba(255,255,255,0.25)",
-              padding: "14px 12px",
-              fontSize: "11px",
-              lineHeight: 1.8,
-              background: "rgba(255,255,255,0.03)",
+              padding: "16px 14px",
+              fontSize: "12px",
+              lineHeight: 1.9,
+              background: "rgba(255,255,255,0.05)",
+              position: "relative",
+              zIndex: 1,
             }}
           >
-            داشبورد نمونه اپلیکیشن:
-            <ul style={{ paddingRight: "18px", margin: "8px 0 0" }}>
+            <div style={{ fontWeight: 600, marginBottom: "10px", fontSize: "13px" }}>
+              ویژگی‌های اپلیکیشن:
+            </div>
+            <ul style={{ paddingRight: "20px", margin: 0, listStyleType: "disc" }}>
               <li>نمایش قیمت لحظه‌ای طلا</li>
               <li>سوابق خرید و فروش و کارمزد</li>
               <li>نمودار عملکرد سبد تو در طول زمان</li>

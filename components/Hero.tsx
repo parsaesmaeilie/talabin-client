@@ -2,10 +2,32 @@
 
 import React from "react";
 import { Button } from "./Button";
+import Image from "next/image";
 
 export const Hero: React.FC = () => {
   return (
-    <section className="hero">
+    <section className="hero" style={{ position: "relative", overflow: "hidden" }}>
+      {/* Background decorative element */}
+      <div
+        style={{
+          position: "absolute",
+          top: "-100px",
+          left: "-100px",
+          width: "400px",
+          height: "400px",
+          opacity: 0.1,
+          zIndex: 0,
+        }}
+      >
+        <Image
+          src="/assets/illustrations/Ellipse 3871-001.png"
+          alt=""
+          width={400}
+          height={400}
+          style={{ objectFit: "contain" }}
+        />
+      </div>
+
       <div className="container" style={{ position: "relative", zIndex: 1 }}>
         <div
           className="grid"
@@ -103,6 +125,42 @@ export const Hero: React.FC = () => {
               <span>✓ پشتیبانی ۲۴ ساعته</span>
               <span>✓ نگهداری امن در خزانه بانکی</span>
               <span>✓ مناسب برای سرمایه‌گذاران و تازه‌کارها</span>
+            </div>
+
+            {/* Product showcase grid */}
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(4, 1fr)",
+                gap: "8px",
+                marginTop: "20px",
+              }}
+            >
+              {[
+                "IMG_7820 1-002.png",
+                "IMG_7818 2-003.png",
+                "IMG_7882 1-004.png",
+                "IMG_7812 1-005.png",
+              ].map((img, idx) => (
+                <div
+                  key={idx}
+                  style={{
+                    position: "relative",
+                    aspectRatio: "1",
+                    borderRadius: "var(--radius-md)",
+                    overflow: "hidden",
+                    border: "1px solid rgba(0,0,0,0.06)",
+                    background: "var(--color-bg)",
+                  }}
+                >
+                  <Image
+                    src={`/assets/illustrations/${img}`}
+                    alt=""
+                    fill
+                    style={{ objectFit: "cover" }}
+                  />
+                </div>
+              ))}
             </div>
           </div>
 
