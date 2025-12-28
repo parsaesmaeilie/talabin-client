@@ -4,30 +4,24 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { walletService, WalletTransaction } from "@/lib/api/wallet";
 
-type FilterType = "all" | "deposit" | "withdraw" | "buy_gold" | "sell_gold" | "fee" | "refund";
-type FilterStatus = "all" | "completed" | "pending" | "failed" | "cancelled" | "processing";
+type MainTab = "buy-sell" | "deposit" | "payment" | "installment" | "delivery";
+type SubTab = "all" | "buy" | "sell";
 
 export default function TransactionHistoryPage() {
   const [transactions, setTransactions] = useState<WalletTransaction[]>([]);
-  const [filteredTransactions, setFilteredTransactions] = useState<WalletTransaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedType, setSelectedType] = useState<FilterType>("all");
-  const [selectedStatus, setSelectedStatus] = useState<FilterStatus>("all");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const [mainTab, setMainTab] = useState<MainTab>("buy-sell");
+  const [subTab, setSubTab] = useState<SubTab>("buy");
+  const [selectedTransaction, setSelectedTransaction] = useState<WalletTransaction | null>(null);
 
   useEffect(() => {
     fetchTransactions();
   }, []);
 
-  useEffect(() => {
-    applyFilters();
-  }, [transactions, selectedType, selectedStatus, searchQuery, sortOrder]);
-
   const fetchTransactions = async () => {
     try {
-      setLoading(true);
+      setLoading(false);
       const response = await walletService.getTransactions();
 
       if (response.success && response.data) {
@@ -43,520 +37,1455 @@ export default function TransactionHistoryPage() {
     }
   };
 
-  const toPersianNumber = (num: string) => {
+  const toPersianNumber = (num: number | string) => {
     const persianDigits = ["۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹"];
-    return num.replace(/\d/g, (digit) => persianDigits[parseInt(digit)]);
+    return num.toString().replace(/\d/g, (digit) => persianDigits[parseInt(digit)]);
   };
 
-  const applyFilters = () => {
-    let filtered = [...transactions];
+  const getFilteredTransactions = () => {
+    let filtered = transactions;
 
-    // Type filter
-    if (selectedType !== "all") {
-      filtered = filtered.filter((t) => t.transaction_type === selectedType);
+    if (mainTab === "buy-sell") {
+      if (subTab === "buy") {
+        filtered = filtered.filter((t) => t.transaction_type === "buy_gold");
+      } else if (subTab === "sell") {
+        filtered = filtered.filter((t) => t.transaction_type === "sell_gold");
+      } else {
+        filtered = filtered.filter((t) =>
+          t.transaction_type === "buy_gold" || t.transaction_type === "sell_gold"
+        );
+      }
+    } else if (mainTab === "deposit") {
+      filtered = filtered.filter((t) => t.transaction_type === "deposit");
+    } else if (mainTab === "payment") {
+      filtered = filtered.filter((t) => t.transaction_type === "withdraw");
+    } else if (mainTab === "installment") {
+      filtered = filtered.filter((t) => t.transaction_type === "installment");
     }
 
-    // Status filter
-    if (selectedStatus !== "all") {
-      filtered = filtered.filter((t) => t.status === selectedStatus);
-    }
-
-    // Search filter
-    if (searchQuery) {
-      filtered = filtered.filter(
-        (t) =>
-          t.reference_id?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          t.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          t.amount_irr?.includes(searchQuery) ||
-          t.amount_gold?.includes(searchQuery)
-      );
-    }
-
-    // Sort by date
-    filtered.sort((a, b) => {
-      return sortOrder === "desc"
-        ? new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-        : new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
-    });
-
-    setFilteredTransactions(filtered);
+    return filtered;
   };
 
-  const getTypeIcon = (type: string) => {
-    switch (type) {
-      case "deposit":
-        return "💰";
-      case "withdraw":
-        return "💸";
-      case "buy_gold":
-        return "🪙";
-      case "sell_gold":
-        return "💎";
-      case "fee":
-        return "💳";
-      case "refund":
-        return "↩️";
-      default:
-        return "📄";
-    }
-  };
-
-  const getTypeLabel = (type: string) => {
-    switch (type) {
-      case "deposit":
-        return "واریز تومان";
-      case "withdraw":
-        return "برداشت تومان";
-      case "buy_gold":
-        return "خرید طلا";
-      case "sell_gold":
-        return "فروش طلا";
-      case "fee":
-        return "کارمزد";
-      case "refund":
-        return "برگشت وجه";
-      default:
-        return type;
-    }
-  };
-
-  const getStatusBadge = (status: string) => {
-    const badges: Record<string, { text: string; color: string; bg: string }> = {
-      completed: { text: "موفق", color: "#059669", bg: "#D1FAE5" },
-      pending: { text: "در انتظار", color: "#F59E0B", bg: "#FEF3C7" },
-      failed: { text: "ناموفق", color: "#DC2626", bg: "#FEE2E2" },
-      cancelled: { text: "لغو شده", color: "#6B7280", bg: "#F3F4F6" },
-      processing: { text: "در حال پردازش", color: "#3B82F6", bg: "#DBEAFE" },
-    };
-
-    const badge = badges[status] || badges.pending;
-
-    return (
-      <div
-        style={{
-          padding: "6px 12px",
-          background: badge.bg,
-          color: badge.color,
-          borderRadius: "8px",
-          fontSize: "11px",
-          fontWeight: 600,
-          display: "inline-block",
-        }}
-      >
-        {badge.text}
-      </div>
-    );
-  };
-
-  const ShimmerBox = ({ width = "100%", height = "20px", borderRadius = "8px" }: any) => (
-    <div
-      style={{
-        width,
-        height,
-        borderRadius,
-        background: "linear-gradient(90deg, #F5F5F5 25%, #E5E5E5 50%, #F5F5F5 75%)",
-        backgroundSize: "200% 100%",
-        animation: "shimmer 1.5s infinite",
-      }}
-    />
-  );
+  const filteredTransactions = getFilteredTransactions();
 
   return (
     <>
-      <style jsx>{`
-        @keyframes shimmer {
-          0% { background-position: 200% 0; }
-          100% { background-position: -200% 0; }
-        }
-      `}</style>
-
-      <div style={{ minHeight: "100vh", background: "#FAFAFA", paddingBottom: "100px" }}>
+      <div style={{ minHeight: "100vh", background: "#FFFFFF", paddingBottom: "100px" }}>
         {/* Header */}
         <div
           style={{
-            background: "#FFFFFF",
-            padding: "16px",
+            padding: "20px 16px",
             display: "flex",
             alignItems: "center",
-            gap: "12px",
-            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.04)",
+            justifyContent: "space-between",
+            borderBottom: "1px solid #E5E5E5",
           }}
         >
-          <Link href="/dashboard/wallet">
-            <div
-              style={{
-                width: "40px",
-                height: "40px",
-                borderRadius: "12px",
-                background: "#F5F5F5",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                cursor: "pointer",
-              }}
-            >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M15 19L8 12L15 5"
-                  stroke="#1F1F1F"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </div>
-          </Link>
-          <h1 style={{ fontSize: "18px", fontWeight: 600, flex: 1, color: "#1F1F1F" }}>
-            تاریخچه تراکنش‌ها
+          <div style={{ width: "40px" }} />
+
+          <h1
+            style={{
+              fontSize: "18px",
+              fontWeight: 700,
+              margin: 0,
+              color: "#1F2937",
+            }}
+          >
+            تاریخچه
           </h1>
+
+          <Link
+            href="/dashboard/wallet"
+            style={{
+              width: "40px",
+              height: "40px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "24px",
+              cursor: "pointer",
+              textDecoration: "none",
+              color: "#1F2937",
+            }}
+          >
+            ←
+          </Link>
         </div>
 
-        {/* Content */}
-        <div style={{ padding: "16px" }}>
-          {/* Error Message */}
-          {error && (
-            <div
+        {/* Main Tabs */}
+        <div
+          style={{
+            display: "flex",
+            gap: "8px",
+            padding: "16px",
+            overflowX: "auto",
+          }}
+        >
+          {[
+            { key: "buy-sell" as MainTab, label: "خرید و فروش" },
+            { key: "deposit" as MainTab, label: "واریز" },
+            { key: "payment" as MainTab, label: "پرداخت" },
+            { key: "installment" as MainTab, label: "خرید قسطی" },
+            { key: "delivery" as MainTab, label: "تحویل" },
+          ].map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setMainTab(tab.key)}
               style={{
-                padding: "12px 16px",
-                marginBottom: "16px",
-                borderRadius: "12px",
-                background: "#FEE2E2",
-                color: "#DC2626",
-                fontSize: "14px",
-                textAlign: "center",
+                padding: "8px 16px",
+                background: mainTab === tab.key ? "#FFFFFF" : "transparent",
+                border: `1px solid ${mainTab === tab.key ? "#E5E7EB" : "transparent"}`,
+                borderRadius: "999px",
+                fontSize: "13px",
                 fontWeight: 600,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
+                cursor: "pointer",
+                transition: "all 0.2s",
+                whiteSpace: "nowrap",
+                color: mainTab === tab.key ? "#1F2937" : "#9CA3AF",
               }}
             >
-              <span>{error}</span>
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Sub Tabs (for Buy & Sell) */}
+        {mainTab === "buy-sell" && (
+          <div
+            style={{
+              display: "flex",
+              gap: "24px",
+              padding: "0 16px 12px",
+              borderBottom: "1px solid #F3F4F6",
+            }}
+          >
+            {[
+              { key: "all" as SubTab, label: "همه موارد" },
+              { key: "buy" as SubTab, label: "خرید ها" },
+              { key: "sell" as SubTab, label: "فروش ها" },
+            ].map((tab) => (
               <button
-                onClick={fetchTransactions}
+                key={tab.key}
+                onClick={() => setSubTab(tab.key)}
                 style={{
+                  padding: "8px 0",
                   background: "transparent",
                   border: "none",
-                  color: "#DC2626",
-                  cursor: "pointer",
-                  fontSize: "12px",
-                  fontWeight: 600,
-                  textDecoration: "underline",
-                }}
-              >
-                تلاش مجدد
-              </button>
-            </div>
-          )}
-
-          {/* Search Box */}
-          <div
-            style={{
-              background: "#FFFFFF",
-              borderRadius: "16px",
-              padding: "16px",
-              marginBottom: "16px",
-              boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
-            }}
-          >
-            <div style={{ position: "relative" }}>
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                style={{
-                  position: "absolute",
-                  right: "12px",
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  pointerEvents: "none",
-                }}
-              >
-                <path
-                  d="M9 17C13.4183 17 17 13.4183 17 9C17 4.58172 13.4183 1 9 1C4.58172 1 1 4.58172 1 9C1 13.4183 4.58172 17 9 17Z"
-                  stroke="#6B7280"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M19 19L14.65 14.65"
-                  stroke="#6B7280"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="جستجو با کد پیگیری یا شرح..."
-                style={{
-                  width: "100%",
-                  padding: "12px 12px 12px 44px",
-                  border: "2px solid #F3F4F6",
-                  borderRadius: "12px",
-                  fontSize: "14px",
-                  background: "#FAFAFA",
-                  color: "#1F1F1F",
-                  outline: "none",
-                }}
-              />
-            </div>
-          </div>
-
-          {/* Filters */}
-          <div
-            style={{
-              background: "#FFFFFF",
-              borderRadius: "16px",
-              padding: "16px",
-              marginBottom: "16px",
-              boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
-            }}
-          >
-            {/* Type Filter */}
-            <div style={{ marginBottom: "16px" }}>
-              <div style={{ fontSize: "12px", fontWeight: 600, marginBottom: "10px", color: "#6B7280" }}>
-                🏷️ نوع تراکنش
-              </div>
-              <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", overflowX: "auto" }}>
-                {(["all", "deposit", "withdraw", "buy_gold", "sell_gold", "fee", "refund"] as const).map((type) => (
-                  <button
-                    key={type}
-                    onClick={() => setSelectedType(type)}
-                    style={{
-                      padding: "8px 14px",
-                      background: selectedType === type ? "#FDB022" : "#F5F5F5",
-                      color: selectedType === type ? "#1F1F1F" : "#6B7280",
-                      border: "none",
-                      borderRadius: "10px",
-                      fontSize: "12px",
-                      fontWeight: 600,
-                      cursor: "pointer",
-                      transition: "all 0.2s",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {type === "all" ? "همه" : getTypeLabel(type)}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Status Filter */}
-            <div style={{ marginBottom: "16px" }}>
-              <div style={{ fontSize: "12px", fontWeight: 600, marginBottom: "10px", color: "#6B7280" }}>
-                📊 وضعیت
-              </div>
-              <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
-                {(["all", "completed", "pending", "failed", "cancelled", "processing"] as const).map((status) => (
-                  <button
-                    key={status}
-                    onClick={() => setSelectedStatus(status)}
-                    style={{
-                      padding: "8px 14px",
-                      background: selectedStatus === status ? "#FDB022" : "#F5F5F5",
-                      color: selectedStatus === status ? "#1F1F1F" : "#6B7280",
-                      border: "none",
-                      borderRadius: "10px",
-                      fontSize: "12px",
-                      fontWeight: 600,
-                      cursor: "pointer",
-                      transition: "all 0.2s",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {status === "all"
-                      ? "همه"
-                      : status === "completed"
-                      ? "موفق"
-                      : status === "pending"
-                      ? "در انتظار"
-                      : status === "failed"
-                      ? "ناموفق"
-                      : status === "cancelled"
-                      ? "لغو شده"
-                      : "در حال پردازش"}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Sort */}
-            <div>
-              <div style={{ fontSize: "12px", fontWeight: 600, marginBottom: "10px", color: "#6B7280" }}>
-                🔄 مرتب‌سازی
-              </div>
-              <button
-                onClick={() => setSortOrder(sortOrder === "desc" ? "asc" : "desc")}
-                style={{
-                  padding: "8px 14px",
-                  background: "#F5F5F5",
-                  border: "none",
-                  borderRadius: "10px",
-                  fontSize: "12px",
+                  borderBottom: `2px solid ${subTab === tab.key ? "#FDB022" : "transparent"}`,
+                  fontSize: "13px",
                   fontWeight: 600,
                   cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "6px",
+                  transition: "all 0.2s",
+                  color: subTab === tab.key ? "#FDB022" : "#6B7280",
                 }}
               >
-                <span>{sortOrder === "desc" ? "جدیدترین ↓" : "قدیمی‌ترین ↑"}</span>
+                {tab.label}
               </button>
+            ))}
+          </div>
+        )}
+
+        {/* Content */}
+        <div style={{ padding: "0" }}>
+          {loading ? (
+            <div style={{ textAlign: "center", padding: "40px", color: "#9CA3AF" }}>
+              در حال بارگذاری...
             </div>
-          </div>
-
-          {/* Results Count */}
-          <div
-            style={{
-              padding: "12px 16px",
-              background: "#FFFFFF",
-              borderRadius: "12px",
-              fontSize: "13px",
-              color: "#6B7280",
-              marginBottom: "12px",
-              textAlign: "center",
-              boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
-              fontWeight: 600,
-            }}
-          >
-            {loading ? "در حال بارگذاری..." : `📋 ${toPersianNumber(filteredTransactions.length.toString())} تراکنش یافت شد`}
-          </div>
-
-          {/* Transaction List */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-            {loading ? (
-              // Loading skeletons
-              [1, 2, 3, 4, 5].map((i) => (
-                <div
-                  key={i}
-                  style={{
-                    background: "#FFFFFF",
-                    borderRadius: "16px",
-                    padding: "16px",
-                    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
-                  }}
-                >
-                  <div style={{ display: "flex", gap: "12px", alignItems: "center", marginBottom: "12px" }}>
-                    <ShimmerBox width="48px" height="48px" borderRadius="12px" />
-                    <div style={{ flex: 1 }}>
-                      <ShimmerBox height="16px" width="60%" borderRadius="6px" />
-                      <div style={{ height: "8px" }} />
-                      <ShimmerBox height="12px" width="40%" borderRadius="6px" />
-                    </div>
-                    <ShimmerBox width="80px" height="28px" borderRadius="8px" />
-                  </div>
-                  <ShimmerBox height="10px" width="100%" borderRadius="6px" />
-                </div>
-              ))
-            ) : filteredTransactions.length > 0 ? (
-              filteredTransactions.map((transaction) => {
-                const isPositive = ["deposit", "buy_gold", "refund"].includes(transaction.transaction_type);
-                const amount = transaction.amount_irr || transaction.amount_gold || "0";
+          ) : filteredTransactions.length > 0 ? (
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              {filteredTransactions.map((transaction, index) => {
+                const isBuy = transaction.transaction_type === "buy_gold";
+                const isDeposit = transaction.transaction_type === "deposit";
+                const isWithdraw = transaction.transaction_type === "withdraw";
+                const isInstallment = transaction.transaction_type === "installment";
+                const amount = isDeposit || isWithdraw
+                  ? (transaction.amount_irr || "15000000")
+                  : isInstallment
+                  ? (transaction.amount_gold || "10")
+                  : (transaction.amount_gold || "12");
 
                 return (
                   <div
                     key={transaction.id}
+                    onClick={() => setSelectedTransaction(transaction)}
                     style={{
-                      background: "#FFFFFF",
-                      borderRadius: "16px",
                       padding: "16px",
-                      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
-                      transition: "all 0.2s",
+                      borderBottom: index < filteredTransactions.length - 1 ? "1px solid #F3F4F6" : "none",
+                      cursor: "pointer",
+                      transition: "background 0.2s",
+                      background: "#FFFFFF",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = "#FAFAFA";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = "#FFFFFF";
                     }}
                   >
-                    <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "12px" }}>
-                      <div
-                        style={{
-                          width: "48px",
-                          height: "48px",
-                          borderRadius: "12px",
-                          background: "#FAFAFA",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          fontSize: "24px",
-                          flexShrink: 0,
-                        }}
-                      >
-                        {getTypeIcon(transaction.transaction_type)}
-                      </div>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: "14px", fontWeight: 600, marginBottom: "4px", color: "#1F1F1F" }}>
-                          {getTypeLabel(transaction.transaction_type)}
-                        </div>
-                        <div style={{ fontSize: "11px", color: "#9CA3AF" }}>
-                          {new Date(transaction.created_at).toLocaleDateString("fa-IR", {
-                            year: "numeric",
-                            month: "short",
-                            day: "numeric",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
-                        </div>
-                      </div>
-                      <div style={{ textAlign: "left", flexShrink: 0 }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                        {/* Icon */}
                         <div
                           style={{
-                            fontSize: "16px",
-                            fontWeight: 700,
-                            marginBottom: "6px",
-                            color: isPositive ? "#10B981" : "#EF4444",
+                            width: "24px",
+                            height: "24px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
                           }}
                         >
-                          {isPositive ? "+" : "-"}
-                          {toPersianNumber(parseFloat(amount).toLocaleString("fa-IR"))}
-                          <span style={{ fontSize: "11px", fontWeight: 500, marginRight: "4px" }}>
-                            {transaction.amount_irr ? "تومان" : "گرم"}
-                          </span>
+                          {isInstallment ? (
+                            <div style={{ fontSize: "24px" }}>📅</div>
+                          ) : isWithdraw ? (
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                              <path d="M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" fill="#FDB022"/>
+                              <path d="M12 17V7M12 7L15 10M12 7L9 10" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                          ) : isDeposit ? (
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                              <path d="M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" fill="#FDB022"/>
+                              <path d="M12 7V17M12 17L15 14M12 17L9 14" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                          ) : (
+                            <svg
+                              width="24"
+                              height="24"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              {isBuy ? (
+                                <>
+                                  <path
+                                    d="M12 19V5"
+                                    stroke="#FDB022"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                  />
+                                  <path
+                                    d="M5 12L12 5L19 12"
+                                    stroke="#FDB022"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  />
+                                </>
+                              ) : (
+                                <>
+                                  <path
+                                    d="M12 5V19"
+                                    stroke="#EF4444"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                  />
+                                  <path
+                                    d="M5 12L12 19L19 12"
+                                    stroke="#EF4444"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  />
+                                </>
+                              )}
+                            </svg>
+                          )}
                         </div>
-                        {getStatusBadge(transaction.status)}
+
+                        <div>
+                          <div
+                            style={{
+                              fontSize: "14px",
+                              fontWeight: 600,
+                              color: "#1F2937",
+                              marginBottom: "4px",
+                            }}
+                          >
+                            {isInstallment ? "خرید قسطی" : isDeposit ? "واریز موفق به کیف پول" : isWithdraw ? "برداشت موفق از کیف پول" : (isBuy ? "خرید طلا" : "فروش طلا")}
+                          </div>
+                          <div style={{ fontSize: "12px", color: "#9CA3AF" }}>
+                            ۱۴۰۴/۱۰/۲۵
+                          </div>
+                        </div>
+                      </div>
+
+                      <div style={{ fontSize: "14px", fontWeight: 700, color: "#1F2937" }}>
+                        {toPersianNumber(amount)} {isDeposit || isWithdraw ? "تومان" : "گرم"}
                       </div>
                     </div>
-
-                    {(transaction.description || transaction.reference_id) && (
-                      <div
-                        style={{
-                          paddingTop: "12px",
-                          borderTop: "1px solid #F3F4F6",
-                          display: "flex",
-                          justifyContent: "space-between",
-                          fontSize: "11px",
-                          color: "#6B7280",
-                        }}
-                      >
-                        {transaction.description && <span>{transaction.description}</span>}
-                        {transaction.reference_id && <span>کد: {transaction.reference_id}</span>}
-                      </div>
-                    )}
                   </div>
                 );
-              })
-            ) : (
+              })}
+            </div>
+          ) : (
+            <EmptyState />
+          )}
+        </div>
+      </div>
+
+      {/* Transaction Detail Modal */}
+      {selectedTransaction && (
+        selectedTransaction.transaction_type === "installment" ? (
+          <InstallmentDetailModal
+            transaction={selectedTransaction}
+            onClose={() => setSelectedTransaction(null)}
+          />
+        ) : selectedTransaction.transaction_type === "deposit" ? (
+          <DepositDetailModal
+            transaction={selectedTransaction}
+            onClose={() => setSelectedTransaction(null)}
+          />
+        ) : selectedTransaction.transaction_type === "withdraw" ? (
+          <WithdrawDetailModal
+            transaction={selectedTransaction}
+            onClose={() => setSelectedTransaction(null)}
+          />
+        ) : (
+          <BuySellDetailModal
+            transaction={selectedTransaction}
+            onClose={() => setSelectedTransaction(null)}
+          />
+        )
+      )}
+    </>
+  );
+}
+
+// Empty State Component
+function EmptyState() {
+  return (
+    <div
+      style={{
+        padding: "60px 40px",
+        textAlign: "center",
+      }}
+    >
+      <svg
+        width="200"
+        height="200"
+        viewBox="0 0 200 200"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <rect x="40" y="80" width="120" height="80" fill="#FFF4E1" rx="8" transform="rotate(-5 100 120)" />
+        <rect x="50" y="70" width="100" height="90" fill="#FFC857" rx="8" transform="rotate(10 100 115)" opacity="0.3" />
+        <circle cx="100" cy="80" r="20" fill="#92400E" />
+        <path
+          d="M70 120 Q100 140 130 120 L130 160 L70 160 Z"
+          fill="#FFFFFF"
+          stroke="#92400E"
+          strokeWidth="2"
+        />
+        <rect x="85" y="100" width="30" height="40" fill="#FFFFFF" stroke="#92400E" strokeWidth="2" rx="2" />
+        <line x1="90" y1="110" x2="110" y2="110" stroke="#92400E" strokeWidth="1" />
+        <line x1="90" y1="115" x2="110" y2="115" stroke="#92400E" strokeWidth="1" />
+        <line x1="90" y1="120" x2="105" y2="120" stroke="#92400E" strokeWidth="1" />
+      </svg>
+
+      <div
+        style={{
+          fontSize: "14px",
+          fontWeight: 600,
+          color: "#6B7280",
+          marginTop: "24px",
+        }}
+      >
+        اطلاعاتی برای نمایش وجود ندارد.
+      </div>
+    </div>
+  );
+}
+
+// Deposit Transaction Detail Modal
+function DepositDetailModal({
+  transaction,
+  onClose,
+}: {
+  transaction: WalletTransaction;
+  onClose: () => void;
+}) {
+  const toPersianNumber = (num: number | string) => {
+    const persianDigits = ["۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹"];
+    return num.toString().replace(/\d/g, (digit) => persianDigits[parseInt(digit)]);
+  };
+
+  const isSuccess = transaction.status === "completed";
+  const amountIRR = transaction.amount_irr || "17589000";
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    alert("کپی شد!");
+  };
+
+  return (
+    <div
+      onClick={onClose}
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: "rgba(0, 0, 0, 0.5)",
+        display: "flex",
+        alignItems: "flex-end",
+        zIndex: 1000,
+      }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          background: "#FFFFFF",
+          borderRadius: "24px 24px 0 0",
+          padding: "0",
+          width: "100%",
+          maxWidth: "600px",
+          margin: "0 auto",
+          maxHeight: "90vh",
+          overflowY: "auto",
+        }}
+      >
+        {/* Drag handle */}
+        <div style={{ padding: "12px 0", display: "flex", justifyContent: "center" }}>
+          <div
+            style={{
+              width: "60px",
+              height: "4px",
+              background: "#E5E7EB",
+              borderRadius: "2px",
+            }}
+          />
+        </div>
+
+        <div style={{ padding: "0 24px 24px" }}>
+          {/* Close button */}
+          <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "16px" }}>
+            <button
+              onClick={onClose}
+              style={{
+                width: "32px",
+                height: "32px",
+                borderRadius: "50%",
+                background: "transparent",
+                border: "none",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "24px",
+                color: "#1F2937",
+              }}
+            >
+              ×
+            </button>
+          </div>
+
+          {/* Status Icon */}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              marginBottom: "24px",
+            }}
+          >
+            <div style={{ position: "relative" }}>
+              {/* Concentric rings */}
               <div
                 style={{
-                  background: "#FFFFFF",
-                  borderRadius: "16px",
-                  padding: "40px 20px",
-                  textAlign: "center",
-                  boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  width: "130px",
+                  height: "130px",
+                  border: `2px solid ${isSuccess ? "#10B981" : "#EF4444"}`,
+                  borderRadius: "50%",
+                  opacity: 0.3,
+                }}
+              />
+              <div
+                style={{
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  width: "100px",
+                  height: "100px",
+                  border: `2px solid ${isSuccess ? "#10B981" : "#EF4444"}`,
+                  borderRadius: "50%",
+                  opacity: 0.5,
+                }}
+              />
+
+              {/* Icon */}
+              <div
+                style={{
+                  width: "70px",
+                  height: "70px",
+                  background: `linear-gradient(135deg, ${isSuccess ? "#10B981" : "#EF4444"} 0%, ${isSuccess ? "#059669" : "#DC2626"} 100%)`,
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  position: "relative",
+                  boxShadow: `0 4px 12px ${isSuccess ? "rgba(16, 185, 129, 0.3)" : "rgba(239, 68, 68, 0.3)"}`,
                 }}
               >
-                <div style={{ fontSize: "64px", marginBottom: "16px" }}>📭</div>
-                <div style={{ fontSize: "15px", fontWeight: 600, marginBottom: "6px", color: "#1F1F1F" }}>
-                  تراکنشی یافت نشد
-                </div>
-                <div style={{ fontSize: "13px", color: "#6B7280" }}>
-                  فیلترها را تغییر دهید یا جستجوی دیگری انجام دهید
+                {isSuccess ? (
+                  <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                    <path d="M10 20L17 27L30 14" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                ) : (
+                  <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                    <path d="M14 14L26 26M26 14L14 26" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Status message */}
+          <div
+            style={{
+              fontSize: "16px",
+              fontWeight: 600,
+              textAlign: "center",
+              marginBottom: "32px",
+              color: "#1F2937",
+            }}
+          >
+            {isSuccess ? "کیف‌پول شما با موفقیت شارژ شد" : "شارژ کیف‌پول انجام نشد"}
+          </div>
+
+          {/* Details */}
+          <div
+            style={{
+              background: "#F9FAFB",
+              borderRadius: "16px",
+              padding: "4px 16px",
+              marginBottom: "24px",
+            }}
+          >
+            {/* Amount */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                padding: "12px 0",
+                borderBottom: "1px solid #E5E7EB",
+              }}
+            >
+              <span style={{ fontSize: "13px", color: "#6B7280" }}>
+                مبلغ پرداختی:
+              </span>
+              <span style={{ fontSize: "13px", fontWeight: 600, color: "#1F2937" }}>
+                {toPersianNumber(amountIRR)} تومان
+              </span>
+            </div>
+
+            {/* Transaction type */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                padding: "12px 0",
+                borderBottom: "1px solid #E5E7EB",
+              }}
+            >
+              <span style={{ fontSize: "13px", color: "#6B7280" }}>نوع تراکنش:</span>
+              <span style={{ fontSize: "13px", fontWeight: 600, color: "#1F2937" }}>
+                واریز با درگاه
+              </span>
+            </div>
+
+            {/* Bank */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                padding: "12px 0",
+                borderBottom: "1px solid #E5E7EB",
+              }}
+            >
+              <span style={{ fontSize: "13px", color: "#6B7280" }}>بانک مبدا:</span>
+              <span style={{ fontSize: "13px", fontWeight: 600, color: "#1F2937" }}>
+                بانک ساسمان
+              </span>
+            </div>
+
+            {/* Timestamp */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                padding: "12px 0",
+                borderBottom: "1px solid #E5E7EB",
+              }}
+            >
+              <span style={{ fontSize: "13px", color: "#6B7280" }}>زمان:</span>
+              <span style={{ fontSize: "13px", fontWeight: 600, color: "#1F2937", direction: "ltr", textAlign: "right" }}>
+                ۱۴۰۴/۱۰/۲۵ - ۱۳:۲۱
+              </span>
+            </div>
+
+            {/* Fee */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                padding: "12px 0",
+                borderBottom: "1px solid #E5E7EB",
+              }}
+            >
+              <span style={{ fontSize: "13px", color: "#6B7280" }}>کارمزد:</span>
+              <span style={{ fontSize: "13px", fontWeight: 600, color: "#1F2937" }}>
+                {toPersianNumber("130")} تومان...
+              </span>
+            </div>
+
+            {/* Status */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                padding: "12px 0",
+                borderBottom: "1px solid #E5E7EB",
+              }}
+            >
+              <span style={{ fontSize: "13px", color: "#6B7280" }}>وضعیت:</span>
+              <span
+                style={{
+                  fontSize: "13px",
+                  fontWeight: 600,
+                  color: isSuccess ? "#10B981" : "#EF4444",
+                }}
+              >
+                {isSuccess ? "موفق" : "ناموفق"}
+              </span>
+            </div>
+
+            {/* Reference ID */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: "12px 0",
+              }}
+            >
+              <span style={{ fontSize: "13px", color: "#6B7280" }}>شماره پیگیری:</span>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <span
+                  style={{
+                    fontSize: "12px",
+                    fontWeight: 600,
+                    color: "#1F2937",
+                    maxWidth: "140px",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  45441015-g5g5g5g...
+                </span>
+                <button
+                  onClick={() => copyToClipboard("45441015-g5g5g5g")}
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    cursor: "pointer",
+                    padding: "4px",
+                  }}
+                >
+                  📋
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Action button */}
+          <button
+            onClick={onClose}
+            style={{
+              width: "100%",
+              padding: "14px",
+              background: "#F3F4F6",
+              border: "none",
+              borderRadius: "12px",
+              fontSize: "14px",
+              fontWeight: 600,
+              cursor: "pointer",
+              color: "#1F2937",
+            }}
+          >
+            بازگشت
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Installment Transaction Detail Modal
+function InstallmentDetailModal({
+  transaction,
+  onClose,
+}: {
+  transaction: WalletTransaction;
+  onClose: () => void;
+}) {
+  const toPersianNumber = (num: number | string) => {
+    const persianDigits = ["۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹"];
+    return num.toString().replace(/\d/g, (digit) => persianDigits[parseInt(digit)]);
+  };
+
+  const amount = transaction.amount_gold || "10";
+
+  return (
+    <div
+      onClick={onClose}
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: "rgba(0, 0, 0, 0.5)",
+        display: "flex",
+        alignItems: "flex-end",
+        zIndex: 1000,
+      }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          background: "#FFFFFF",
+          borderRadius: "24px 24px 0 0",
+          padding: "24px",
+          width: "100%",
+          maxWidth: "600px",
+          margin: "0 auto",
+        }}
+      >
+        <h3 style={{ fontSize: "18px", fontWeight: 700, marginBottom: "16px", textAlign: "center" }}>
+          خرید قسطی
+        </h3>
+        <p style={{ fontSize: "14px", color: "#6B7280", textAlign: "center", marginBottom: "24px" }}>
+          {toPersianNumber(amount)} گرم طلا
+        </p>
+        <button
+          onClick={onClose}
+          style={{
+            width: "100%",
+            padding: "14px",
+            background: "#F3F4F6",
+            border: "none",
+            borderRadius: "12px",
+            fontSize: "14px",
+            fontWeight: 600,
+            cursor: "pointer",
+            color: "#1F2937",
+          }}
+        >
+          بازگشت
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// Withdraw Transaction Detail Modal
+function WithdrawDetailModal({
+  transaction,
+  onClose,
+}: {
+  transaction: WalletTransaction;
+  onClose: () => void;
+}) {
+  const toPersianNumber = (num: number | string) => {
+    const persianDigits = ["۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹"];
+    return num.toString().replace(/\d/g, (digit) => persianDigits[parseInt(digit)]);
+  };
+
+  const isSuccess = transaction.status === "completed";
+  const amountIRR = transaction.amount_irr || "17598000";
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    alert("کپی شد!");
+  };
+
+  return (
+    <div
+      onClick={onClose}
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: "rgba(0, 0, 0, 0.5)",
+        display: "flex",
+        alignItems: "flex-end",
+        zIndex: 1000,
+      }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          background: "#FFFFFF",
+          borderRadius: "24px 24px 0 0",
+          padding: "0",
+          width: "100%",
+          maxWidth: "600px",
+          margin: "0 auto",
+          maxHeight: "90vh",
+          overflowY: "auto",
+        }}
+      >
+        {/* Drag handle */}
+        <div style={{ padding: "12px 0", display: "flex", justifyContent: "center" }}>
+          <div
+            style={{
+              width: "60px",
+              height: "4px",
+              background: "#E5E7EB",
+              borderRadius: "2px",
+            }}
+          />
+        </div>
+
+        <div style={{ padding: "0 24px 24px" }}>
+          {/* Close button */}
+          <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "16px" }}>
+            <button
+              onClick={onClose}
+              style={{
+                width: "32px",
+                height: "32px",
+                borderRadius: "50%",
+                background: "transparent",
+                border: "none",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "24px",
+                color: "#1F2937",
+              }}
+            >
+              ×
+            </button>
+          </div>
+
+          {/* Status Icon */}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              marginBottom: "24px",
+            }}
+          >
+            <div style={{ position: "relative" }}>
+              {/* Concentric rings */}
+              <div
+                style={{
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  width: "130px",
+                  height: "130px",
+                  border: `2px solid ${isSuccess ? "#10B981" : "#EF4444"}`,
+                  borderRadius: "50%",
+                  opacity: 0.3,
+                }}
+              />
+              <div
+                style={{
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  width: "100px",
+                  height: "100px",
+                  border: `2px solid ${isSuccess ? "#10B981" : "#EF4444"}`,
+                  borderRadius: "50%",
+                  opacity: 0.5,
+                }}
+              />
+
+              {/* Icon */}
+              <div
+                style={{
+                  width: "70px",
+                  height: "70px",
+                  background: `linear-gradient(135deg, ${isSuccess ? "#10B981" : "#EF4444"} 0%, ${isSuccess ? "#059669" : "#DC2626"} 100%)`,
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  position: "relative",
+                  boxShadow: `0 4px 12px ${isSuccess ? "rgba(16, 185, 129, 0.3)" : "rgba(239, 68, 68, 0.3)"}`,
+                }}
+              >
+                {isSuccess ? (
+                  <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                    <path d="M10 20L17 27L30 14" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                ) : (
+                  <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                    <path d="M14 14L26 26M26 14L14 26" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Status message */}
+          <div
+            style={{
+              fontSize: "16px",
+              fontWeight: 600,
+              textAlign: "center",
+              marginBottom: "32px",
+              color: "#1F2937",
+            }}
+          >
+            {isSuccess ? "برداشت شما با موفقیت انجام شد" : "برداشت انجام نشد"}
+          </div>
+
+          {/* Details */}
+          <div
+            style={{
+              background: "#F9FAFB",
+              borderRadius: "16px",
+              padding: "4px 16px",
+              marginBottom: "24px",
+            }}
+          >
+            {/* Amount */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                padding: "12px 0",
+                borderBottom: "1px solid #E5E7EB",
+              }}
+            >
+              <span style={{ fontSize: "13px", color: "#6B7280" }}>
+                مبلغ درخواستی:
+              </span>
+              <span style={{ fontSize: "13px", fontWeight: 600, color: "#1F2937" }}>
+                {toPersianNumber(amountIRR)} تومان
+              </span>
+            </div>
+
+            {/* Transaction type */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                padding: "12px 0",
+                borderBottom: "1px solid #E5E7EB",
+              }}
+            >
+              <span style={{ fontSize: "13px", color: "#6B7280" }}>نوع تراکنش:</span>
+              <span style={{ fontSize: "13px", fontWeight: 600, color: "#1F2937" }}>
+                خرید طلا
+              </span>
+            </div>
+
+            {/* Bank */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                padding: "12px 0",
+                borderBottom: "1px solid #E5E7EB",
+              }}
+            >
+              <span style={{ fontSize: "13px", color: "#6B7280" }}>بانک مبدا:</span>
+              <span style={{ fontSize: "13px", fontWeight: 600, color: "#1F2937" }}>
+                بانک سامان
+              </span>
+            </div>
+
+            {/* Timestamp */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                padding: "12px 0",
+                borderBottom: "1px solid #E5E7EB",
+              }}
+            >
+              <span style={{ fontSize: "13px", color: "#6B7280" }}>زمان:</span>
+              <span style={{ fontSize: "13px", fontWeight: 600, color: "#1F2937", direction: "ltr", textAlign: "right" }}>
+                ۱۴:۲۱ - ۱۴۰۴/۰۲/۱۵
+              </span>
+            </div>
+
+            {/* Fee */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                padding: "12px 0",
+                borderBottom: "1px solid #E5E7EB",
+              }}
+            >
+              <span style={{ fontSize: "13px", color: "#6B7280" }}>کارمزد:</span>
+              <span style={{ fontSize: "13px", fontWeight: 600, color: "#1F2937" }}>
+                {toPersianNumber("150,000")} تومان...
+              </span>
+            </div>
+
+            {/* Status */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                padding: "12px 0",
+                borderBottom: "1px solid #E5E7EB",
+              }}
+            >
+              <span style={{ fontSize: "13px", color: "#6B7280" }}>وضعیت:</span>
+              <span
+                style={{
+                  fontSize: "13px",
+                  fontWeight: 600,
+                  color: isSuccess ? "#10B981" : "#EF4444",
+                }}
+              >
+                {isSuccess ? "موفق" : "ناموفق"}
+              </span>
+            </div>
+
+            {/* Reference ID */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: "12px 0",
+              }}
+            >
+              <span style={{ fontSize: "13px", color: "#6B7280" }}>شماره پیگیری:</span>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <span
+                  style={{
+                    fontSize: "12px",
+                    fontWeight: 600,
+                    color: "#1F2937",
+                    maxWidth: "140px",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  45441015-g5g5g5g...
+                </span>
+                <button
+                  onClick={() => copyToClipboard("45441015-g5g5g5g")}
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    cursor: "pointer",
+                    padding: "4px",
+                  }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <rect x="5" y="5" width="9" height="9" rx="1.5" stroke="#6B7280" strokeWidth="1.5"/>
+                    <path d="M3 11V3C3 2.44772 3.44772 2 4 2H10" stroke="#6B7280" strokeWidth="1.5" strokeLinecap="round"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Action button */}
+          <button
+            onClick={onClose}
+            style={{
+              width: "100%",
+              padding: "14px",
+              background: "#F3F4F6",
+              border: "none",
+              borderRadius: "12px",
+              fontSize: "14px",
+              fontWeight: 600,
+              cursor: "pointer",
+              color: "#1F2937",
+            }}
+          >
+            بازگشت
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Buy/Sell Transaction Detail Modal (existing)
+function BuySellDetailModal({
+  transaction,
+  onClose,
+}: {
+  transaction: WalletTransaction;
+  onClose: () => void;
+}) {
+  const toPersianNumber = (num: number | string) => {
+    const persianDigits = ["۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹"];
+    return num.toString().replace(/\d/g, (digit) => persianDigits[parseInt(digit)]);
+  };
+
+  const isBuy = transaction.transaction_type === "buy_gold";
+  const amount = transaction.amount_gold || "12";
+  const amountIRR = transaction.amount_irr || "151176000";
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    alert("کپی شد!");
+  };
+
+  return (
+    <div
+      onClick={onClose}
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: "rgba(0, 0, 0, 0.5)",
+        display: "flex",
+        alignItems: "flex-end",
+        zIndex: 1000,
+      }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          background: "#FFFFFF",
+          borderRadius: "24px 24px 0 0",
+          padding: "0",
+          width: "100%",
+          maxWidth: "600px",
+          margin: "0 auto",
+          maxHeight: "90vh",
+          overflowY: "auto",
+        }}
+      >
+        {/* Drag handle */}
+        <div style={{ padding: "12px 0", display: "flex", justifyContent: "center" }}>
+          <div
+            style={{
+              width: "60px",
+              height: "4px",
+              background: "#E5E7EB",
+              borderRadius: "2px",
+            }}
+          />
+        </div>
+
+        <div style={{ padding: "0 24px 24px" }}>
+          {/* Close button */}
+          <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "16px" }}>
+            <button
+              onClick={onClose}
+              style={{
+                width: "32px",
+                height: "32px",
+                borderRadius: "50%",
+                background: "transparent",
+                border: "none",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "24px",
+                color: "#1F2937",
+              }}
+            >
+              ×
+            </button>
+          </div>
+
+          {/* Gold Icon with rings */}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              marginBottom: "24px",
+            }}
+          >
+            <div style={{ position: "relative" }}>
+              {/* Concentric rings */}
+              <div
+                style={{
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  width: "130px",
+                  height: "130px",
+                  border: "2px solid #FDB022",
+                  borderRadius: "50%",
+                  opacity: 0.3,
+                }}
+              />
+              <div
+                style={{
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  width: "100px",
+                  height: "100px",
+                  border: "2px solid #FDB022",
+                  borderRadius: "50%",
+                  opacity: 0.5,
+                }}
+              />
+
+              {/* Gold bar icon */}
+              <div
+                style={{
+                  width: "70px",
+                  height: "50px",
+                  background: "linear-gradient(135deg, #FDB022 0%, #FBBF24 50%, #F59E0B 100%)",
+                  borderRadius: "8px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  position: "relative",
+                  boxShadow: "0 4px 12px rgba(251, 176, 34, 0.3), inset 0 2px 4px rgba(255, 255, 255, 0.3)",
+                  transform: "perspective(200px) rotateY(-10deg)",
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: "18px",
+                    fontWeight: 900,
+                    color: "#92400E",
+                    textShadow: "0 1px 2px rgba(0,0,0,0.1)",
+                  }}
+                >
+                  GOLD
                 </div>
               </div>
-            )}
+            </div>
+          </div>
+
+          {/* Amount */}
+          <div
+            style={{
+              fontSize: "28px",
+              fontWeight: 700,
+              textAlign: "center",
+              marginBottom: "8px",
+              color: "#1F2937",
+            }}
+          >
+            {toPersianNumber(amount)} گرم
+          </div>
+
+          {/* Success message */}
+          <div
+            style={{
+              fontSize: "14px",
+              fontWeight: 600,
+              textAlign: "center",
+              marginBottom: "32px",
+              color: "#6B7280",
+            }}
+          >
+            طلا با موفقیت {isBuy ? "خریداری" : "فروخته"} شد
+          </div>
+
+          {/* Details */}
+          <div
+            style={{
+              background: "#F9FAFB",
+              borderRadius: "16px",
+              padding: "4px 16px",
+              marginBottom: "24px",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                padding: "12px 0",
+                borderBottom: "1px solid #E5E7EB",
+              }}
+            >
+              <span style={{ fontSize: "13px", color: "#6B7280" }}>
+                قیمت لحظه فروش (گرمی):
+              </span>
+              <span style={{ fontSize: "13px", fontWeight: 600, color: "#1F2937" }}>
+                {toPersianNumber("17,589,000")} تومان
+              </span>
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                padding: "12px 0",
+                borderBottom: "1px solid #E5E7EB",
+              }}
+            >
+              <span style={{ fontSize: "13px", color: "#6B7280" }}>نوع تراکنش:</span>
+              <span style={{ fontSize: "13px", fontWeight: 600, color: "#1F2937" }}>
+                {isBuy ? "خرید طلا" : "فروش طلا"}
+              </span>
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                padding: "12px 0",
+                borderBottom: "1px solid #E5E7EB",
+              }}
+            >
+              <span style={{ fontSize: "13px", color: "#6B7280" }}>
+                مبلغ پرداختی از کیف پول:
+              </span>
+              <span style={{ fontSize: "13px", fontWeight: 600, color: "#1F2937" }}>
+                {toPersianNumber("151,176,000")} تومان
+              </span>
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                padding: "12px 0",
+                borderBottom: "1px solid #E5E7EB",
+              }}
+            >
+              <span style={{ fontSize: "13px", color: "#6B7280" }}>زمان:</span>
+              <span style={{ fontSize: "13px", fontWeight: 600, color: "#1F2937", direction: "ltr", textAlign: "right" }}>
+                ۱۴۰۴/۱۰/۲۵ - ۱۳:۲۱
+              </span>
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                padding: "12px 0",
+                borderBottom: "1px solid #E5E7EB",
+              }}
+            >
+              <span style={{ fontSize: "13px", color: "#6B7280" }}>کارمزد:</span>
+              <span style={{ fontSize: "13px", fontWeight: 600, color: "#1F2937" }}>
+                {toPersianNumber("150,000")} تومان...
+              </span>
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                padding: "12px 0",
+                borderBottom: "1px solid #E5E7EB",
+              }}
+            >
+              <span style={{ fontSize: "13px", color: "#6B7280" }}>وضعیت:</span>
+              <span
+                style={{
+                  fontSize: "13px",
+                  fontWeight: 600,
+                  color: "#10B981",
+                }}
+              >
+                موفق
+              </span>
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: "12px 0",
+              }}
+            >
+              <span style={{ fontSize: "13px", color: "#6B7280" }}>شماره پیگیری:</span>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <span
+                  style={{
+                    fontSize: "12px",
+                    fontWeight: 600,
+                    color: "#1F2937",
+                    maxWidth: "140px",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  45441015-g5g5g5g...
+                </span>
+                <button
+                  onClick={() => copyToClipboard("45441015-g5g5g5g")}
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    cursor: "pointer",
+                    padding: "4px",
+                  }}
+                >
+                  📋
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Action buttons */}
+          <div style={{ display: "flex", gap: "12px" }}>
+            <button
+              onClick={onClose}
+              style={{
+                flex: 1,
+                padding: "14px",
+                background: "#F3F4F6",
+                border: "none",
+                borderRadius: "12px",
+                fontSize: "14px",
+                fontWeight: 600,
+                cursor: "pointer",
+                color: "#1F2937",
+              }}
+            >
+              بازگشت
+            </button>
+            <button
+              style={{
+                flex: 1,
+                padding: "14px",
+                background: "#1F2937",
+                border: "none",
+                borderRadius: "12px",
+                fontSize: "14px",
+                fontWeight: 600,
+                cursor: "pointer",
+                color: "#FFFFFF",
+              }}
+            >
+              دانلود فاکتور
+            </button>
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }

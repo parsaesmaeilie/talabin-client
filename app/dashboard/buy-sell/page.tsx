@@ -25,12 +25,18 @@ export default function BuySell() {
   }, []);
 
   useEffect(() => {
-    if (amount && parseFloat(amount) >= 100000) {
+    // Clear amount when switching tabs
+    setAmount("");
+    setPreview(null);
+  }, [activeTab]);
+
+  useEffect(() => {
+    if (amount) {
       fetchPreview();
     } else {
       setPreview(null);
     }
-  }, [amount, activeTab]);
+  }, [amount]);
 
   const fetchData = async () => {
     try {
@@ -52,12 +58,26 @@ export default function BuySell() {
   };
 
   const fetchPreview = async () => {
-    if (!amount || parseFloat(amount) < 100000) return;
+    if (!amount) return;
+
+    // Calculate toman amount for preview
+    const { tomanAmount: previewToman } = (() => {
+      if (!currentPrice) return { tomanAmount: 0 };
+      const amountNum = parseFloat(amount);
+      if (activeTab === "buy") {
+        return { tomanAmount: amountNum };
+      } else {
+        const price = parseFloat(currentPrice.buy_price);
+        return { tomanAmount: amountNum * price };
+      }
+    })();
+
+    if (previewToman < 100000) return;
 
     try {
       const response = await tradingService.previewOrder({
         order_type: activeTab,
-        amount_irr: parseFloat(amount),
+        amount_irr: previewToman,
       });
 
       if (response.success && response.data) {
@@ -72,8 +92,15 @@ export default function BuySell() {
     setError(null);
     setSuccess(null);
 
-    if (!amount || parseFloat(amount) < 100000) {
-      setError("حداقل مبلغ 100,000 تومان است");
+    // Validate input
+    if (!amount || parseFloat(amount) <= 0) {
+      setError(activeTab === "buy" ? "لطفا مبلغ را وارد کنید" : "لطفا مقدار طلا را وارد کنید");
+      return;
+    }
+
+    // Validate minimum toman amount (100k)
+    if (tomanAmount < 100000) {
+      setError("حداقل مبلغ معامله 100,000 تومان است");
       return;
     }
 
@@ -82,7 +109,7 @@ export default function BuySell() {
     try {
       const response = await tradingService.placeOrder({
         order_type: activeTab,
-        amount_irr: parseFloat(amount),
+        amount_irr: tomanAmount, // Always send toman amount to API
       });
 
       if (response.success) {
@@ -125,108 +152,48 @@ export default function BuySell() {
     return num.replace(/\d/g, (digit) => persianDigits[parseInt(digit)]);
   };
 
-  // Calculate gold amount in real-time (even for amounts < 100,000)
-  const calculateGoldAmount = () => {
-    if (!amount || !currentPrice) return 0;
-    const amountNum = parseFloat(amount);
-    const price = activeTab === "buy"
-      ? parseFloat(currentPrice.sell_price)
-      : parseFloat(currentPrice.buy_price);
-    return amountNum / price;
+  const formatNumber = (value: number | string): string => {
+    if (!value && value !== 0) return "";
+    const numValue = typeof value === "string" ? parseFloat(value) : value;
+    if (isNaN(numValue)) return "";
+    return numValue.toLocaleString("fa-IR");
   };
 
-  const goldAmount = calculateGoldAmount();
-  const isValidAmount = amount && parseFloat(amount) >= 100000;
+  // Calculate conversions in real-time
+  const getCalculatedValues = () => {
+    if (!amount || !currentPrice) return { tomanAmount: 0, goldAmount: 0 };
+
+    const amountNum = parseFloat(amount);
+    if (isNaN(amountNum)) return { tomanAmount: 0, goldAmount: 0 };
+
+    if (activeTab === "buy") {
+      // Buy mode: user enters toman, calculate gold
+      const price = parseFloat(currentPrice.sell_price);
+      return {
+        tomanAmount: amountNum,
+        goldAmount: amountNum / price,
+      };
+    } else {
+      // Sell mode: user enters gold grams, calculate toman
+      const price = parseFloat(currentPrice.buy_price);
+      return {
+        tomanAmount: amountNum * price,
+        goldAmount: amountNum,
+      };
+    }
+  };
+
+  const { tomanAmount, goldAmount } = getCalculatedValues();
+
+  // Validation: check if toman amount is >= 100k and amount is entered
+  const isValidAmount = amount && !isNaN(parseFloat(amount)) && parseFloat(amount) > 0 && tomanAmount >= 100000;
 
   return (
-    <div style={{ minHeight: "100vh", background: "#FAFAFA", paddingBottom: "120px" }} className="fade-in">
-      {/* Header */}
-      <div
-        style={{
-          background: "#FFFFFF",
-          padding: "clamp(12px, 3vw, 16px)",
-          display: "flex",
-          alignItems: "center",
-          gap: "12px",
-          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.04)",
-          position: "sticky",
-          top: 0,
-          zIndex: 10,
-          transition: "all 0.3s ease",
-        }}
-      >
-        <Link href="/dashboard">
-          <div
-            style={{
-              width: "40px",
-              height: "40px",
-              borderRadius: "12px",
-              background: "#F5F5F5",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "pointer",
-            }}
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M15 19L8 12L15 5"
-                stroke="#1F1F1F"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </div>
-        </Link>
-        <h1 style={{ fontSize: "18px", fontWeight: 600, flex: 1, color: "#1F1F1F" }}>
-          {activeTab === "buy" ? "خرید طلا" : "فروش طلا"}
-        </h1>
-      </div>
-
+    <div style={{ minHeight: "100vh", background: "#FAFAFA", paddingBottom: "120px", paddingTop: "clamp(16px, 4vw, 20px)" }} className="fade-in">
       {/* Content */}
       <div style={{ padding: "clamp(12px, 3vw, 16px)", maxWidth: "600px", margin: "0 auto" }}>
-        {/* Success/Error Messages */}
-        {success && (
-          <div
-            className="slide-in-down"
-            style={{
-              padding: "12px 16px",
-              marginBottom: "16px",
-              borderRadius: "12px",
-              background: "#D1FAE5",
-              color: "#059669",
-              fontSize: "clamp(13px, 3vw, 14px)",
-              textAlign: "center",
-              fontWeight: 600,
-              transition: "all 0.3s ease",
-            }}
-          >
-            {success}
-          </div>
-        )}
-
-        {error && (
-          <div
-            className="slide-in-down"
-            style={{
-              padding: "12px 16px",
-              marginBottom: "16px",
-              borderRadius: "12px",
-              background: "#FEE2E2",
-              color: "#DC2626",
-              fontSize: "clamp(13px, 3vw, 14px)",
-              textAlign: "center",
-              fontWeight: 600,
-              transition: "all 0.3s ease",
-            }}
-          >
-            {error}
-          </div>
-        )}
-
         {/* Tab Switcher */}
-        <div style={{ marginBottom: "16px" }}>
+        <div style={{ marginBottom: "20px" }}>
           <TabSwitcher activeTab={activeTab} onTabChange={setActiveTab} />
         </div>
 
@@ -234,235 +201,225 @@ export default function BuySell() {
         <div
           className="scale-in"
           style={{
-            background: activeTab === "buy" ? "linear-gradient(135deg, #10B981 0%, #059669 100%)" : "linear-gradient(135deg, #EF4444 0%, #DC2626 100%)",
+            background: "#F8F9FA",
             borderRadius: "clamp(16px, 4vw, 20px)",
             padding: "clamp(20px, 5vw, 24px)",
             marginBottom: "16px",
             textAlign: "center",
-            boxShadow: "0 8px 20px rgba(0, 0, 0, 0.12)",
-            color: "#FFFFFF",
+            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
             transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
             transform: "translateZ(0)",
+            position: "relative",
           }}
         >
-          <div style={{ fontSize: "clamp(12px, 3vw, 13px)", marginBottom: "8px", opacity: 0.9 }}>
-            قیمت {activeTab === "buy" ? "خرید" : "فروش"} هر گرم طلای ۱۸ عیار
+          <div
+            style={{
+              position: "absolute",
+              top: "20px",
+              right: "20px",
+              background: "#10B981",
+              color: "#FFFFFF",
+              padding: "6px 12px",
+              borderRadius: "12px",
+              fontSize: "11px",
+              fontWeight: 600,
+            }}
+          >
+            قیمت لحظه‌ای
           </div>
-          <div style={{ fontSize: "clamp(28px, 8vw, 36px)", fontWeight: 700, lineHeight: 1.2 }}>
+          <div style={{ fontSize: "clamp(13px, 3vw, 14px)", marginBottom: "8px", color: "#6B7280", fontWeight: 500 }}>
+            هر گرم طلا ۱۸ عیار
+          </div>
+          <div style={{ fontSize: "clamp(28px, 8vw, 36px)", fontWeight: 700, lineHeight: 1.2, color: "#1F1F1F" }}>
             {currentPrice
               ? toPersianNumber(
-                  parseFloat(
-                    activeTab === "buy" ? currentPrice.sell_price : currentPrice.buy_price
-                  ).toLocaleString("fa-IR")
+                  formatNumber(activeTab === "buy" ? currentPrice.sell_price : currentPrice.buy_price)
                 )
               : "..."}
           </div>
-          <div style={{ fontSize: "clamp(13px, 3vw, 14px)", marginTop: "4px", opacity: 0.9 }}>
+          <div style={{ fontSize: "clamp(13px, 3vw, 14px)", marginTop: "4px", color: "#6B7280" }}>
             تومان
           </div>
         </div>
 
-        {/* Wallet Balance */}
-        {wallet && (
+        {/* Recommended Prices */}
+        <div style={{ marginBottom: "20px" }}>
           <div
-            className="slide-in-up"
             style={{
-              background: "#FFFFFF",
-              borderRadius: "clamp(14px, 3.5vw, 16px)",
-              padding: "clamp(14px, 3.5vw, 16px)",
-              marginBottom: "16px",
-              boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
               display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              transition: "transform 0.3s ease, box-shadow 0.3s ease",
-              cursor: "pointer",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = "translateY(-2px)";
-              e.currentTarget.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.1)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.06)";
+              gap: "8px",
+              justifyContent: "center",
+              flexWrap: "wrap",
             }}
           >
-            <div>
-              <div style={{ fontSize: "clamp(11px, 2.5vw, 12px)", color: "#6B7280", marginBottom: "4px" }}>
-                موجودی {activeTab === "buy" ? "تومان" : "طلا"}
-              </div>
-              <div style={{ fontSize: "clamp(15px, 3.5vw, 16px)", fontWeight: 600, color: "#1F1F1F" }}>
-                {activeTab === "buy"
-                  ? `${toPersianNumber(parseFloat(wallet.balance_irr).toLocaleString("fa-IR"))} تومان`
-                  : `${toPersianNumber(parseFloat(wallet.gold_balance).toFixed(4))} گرم`}
-              </div>
-            </div>
-            <div
-              style={{
-                width: "clamp(44px, 10vw, 48px)",
-                height: "clamp(44px, 10vw, 48px)",
-                borderRadius: "12px",
-                background: activeTab === "buy" ? "#D1FAE5" : "#FEE2E2",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: "clamp(20px, 5vw, 24px)",
-                transition: "transform 0.3s ease",
-              }}
-            >
-              {activeTab === "buy" ? "💰" : "⭐"}
-            </div>
-          </div>
-        )}
-
-        {/* Quick Amount Buttons */}
-        <div style={{ marginBottom: "16px" }}>
-          <div style={{ fontSize: "clamp(12px, 3vw, 13px)", color: "#6B7280", marginBottom: "8px", fontWeight: 500 }}>
-            مبالغ پیشنهادی:
-          </div>
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(70px, 1fr))",
-            gap: "clamp(6px, 2vw, 8px)"
-          }}>
-            {[100000, 500000, 1000000, 5000000].map((value) => (
-              <button
-                key={value}
-                onClick={() => handleQuickAmount(value)}
-                style={{
-                  padding: "clamp(10px, 3vw, 12px) clamp(6px, 2vw, 8px)",
-                  background: amount === value.toString() ? "#FFC857" : "#FFFFFF",
-                  border: amount === value.toString() ? "2px solid #E6A700" : "1px solid #E5E7EB",
-                  borderRadius: "clamp(10px, 2.5vw, 12px)",
-                  fontSize: "clamp(10px, 2.5vw, 11px)",
-                  fontWeight: 600,
-                  color: amount === value.toString() ? "#1F1F1F" : "#6B7280",
-                  cursor: "pointer",
-                  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                  transform: amount === value.toString() ? "scale(1.05)" : "scale(1)",
-                  boxShadow: amount === value.toString() ? "0 4px 8px rgba(252, 176, 69, 0.3)" : "none",
-                  minHeight: "44px",
-                  touchAction: "manipulation",
-                }}
-                onMouseEnter={(e) => {
-                  if (amount !== value.toString()) {
-                    e.currentTarget.style.transform = "scale(1.05)";
-                    e.currentTarget.style.borderColor = "#D1D5DB";
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (amount !== value.toString()) {
-                    e.currentTarget.style.transform = "scale(1)";
-                    e.currentTarget.style.borderColor = "#E5E7EB";
-                  }
-                }}
-              >
-                {value >= 1000000
-                  ? `${toPersianNumber((value / 1000000).toString())}M`
-                  : `${toPersianNumber((value / 1000).toString())}K`}
-              </button>
-            ))}
+            {activeTab === "buy" ? (
+              // Buy mode: show toman amounts
+              [500000, 1000000, 2000000, 5000000].map((value) => (
+                <button
+                  key={value}
+                  onClick={() => handleQuickAmount(value)}
+                  style={{
+                    padding: "10px 18px",
+                    background: amount === value.toString() ? "#FFC857" : "#FFFFFF",
+                    border: `2px solid ${amount === value.toString() ? "#FFC857" : "#E5E7EB"}`,
+                    borderRadius: "20px",
+                    fontSize: "13px",
+                    fontWeight: 600,
+                    color: amount === value.toString() ? "#1F1F1F" : "#6B7280",
+                    cursor: "pointer",
+                    transition: "all 0.2s ease",
+                    touchAction: "manipulation",
+                  }}
+                  onMouseEnter={(e) => {
+                    if (amount !== value.toString()) {
+                      e.currentTarget.style.borderColor = "#9CA3AF";
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (amount !== value.toString()) {
+                      e.currentTarget.style.borderColor = "#E5E7EB";
+                    }
+                  }}
+                >
+                  {value >= 1000000
+                    ? `${toPersianNumber((value / 1000000).toString())}M`
+                    : `${toPersianNumber((value / 1000).toString())}K`}
+                </button>
+              ))
+            ) : (
+              // Sell mode: show gold amounts
+              [0.5, 1, 2, 5].map((value) => (
+                <button
+                  key={value}
+                  onClick={() => handleQuickAmount(value)}
+                  style={{
+                    padding: "10px 18px",
+                    background: amount === value.toString() ? "#EF8B8B" : "#FFFFFF",
+                    border: `2px solid ${amount === value.toString() ? "#EF8B8B" : "#E5E7EB"}`,
+                    borderRadius: "20px",
+                    fontSize: "13px",
+                    fontWeight: 600,
+                    color: amount === value.toString() ? "#1F1F1F" : "#6B7280",
+                    cursor: "pointer",
+                    transition: "all 0.2s ease",
+                    touchAction: "manipulation",
+                  }}
+                  onMouseEnter={(e) => {
+                    if (amount !== value.toString()) {
+                      e.currentTarget.style.borderColor = "#9CA3AF";
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (amount !== value.toString()) {
+                      e.currentTarget.style.borderColor = "#E5E7EB";
+                    }
+                  }}
+                >
+                  {toPersianNumber(value.toString())} گرم
+                </button>
+              ))
+            )}
           </div>
         </div>
 
-        {/* Input Card */}
+        {/* Input Fields */}
         <div
           style={{
-            background: "#FFFFFF",
-            borderRadius: "20px",
-            padding: "20px",
             marginBottom: "16px",
-            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
+            display: "flex",
+            flexDirection: "column",
+            gap: "12px",
           }}
         >
-          {/* Amount Input */}
-          <div
-            style={{
-              padding: "20px",
-              border: "2px solid #F3F4F6",
-              borderRadius: "16px",
-              marginBottom: "12px",
-              background: "#FAFAFA",
-            }}
-          >
-            <div style={{ fontSize: "12px", color: "#6B7280", marginBottom: "8px", textAlign: "center" }}>
-              مبلغ پرداختی (تومان)
-            </div>
-            <div
-              style={{
-                fontSize: "28px",
-                fontWeight: 700,
-                textAlign: "center",
-                minHeight: "40px",
-                color: amount ? "#1F1F1F" : "#D1D5DB",
-              }}
-            >
-              {amount ? toPersianNumber(parseFloat(amount).toLocaleString("fa-IR")) : "۰"}
-            </div>
-          </div>
+          {/* First Input - Order depends on buy/sell */}
+          {activeTab === "buy" ? (
+            <>
+              {/* Amount in Toman Input - User enters this */}
+              <div
+                style={{
+                  padding: "18px 20px",
+                  border: "2px solid #E5E7EB",
+                  borderRadius: "16px",
+                  background: "#FFFFFF",
+                  textAlign: "right",
+                }}
+              >
+                <div style={{ fontSize: "14px", color: amount ? "#1F1F1F" : "#9CA3AF", fontWeight: 500 }}>
+                  {amount ? toPersianNumber(formatNumber(amount)) + " تومان" : "مبلغ پرداختی به تومان"}
+                </div>
+              </div>
 
-          {/* Gold Amount Display - NOW SHOWS ALWAYS */}
-          <div
-            style={{
-              padding: "20px",
-              border: `3px solid ${activeTab === "buy" ? "#10B981" : "#EF4444"}`,
-              borderRadius: "16px",
-              marginBottom: "20px",
-              background: activeTab === "buy" ? "#ECFDF5" : "#FEF2F2",
-            }}
-          >
-            <div style={{
-              fontSize: "12px",
-              color: activeTab === "buy" ? "#059669" : "#DC2626",
-              marginBottom: "8px",
-              textAlign: "center",
-              fontWeight: 600,
-            }}>
-              🪙 مقدار طلا (گرم)
-            </div>
-            <div
-              style={{
-                fontSize: "24px",
-                fontWeight: 700,
-                textAlign: "center",
-                minHeight: "36px",
-                color: activeTab === "buy" ? "#059669" : "#DC2626",
-              }}
-            >
-              {goldAmount > 0 ? toPersianNumber(goldAmount.toFixed(4)) : "۰.۰۰۰۰"}
-            </div>
-          </div>
+              {/* Gold Amount Display - Calculated */}
+              <div
+                style={{
+                  padding: "18px 20px",
+                  border: "2px solid #E5E7EB",
+                  borderRadius: "16px",
+                  background: "#FFFFFF",
+                  textAlign: "right",
+                }}
+              >
+                <div style={{ fontSize: "14px", color: goldAmount > 0 ? "#1F1F1F" : "#9CA3AF", fontWeight: 500 }}>
+                  {goldAmount > 0 ? toPersianNumber(goldAmount.toFixed(4)) + " گرم" : "مقدار طلا به گرم"}
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Gold Amount Input for Sell - User enters this */}
+              <div
+                style={{
+                  padding: "18px 20px",
+                  border: "2px solid #E5E7EB",
+                  borderRadius: "16px",
+                  background: "#FFFFFF",
+                  textAlign: "right",
+                }}
+              >
+                <div style={{ fontSize: "14px", color: amount ? "#1F1F1F" : "#9CA3AF", fontWeight: 500 }}>
+                  {amount ? toPersianNumber(amount) + " گرم" : "مقدار طلا به گرم"}
+                </div>
+              </div>
 
-          {/* Number Pad */}
-          <NumberPad onNumberClick={handleNumberClick} onBackspace={handleBackspace} />
-
-          {/* Fee Display */}
-          {preview && (
-            <div
-              style={{
-                marginTop: "20px",
-                padding: "12px",
-                background: "#FEF3C7",
-                borderRadius: "12px",
-                textAlign: "center",
-                fontSize: "13px",
-                color: "#92400E",
-                fontWeight: 600,
-              }}
-            >
-              💳 کارمزد:{" "}
-              <span style={{ fontWeight: 700 }}>
-                {toPersianNumber(preview.fee.toLocaleString("fa-IR"))} تومان
-              </span>
-            </div>
+              {/* Amount in Toman Display - Calculated */}
+              <div
+                style={{
+                  padding: "18px 20px",
+                  border: "2px solid #E5E7EB",
+                  borderRadius: "16px",
+                  background: "#FFFFFF",
+                  textAlign: "right",
+                }}
+              >
+                <div style={{ fontSize: "14px", color: tomanAmount > 0 ? "#1F1F1F" : "#9CA3AF", fontWeight: 500 }}>
+                  {tomanAmount > 0 ? toPersianNumber(formatNumber(tomanAmount)) + " تومان" : "مبلغ دریافتی به تومان"}
+                </div>
+              </div>
+            </>
           )}
+        </div>
+
+        {/* Fee Display */}
+        <div
+          style={{
+            marginBottom: "16px",
+            textAlign: "center",
+            fontSize: "13px",
+            color: "#6B7280",
+          }}
+        >
+          کارمزد: {preview ? toPersianNumber(formatNumber(preview.fee)) : "۱۰,۰۰۰"} تومان
+        </div>
+
+        {/* Number Pad */}
+        <div style={{ marginBottom: "16px" }}>
+          <NumberPad onNumberClick={handleNumberClick} onBackspace={handleBackspace} />
         </div>
 
         {/* Submit Button - ALWAYS VISIBLE */}
         <button
           onClick={handleSubmit}
           disabled={loading || !isValidAmount}
-          className="pulse"
           style={{
             width: "100%",
             padding: "clamp(16px, 4vw, 20px)",
@@ -472,33 +429,30 @@ export default function BuySell() {
             background: loading
               ? "#9CA3AF"
               : !isValidAmount
-              ? "linear-gradient(135deg, #6B7280 0%, #4B5563 100%)"
+              ? "#9CA3AF"
               : activeTab === "buy"
-              ? "linear-gradient(135deg, #10B981 0%, #059669 100%)"
-              : "linear-gradient(135deg, #EF4444 0%, #DC2626 100%)",
+              ? "#1F1F1F"
+              : "#EF8B8B",
             border: "none",
-            borderRadius: "clamp(14px, 3.5vw, 16px)",
+            borderRadius: "clamp(20px, 5vw, 24px)",
             cursor: loading || !isValidAmount ? "not-allowed" : "pointer",
-            transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-            boxShadow: isValidAmount && !loading
-              ? "0 8px 20px rgba(0, 0, 0, 0.2)"
-              : "0 4px 8px rgba(0, 0, 0, 0.1)",
+            transition: "all 0.3s ease",
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
             display: "block",
             position: "relative",
             minHeight: "56px",
             touchAction: "manipulation",
-            transform: "translateZ(0)",
           }}
           onMouseEnter={(e) => {
             if (isValidAmount && !loading) {
-              e.currentTarget.style.transform = "translateY(-2px) scale(1.02)";
-              e.currentTarget.style.boxShadow = "0 12px 28px rgba(0, 0, 0, 0.25)";
+              e.currentTarget.style.transform = "translateY(-2px)";
+              e.currentTarget.style.boxShadow = "0 6px 16px rgba(0, 0, 0, 0.2)";
             }
           }}
           onMouseLeave={(e) => {
             if (isValidAmount && !loading) {
-              e.currentTarget.style.transform = "translateY(0) scale(1)";
-              e.currentTarget.style.boxShadow = "0 8px 20px rgba(0, 0, 0, 0.2)";
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.15)";
             }
           }}
           onTouchStart={(e) => {
@@ -513,35 +467,13 @@ export default function BuySell() {
           }}
         >
           {loading ? (
-            <span>⏳ در حال پردازش...</span>
-          ) : !amount ? (
-            <span>مبلغ مورد نظر را وارد کنید</span>
-          ) : !isValidAmount ? (
-            <span>⚠️ حداقل مبلغ ۱۰۰,۰۰۰ تومان</span>
+            <span>در حال پردازش...</span>
           ) : activeTab === "buy" ? (
-            <span>✅ تایید و خرید طلا</span>
+            <span>خرید طلا</span>
           ) : (
-            <span>✅ تایید و فروش طلا</span>
+            <span>فروش طلا</span>
           )}
         </button>
-
-        {/* Helper Text */}
-        {!isValidAmount && amount && parseFloat(amount) < 100000 && (
-          <div
-            style={{
-              marginTop: "12px",
-              padding: "12px",
-              background: "#FEF3C7",
-              borderRadius: "12px",
-              textAlign: "center",
-              fontSize: "13px",
-              color: "#92400E",
-              fontWeight: 500,
-            }}
-          >
-            ⚠️ برای ثبت سفارش، حداقل ۱۰۰,۰۰۰ تومان وارد کنید
-          </div>
-        )}
       </div>
     </div>
   );

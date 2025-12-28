@@ -2,528 +2,207 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
-export default function InstallmentPurchase() {
-  const [goldAmount, setGoldAmount] = useState<number>(5);
-  const [installmentMonths, setInstallmentMonths] = useState<number>(4);
-  const [step, setStep] = useState(1);
+export default function InstallmentPage() {
+  const router = useRouter();
+  const [amount, setAmount] = useState(5000000);
+  const [duration, setDuration] = useState<2 | 3 | 4>(2);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
 
-  // Mock data - replace with API
   const goldPricePerGram = 13459000;
-  const annualInterestRate = 0.23; // 23%
+  const annualInterestRate = 0.12;
+  const minAmount = 5000000;
+  const maxAmount = 30000000;
 
   const toPersianNumber = (num: number | string) => {
     const persianDigits = ["۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹"];
     return num.toString().replace(/\d/g, (digit) => persianDigits[parseInt(digit)]);
   };
 
-  const calculateInstallment = () => {
-    const totalPrice = goldAmount * goldPricePerGram;
-    const monthlyInterest = annualInterestRate / 12;
-    const totalInterest = totalPrice * monthlyInterest * installmentMonths;
-    const totalAmount = totalPrice + totalInterest;
-    const monthlyPayment = totalAmount / installmentMonths;
-
-    return {
-      totalPrice,
-      totalInterest,
-      totalAmount,
-      monthlyPayment,
-    };
+  const formatNumber = (num: number) => num.toLocaleString("en-US");
+  const calculateGoldAmount = () => (amount / goldPricePerGram).toFixed(1);
+  const calculateInstallmentAmount = () => Math.floor(amount / duration);
+  const calculateTotalWithInterest = () => {
+    const monthlyRate = annualInterestRate / 12;
+    return Math.floor(amount + amount * monthlyRate * duration);
   };
 
-  const calc = calculateInstallment();
-
-  const handleContinue = () => {
-    setStep(2);
-  };
-
-  const handleConfirm = () => {
-    // Add API call here
-    alert("خرید قسطی شما ثبت شد!");
-    window.location.href = "/dashboard/wallet";
-  };
+  if (showConfirmation) {
+    return (
+      <div style={{ minHeight: "100vh", background: "#FFFFFF", padding: "20px 16px 100px" }}>
+        <div style={{ maxWidth: "600px", margin: "0 auto" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "40px", paddingBottom: "16px", borderBottom: "1px solid #E5E5E5" }}>
+            <div onClick={() => setShowConfirmation(false)} style={{ width: "40px", height: "40px", borderRadius: "50%", background: "#E5E5E5", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: "20px", color: "#6B7280" }}>?</div>
+            <h1 style={{ fontSize: "18px", fontWeight: 700, margin: 0, color: "#1F2937" }}>خرید قسطی</h1>
+            <div onClick={() => setShowConfirmation(false)} style={{ width: "40px", height: "40px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "24px", cursor: "pointer", color: "#1F2937" }}>←</div>
+          </div>
+          <div style={{ display: "flex", justifyContent: "center", marginBottom: "24px" }}>
+            <div style={{ fontSize: "100px" }}>📅</div>
+          </div>
+          <div style={{ fontSize: "16px", fontWeight: 600, textAlign: "center", marginBottom: "40px", color: "#1F2937" }}>
+            طلای دریافتی: {toPersianNumber(calculateGoldAmount())}گرم
+          </div>
+          <div style={{ marginBottom: "40px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", padding: "16px 0", borderBottom: "1px solid #E5E5E5" }}>
+              <span style={{ fontSize: "14px", color: "#6B7280" }}>اعتبار دریافتی:</span>
+              <span style={{ fontSize: "14px", fontWeight: 600, color: "#1F2937" }}>{toPersianNumber(formatNumber(amount))} تومان</span>
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", padding: "16px 0", borderBottom: "1px solid #E5E5E5" }}>
+              <span style={{ fontSize: "14px", color: "#6B7280" }}>مبلغ هر قسط:</span>
+              <span style={{ fontSize: "14px", fontWeight: 600, color: "#1F2937" }}>{toPersianNumber(formatNumber(calculateInstallmentAmount()))} تومان</span>
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", padding: "16px 0", borderBottom: "1px solid #E5E5E5" }}>
+              <span style={{ fontSize: "14px", color: "#6B7280" }}>مجموع قسط‌ها (۱۲% سالیانه):</span>
+              <span style={{ fontSize: "14px", fontWeight: 600, color: "#1F2937" }}>{toPersianNumber(formatNumber(calculateTotalWithInterest()))} تومان</span>
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 0", borderBottom: "1px solid #E5E5E5" }}>
+              <span style={{ fontSize: "14px", color: "#6B7280" }}><span style={{ marginLeft: "8px" }}>📅</span>زمان بندی اقساط شما:</span>
+              <span style={{ fontSize: "14px", fontWeight: 600, color: "#1F2937" }}>{toPersianNumber(duration)}ماهه</span>
+            </div>
+          </div>
+          <div style={{ display: "flex", alignItems: "flex-start", gap: "12px", padding: "16px", background: "#FFF9E6", borderRadius: "12px", marginBottom: "80px" }}>
+            <div style={{ fontSize: "32px", flexShrink: 0 }}>⚠️</div>
+            <p style={{ fontSize: "13px", color: "#92400E", lineHeight: "1.6", margin: 0 }}>
+              طلای خریداری شده تا پایان پرداخت اقساط، نزد طلابین وثیقه می‌ماند و قابل فروش نیست.
+            </p>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "20px" }}>
+            <div onClick={() => setAgreedToTerms(!agreedToTerms)} style={{ width: "24px", height: "24px", borderRadius: "4px", border: `2px solid ${agreedToTerms ? "#3B82F6" : "#D1D5DB"}`, background: agreedToTerms ? "#3B82F6" : "#FFFFFF", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#FFFFFF", fontSize: "16px", fontWeight: 700 }}>
+              {agreedToTerms && "✓"}
+            </div>
+            <span style={{ fontSize: "14px", color: "#1F2937" }}>قوانین و مقررات را میپذیرم.</span>
+          </div>
+          <button onClick={() => router.push("/dashboard/wallet/history")} disabled={!agreedToTerms} style={{ width: "100%", padding: "16px", background: agreedToTerms ? "#1F2937" : "#D1D5DB", color: "#FFFFFF", border: "none", borderRadius: "16px", fontSize: "16px", fontWeight: 700, cursor: agreedToTerms ? "pointer" : "not-allowed" }}>
+            تایید و ادامه
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div style={{ minHeight: "100vh", background: "#FAFAFA" }}>
-      {/* Header */}
-      <div
-        style={{
-          background: "#FFFFFF",
-          padding: "16px",
-          display: "flex",
-          alignItems: "center",
-          gap: "12px",
-          marginBottom: "16px",
-        }}
-      >
-        <Link href="/dashboard/services">
-          <div
-            style={{
-              width: "40px",
-              height: "40px",
-              borderRadius: "12px",
-              background: "#F5F5F5",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "pointer",
-            }}
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M15 19L8 12L15 5"
-                stroke="#1F1F1F"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
+    <div style={{ minHeight: "100vh", background: "#F5F5F5", padding: "20px 16px 100px" }}>
+      <div style={{ maxWidth: "600px", margin: "0 auto" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px", paddingBottom: "16px", borderBottom: "1px solid #E5E5E5" }}>
+          <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "#E5E5E5", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: "20px", color: "#6B7280" }}>?</div>
+          <h1 style={{ fontSize: "18px", fontWeight: 700, margin: 0, color: "#1F2937" }}>خرید قسطی</h1>
+          <Link href="/dashboard/services" style={{ width: "40px", height: "40px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "24px", cursor: "pointer", textDecoration: "none", color: "#1F2937" }}>←</Link>
+        </div>
+        <div style={{ padding: "20px", background: "#FFFFFF", borderRadius: "16px", marginBottom: "24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div>
+            <div style={{ display: "inline-block", padding: "4px 12px", background: "rgba(16, 185, 129, 0.1)", borderRadius: "999px", fontSize: "12px", fontWeight: 600, color: "#059669", marginBottom: "8px" }}>قیمت لحظه‌ای</div>
+            <div style={{ fontSize: "20px", fontWeight: 700, color: "#1F2937" }}>{toPersianNumber(formatNumber(goldPricePerGram))} تومان</div>
           </div>
-        </Link>
-        <h1 style={{ fontSize: "18px", fontWeight: 600, flex: 1, color: "#1F1F1F" }}>
-          خرید قسطی طلا
-        </h1>
-      </div>
+          <div style={{ textAlign: "left", fontSize: "14px", color: "#6B7280" }}>هر گرم طلا ۱۸ عیار</div>
+        </div>
+        <div style={{ fontSize: "14px", color: "#6B7280", textAlign: "center", marginBottom: "16px" }}>مبلغ خرید</div>
+        <div style={{ fontSize: "36px", fontWeight: 700, textAlign: "center", marginBottom: "8px", color: "#1F2937" }}>{toPersianNumber(formatNumber(amount))} تومان</div>
+        <div style={{ fontSize: "14px", color: "#6B7280", textAlign: "center", marginBottom: "40px" }}>طلای دریافتی: {toPersianNumber(calculateGoldAmount())}گرم</div>
+        <div style={{ marginBottom: "40px", padding: "0 20px", position: "relative" }}>
+          {/* Slider track with dots */}
+          <div style={{ position: "relative", paddingTop: "30px", paddingBottom: "30px" }}>
+            {/* Track line */}
+            <div style={{ position: "absolute", top: "50%", left: "12px", right: "12px", height: "3px", background: "#1F2937", transform: "translateY(-50%)", borderRadius: "2px" }} />
 
-      {/* Content */}
-      <div style={{ padding: "0 16px 16px" }}>
-
-        {step === 1 && (
-          <>
-            {/* Price Display */}
-            <div
-              className="card"
-              style={{
-                marginBottom: "20px",
-                padding: "20px",
-                textAlign: "center",
-                background: "#FFFFFF",
-              }}
-            >
-              <div style={{ marginBottom: "8px" }}>
-                <div
-                  className="badge-pill green"
-                  style={{
-                    display: "inline-flex",
-                    fontSize: "11px",
-                    padding: "4px 10px",
-                  }}
-                >
-                  قیمت لحظه‌ای
-                </div>
-              </div>
-              <div
-                style={{
-                  fontSize: "13px",
-                  color: "var(--color-muted)",
-                  marginBottom: "8px",
-                }}
-              >
-                هر ۱ گرم طلا ۱۸ عیار
-              </div>
-              <div style={{ fontSize: "32px", fontWeight: 700 }}>
-                {toPersianNumber(goldPricePerGram.toLocaleString("fa-IR"))}
-                <span
-                  style={{
-                    fontSize: "16px",
-                    fontWeight: 400,
-                    color: "var(--color-muted)",
-                    marginRight: "8px",
-                  }}
-                >
-                  تومان
-                </span>
-              </div>
-            </div>
-
-            {/* Gold Amount Selector */}
-            <div
-              className="card"
-              style={{
-                marginBottom: "20px",
-                padding: "20px",
-              }}
-            >
-              <div
-                style={{
-                  fontSize: "14px",
-                  fontWeight: 600,
-                  marginBottom: "16px",
-                }}
-              >
-                مبلغ خرید
-              </div>
-
-              {/* Amount Display */}
-              <div
-                style={{
-                  padding: "20px",
-                  background: "rgba(255, 200, 87, 0.1)",
-                  borderRadius: "16px",
-                  marginBottom: "16px",
-                  textAlign: "center",
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: "36px",
-                    fontWeight: 700,
-                    marginBottom: "8px",
-                  }}
-                >
-                  {toPersianNumber(goldAmount)}
-                  <span
-                    style={{
-                      fontSize: "18px",
-                      fontWeight: 400,
-                      marginRight: "8px",
-                    }}
-                  >
-                    گرم
-                  </span>
-                </div>
-                <div style={{ fontSize: "13px", color: "var(--color-muted)" }}>
-                  {toPersianNumber(calc.totalPrice.toLocaleString("fa-IR"))} تومان
-                </div>
-              </div>
-
-              {/* Amount Slider */}
-              <input
-                type="range"
-                min="0.5"
-                max="30"
-                step="0.5"
-                value={goldAmount}
-                onChange={(e) => setGoldAmount(parseFloat(e.target.value))}
-                style={{
-                  width: "100%",
-                  marginBottom: "12px",
-                }}
-              />
-
-              {/* Quick Amount Buttons */}
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(3, 1fr)",
-                  gap: "8px",
-                }}
-              >
-                {[5, 15, 30].map((amount) => (
-                  <button
-                    key={amount}
-                    onClick={() => setGoldAmount(amount)}
-                    style={{
-                      padding: "12px",
-                      background:
-                        goldAmount === amount
-                          ? "var(--color-primary)"
-                          : "rgba(0,0,0,0.04)",
-                      border: "none",
-                      borderRadius: "12px",
-                      fontSize: "13px",
-                      fontWeight: 600,
-                      cursor: "pointer",
-                      transition: "all 0.2s",
-                    }}
-                  >
-                    {toPersianNumber(amount)} گرم
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Installment Period Selector */}
-            <div
-              className="card"
-              style={{
-                marginBottom: "20px",
-                padding: "20px",
-              }}
-            >
-              <div
-                style={{
-                  fontSize: "14px",
-                  fontWeight: 600,
-                  marginBottom: "16px",
-                }}
-              >
-                زمان‌بندی اقساط شما
-              </div>
-
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(3, 1fr)",
-                  gap: "8px",
-                  marginBottom: "16px",
-                }}
-              >
-                {[2, 3, 4].map((months) => (
-                  <button
-                    key={months}
-                    onClick={() => setInstallmentMonths(months)}
-                    style={{
-                      padding: "16px",
-                      background:
-                        installmentMonths === months
-                          ? "var(--color-primary)"
-                          : "rgba(0,0,0,0.04)",
-                      border: "none",
-                      borderRadius: "12px",
-                      fontSize: "13px",
-                      fontWeight: 600,
-                      cursor: "pointer",
-                      transition: "all 0.2s",
-                    }}
-                  >
-                    {toPersianNumber(months)} ماهه
-                  </button>
-                ))}
-              </div>
-
-              {/* Payment Details */}
-              <div
-                style={{
-                  padding: "16px",
-                  background: "rgba(0,0,0,0.02)",
-                  borderRadius: "12px",
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    marginBottom: "8px",
-                    fontSize: "13px",
-                  }}
-                >
-                  <span style={{ color: "var(--color-muted)" }}>مبلغ هر قسط</span>
-                  <span style={{ fontWeight: 600 }}>
-                    {toPersianNumber(Math.round(calc.monthlyPayment).toLocaleString("fa-IR"))} تومان
-                  </span>
-                </div>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    fontSize: "13px",
-                  }}
-                >
-                  <span style={{ color: "var(--color-muted)" }}>
-                    مجموع اقساط (سالانه ۲۳٪)
-                  </span>
-                  <span style={{ fontWeight: 600 }}>
-                    {toPersianNumber(Math.round(calc.totalAmount).toLocaleString("fa-IR"))} تومان
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Gold Received Info */}
-            <div
-              style={{
-                padding: "16px",
-                background: "rgba(16, 185, 129, 0.1)",
-                borderRadius: "12px",
-                fontSize: "13px",
-                marginBottom: "20px",
-                textAlign: "center",
-              }}
-            >
-              ⓘ طلای دریافتی: {toPersianNumber(goldAmount)} گرم
-              <br />
-              قابل فروش نیست و پس از فعال‌سازی حداکثر ۲۴ ساعت قابل بازگشت است.
-            </div>
-
-            {/* Continue Button */}
-            <button
-              onClick={handleContinue}
-              className="btn btn-primary btn-block"
-              style={{
-                padding: "18px",
-                fontSize: "16px",
-                fontWeight: 700,
-                borderRadius: "16px",
-              }}
-            >
-              خرید قسطی
-            </button>
-          </>
-        )}
-
-        {step === 2 && (
-          <>
-            {/* Confirmation Header */}
-            <div
-              className="card"
-              style={{
-                marginBottom: "20px",
-                padding: "24px",
-                textAlign: "center",
-                background: "linear-gradient(135deg, #FFF4E1 0%, #FFFFFF 100%)",
-              }}
-            >
-              <div style={{ fontSize: "48px", marginBottom: "12px" }}>📅</div>
-              <div
-                style={{
-                  fontSize: "16px",
-                  fontWeight: 600,
-                }}
-              >
-                تایید و ادامه خرید قسطی
-              </div>
-            </div>
-
-            {/* Summary */}
-            <div
-              className="card"
-              style={{
-                marginBottom: "20px",
-                padding: "20px",
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  padding: "12px 0",
-                  borderBottom: "1px solid rgba(0,0,0,0.06)",
-                }}
-              >
-                <span style={{ color: "var(--color-muted)" }}>مبلغ هر قسط</span>
-                <span style={{ fontWeight: 600 }}>
-                  {toPersianNumber(Math.round(calc.monthlyPayment).toLocaleString("fa-IR"))} تومان
-                </span>
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  padding: "12px 0",
-                  borderBottom: "1px solid rgba(0,0,0,0.06)",
-                }}
-              >
-                <span style={{ color: "var(--color-muted)" }}>زمان‌بندی اقساط شما</span>
-                <span style={{ fontWeight: 600 }}>{toPersianNumber(installmentMonths)}ماهه</span>
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  padding: "12px 0",
-                  borderBottom: "1px solid rgba(0,0,0,0.06)",
-                }}
-              >
-                <span style={{ color: "var(--color-muted)" }}>
-                  مجموع اقساط (سالانه ۲۳٪)
-                </span>
-                <span style={{ fontWeight: 600 }}>
-                  {toPersianNumber(Math.round(calc.totalAmount).toLocaleString("fa-IR"))} تومان
-                </span>
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  padding: "12px 0",
-                }}
-              >
-                <span style={{ color: "var(--color-muted)" }}>اعتبار دریافتی</span>
-                <span style={{ fontWeight: 600 }}>
-                  {toPersianNumber(calc.totalPrice.toLocaleString("fa-IR"))} تومان
-                </span>
-              </div>
-            </div>
-
-            {/* Payment Schedule */}
-            <div
-              className="card"
-              style={{
-                marginBottom: "20px",
-                padding: "20px",
-              }}
-            >
-              <div
-                style={{
-                  fontSize: "14px",
-                  fontWeight: 600,
-                  marginBottom: "16px",
-                }}
-              >
-                زمان‌بندی اقساط
-              </div>
-
-              {Array.from({ length: installmentMonths }, (_, i) => {
-                const installmentNames = ["اول", "دوم", "سوم", "چهارم"];
-                const date = new Date();
-                date.setMonth(date.getMonth() + i + 1);
-                const persianMonth = date.toLocaleDateString("fa-IR", { month: "long" });
+            {/* Dots container */}
+            <div style={{ position: "relative", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              {[0, 1, 2, 3, 4, 5].map((i) => {
+                const dotValue = minAmount + (i * (maxAmount - minAmount) / 5);
+                const currentIndex = Math.round(((amount - minAmount) / (maxAmount - minAmount)) * 5);
+                const isCurrentPosition = i === currentIndex;
+                const isLeftMost = i === 0;
 
                 return (
                   <div
                     key={i}
                     style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      padding: "12px 16px",
-                      background: i % 2 === 0 ? "rgba(0,0,0,0.02)" : "transparent",
-                      borderRadius: "8px",
-                      fontSize: "13px",
-                      marginBottom: "4px",
+                      width: isLeftMost ? "26px" : "14px",
+                      height: isLeftMost ? "26px" : "14px",
+                      borderRadius: "50%",
+                      background: isLeftMost ? "#FDB022" : "#1F2937",
+                      cursor: "pointer",
+                      transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                      boxShadow: isLeftMost ? "0 3px 10px rgba(253, 176, 34, 0.5)" : "0 1px 3px rgba(0, 0, 0, 0.2)",
+                      zIndex: isLeftMost ? 10 : 1,
+                      position: "relative",
                     }}
-                  >
-                    <span>قسط {installmentNames[i]}</span>
-                    <span style={{ color: "var(--color-muted)" }}>
-                      ۲۰ {persianMonth} ۱۴۰۴
-                    </span>
-                  </div>
+                    onClick={() => setAmount(dotValue)}
+                  />
                 );
               })}
             </div>
 
-            {/* Terms */}
-            <div
+            {/* Invisible input for smooth dragging */}
+            <input
+              type="range"
+              min={minAmount}
+              max={maxAmount}
+              step={1000000}
+              value={amount}
+              onChange={(e) => setAmount(parseInt(e.target.value))}
               style={{
-                padding: "16px",
-                background: "rgba(255, 200, 87, 0.1)",
-                borderRadius: "12px",
-                fontSize: "12px",
-                marginBottom: "20px",
+                position: "absolute",
+                top: "50%",
+                left: "0",
+                right: "0",
+                width: "100%",
+                transform: "translateY(-50%)",
+                opacity: 0,
+                cursor: "pointer",
+                height: "50px",
+                zIndex: 20,
               }}
-            >
-              ✓ من قوانین و مقررات را می‌پذیرم.
-              <br />و قابل فروش نیست.
-            </div>
+            />
+          </div>
 
-            {/* Action Buttons */}
-            <div style={{ display: "flex", gap: "12px" }}>
-              <button
-                onClick={() => setStep(1)}
-                className="btn btn-outline"
-                style={{
-                  flex: 1,
-                  padding: "16px",
-                  borderRadius: "16px",
-                }}
-              >
-                بازگشت
-              </button>
-              <button
-                onClick={handleConfirm}
-                className="btn btn-success"
-                style={{
-                  flex: 1,
-                  padding: "16px",
-                  borderRadius: "16px",
-                }}
-              >
-                تایید و ادامه
-              </button>
-            </div>
-          </>
-        )}
+          <div style={{ display: "flex", justifyContent: "space-between", marginTop: "8px", fontSize: "13px", color: "#6B7280", fontWeight: 500 }}>
+            <span>{toPersianNumber("5")} میلیون تومان</span>
+            <span>{toPersianNumber("30")} میلیون تومان</span>
+          </div>
+        </div>
+        <div style={{ marginBottom: "24px" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", padding: "16px 0", borderBottom: "1px solid #E5E5E5" }}>
+            <span style={{ fontSize: "14px", color: "#6B7280" }}>مبلغ هر قسط:</span>
+            <span style={{ fontSize: "14px", fontWeight: 600, color: "#1F2937" }}>{toPersianNumber(formatNumber(calculateInstallmentAmount()))} تومان</span>
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between", padding: "16px 0", borderBottom: "1px solid #E5E5E5" }}>
+            <span style={{ fontSize: "14px", color: "#6B7280" }}>مجموع قسط‌ها (۱۲% سالیانه):</span>
+            <span style={{ fontSize: "14px", fontWeight: 600, color: "#1F2937" }}>{toPersianNumber(formatNumber(calculateTotalWithInterest()))} تومان</span>
+          </div>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "12px", marginBottom: "120px" }}>
+          {[2, 3, 4].map((months) => (
+            <button key={months} onClick={() => setDuration(months as 2 | 3 | 4)} style={{ padding: "16px", background: "#FFFFFF", border: `2px solid ${duration === months ? "#1F2937" : "#E5E7EB"}`, borderRadius: "12px", fontSize: "14px", fontWeight: 600, cursor: "pointer", color: "#1F2937" }}>
+              {toPersianNumber(months)} ماهه
+            </button>
+          ))}
+        </div>
+        <div style={{ position: "fixed", bottom: "20px", left: "16px", right: "16px", maxWidth: "568px", margin: "0 auto" }}>
+          <button onClick={() => setShowConfirmation(true)} style={{ width: "100%", padding: "16px", background: "#1F2937", color: "#FFFFFF", border: "none", borderRadius: "16px", fontSize: "16px", fontWeight: 700, cursor: "pointer" }}>خرید قسطی</button>
+        </div>
+        <style jsx>{`
+          input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #FDB022;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(253, 176, 34, 0.4);
+          }
+          input[type="range"]::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #FDB022;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 8px rgba(253, 176, 34, 0.4);
+          }
+        `}</style>
       </div>
     </div>
   );

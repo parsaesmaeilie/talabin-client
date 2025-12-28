@@ -2,66 +2,77 @@
 
 import { useState } from "react";
 import Link from "next/link";
-
-type RequestStatus = "pending" | "ready" | "received" | "failed";
-
-interface PhysicalRequest {
-  id: string;
-  amount: number;
-  status: RequestStatus;
-  date: string;
-}
+import { useRouter } from "next/navigation";
 
 export default function PhysicalReceiptPage() {
-  const [activeTab, setActiveTab] = useState<RequestStatus | "all">("all");
-  const [showRequestModal, setShowRequestModal] = useState(false);
-  const [showInstructionsModal, setShowInstructionsModal] = useState(false);
+  const router = useRouter();
+  const [amount, setAmount] = useState("");
+  const [error, setError] = useState("");
+  const [showSuccess, setShowSuccess] = useState(false);
 
-  // Mock data
+  // Mock data - replace with API call
   const walletGold = 102; // grams
   const availableForPhysical = 100; // grams
-
-  const requests: PhysicalRequest[] = [
-    { id: "1", amount: 10, status: "ready", date: "۱۴۰۴/۱۰/۲۵" },
-    { id: "2", amount: 50, status: "received", date: "۱۴۰۴/۱۰/۲۰" },
-  ];
 
   const toPersianNumber = (num: number | string) => {
     const persianDigits = ["۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹"];
     return num.toString().replace(/\d/g, (digit) => persianDigits[parseInt(digit)]);
   };
 
-  const getStatusBadge = (status: RequestStatus) => {
-    const badges = {
-      pending: { text: "در حال بررسی", color: "#F59E0B" },
-      ready: { text: "آماده دریافت", color: "#10B981" },
-      received: { text: "دریافت شده", color: "#6B7280" },
-      failed: { text: "ناموفق", color: "#EF4444" },
-    };
-
-    const badge = badges[status];
-
-    return (
-      <div
-        style={{
-          padding: "4px 12px",
-          background: `${badge.color}20`,
-          color: badge.color,
-          borderRadius: "999px",
-          fontSize: "11px",
-          fontWeight: 600,
-          display: "inline-block",
-        }}
-      >
-        {badge.text}
-      </div>
-    );
+  const handleQuickAmount = (value: number) => {
+    setAmount(value.toString());
+    setError("");
   };
 
-  const filteredRequests =
-    activeTab === "all"
-      ? requests
-      : requests.filter((req) => req.status === activeTab);
+  const incrementAmount = (increment: number) => {
+    const currentAmount = parseFloat(amount) || 0;
+    setAmount((currentAmount + increment).toString());
+    setError("");
+  };
+
+  const decrementAmount = (decrement: number) => {
+    const currentAmount = parseFloat(amount) || 0;
+    const newAmount = Math.max(0, currentAmount - decrement);
+    setAmount(newAmount.toString());
+    setError("");
+  };
+
+  const handleSubmit = () => {
+    const numAmount = parseFloat(amount);
+
+    // Validation: Empty field
+    if (!amount) {
+      setError("این فیلد اجباری است");
+      return;
+    }
+
+    // Validation: Must be multiple of 10 and at least 10
+    if (numAmount < 10 || numAmount % 10 !== 0) {
+      setError("حداقل مقدار دریافت فیزیکی طلا ۱۰ گرم است و طلای فیزیکی مورد تقاضای شما باید مضربی از ۱۰ داشته باشد.");
+      return;
+    }
+
+    // Validation: Exceeds available balance
+    if (numAmount > availableForPhysical) {
+      setError("مقدار وارد شده بیش از موجودی کیف طلا شما است.");
+      return;
+    }
+
+    // Success - show success screen
+    setShowSuccess(true);
+  };
+
+  const handleSuccessClose = () => {
+    setShowSuccess(false);
+    setAmount("");
+    setError("");
+    // Redirect to list page
+    router.push("/dashboard/physical-receipt/list");
+  };
+
+  if (showSuccess) {
+    return <SuccessPage onClose={handleSuccessClose} />;
+  }
 
   return (
     <div
@@ -75,60 +86,112 @@ export default function PhysicalReceiptPage() {
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            marginBottom: "24px",
+            marginBottom: "20px",
+            paddingBottom: "16px",
+            borderBottom: "1px solid #E5E5E5",
           }}
         >
-          <Link
-            href="/dashboard/services"
+          <div
             style={{
               width: "40px",
               height: "40px",
-              borderRadius: "12px",
-              background: "#FFFFFF",
+              borderRadius: "50%",
+              background: "#E5E5E5",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              fontSize: "20px",
               cursor: "pointer",
-              textDecoration: "none",
             }}
           >
-            ←
-          </Link>
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#6B7280"
+              strokeWidth="2"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 16 14" />
+            </svg>
+          </div>
+
           <h1
             style={{
               fontSize: "18px",
               fontWeight: 700,
               margin: 0,
+              color: "#1F2937",
             }}
           >
             دریافت فیزیکی
           </h1>
-          <div
-            onClick={() => setShowInstructionsModal(true)}
+
+          <Link
+            href="/dashboard/services"
             style={{
               width: "40px",
               height: "40px",
-              borderRadius: "12px",
-              background: "#FFFFFF",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              fontSize: "16px",
+              fontSize: "24px",
               cursor: "pointer",
+              textDecoration: "none",
+              color: "#1F2937",
             }}
           >
-            ⓘ
+            ←
+          </Link>
+        </div>
+
+        {/* Info Banner */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            padding: "10px 16px",
+            background: "rgba(251, 191, 36, 0.15)",
+            borderRadius: "12px",
+            marginBottom: "20px",
+          }}
+        >
+          <div
+            style={{
+              width: "20px",
+              height: "20px",
+              borderRadius: "50%",
+              background: "#FDB022",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "12px",
+              fontWeight: 700,
+              color: "#FFFFFF",
+              flexShrink: 0,
+            }}
+          >
+            i
           </div>
+          <span
+            style={{
+              fontSize: "13px",
+              fontWeight: 600,
+              color: "#D97706",
+            }}
+          >
+            راهنمای تحویل فیزیکی
+          </span>
         </div>
 
         {/* Balance Card */}
         <div
-          className="card"
           style={{
-            marginBottom: "20px",
             padding: "20px",
-            background: "linear-gradient(135deg, #FFF4E1 0%, #FFFFFF 100%)",
+            background: "#E8E4DD",
+            borderRadius: "16px",
+            marginBottom: "20px",
           }}
         >
           <div
@@ -138,17 +201,17 @@ export default function PhysicalReceiptPage() {
               marginBottom: "12px",
             }}
           >
-            <div>
+            <div style={{ textAlign: "right" }}>
               <div
                 style={{
                   fontSize: "13px",
-                  color: "var(--color-muted)",
+                  color: "#6B7280",
                   marginBottom: "4px",
                 }}
               >
                 موجودی کیف طلا:
               </div>
-              <div style={{ fontSize: "24px", fontWeight: 700 }}>
+              <div style={{ fontSize: "18px", fontWeight: 700, color: "#1F2937" }}>
                 {toPersianNumber(walletGold)} گرم
               </div>
             </div>
@@ -156,379 +219,232 @@ export default function PhysicalReceiptPage() {
               <div
                 style={{
                   fontSize: "13px",
-                  color: "var(--color-muted)",
+                  color: "#6B7280",
                   marginBottom: "4px",
                 }}
               >
                 موجودی قابل دریافت فیزیکی:
               </div>
-              <div style={{ fontSize: "24px", fontWeight: 700, color: "#10B981" }}>
+              <div style={{ fontSize: "18px", fontWeight: 700, color: "#1F2937" }}>
                 {toPersianNumber(availableForPhysical)} گرم
               </div>
             </div>
           </div>
-
-          <button
-            onClick={() => setShowRequestModal(true)}
-            className="btn btn-primary btn-block"
-            style={{
-              marginTop: "16px",
-              padding: "14px",
-              fontSize: "14px",
-              borderRadius: "12px",
-            }}
-          >
-            ثبت درخواست
-          </button>
         </div>
 
-        {/* Info Card */}
+        {/* Amount Input */}
         <div
           style={{
-            padding: "16px",
-            background: "rgba(59, 130, 246, 0.1)",
-            borderRadius: "12px",
-            fontSize: "12px",
-            marginBottom: "20px",
-            display: "flex",
-            gap: "12px",
+            padding: "20px",
+            border: "1px solid #D1D5DB",
+            borderRadius: "16px",
+            marginBottom: "12px",
+            background: "#FFFFFF",
           }}
         >
-          <span>ⓘ</span>
-          <div>
-            <div style={{ fontWeight: 600, marginBottom: "4px" }}>
-              راهنمای تحویل فیزیکی
-            </div>
-            <div style={{ color: "var(--color-muted)" }}>
-              ۱ باید مضربی از ۱۰ داشته باشد.
-            </div>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <span
+              style={{
+                fontSize: "14px",
+                color: "#6B7280",
+              }}
+            >
+              گرم
+            </span>
+            <input
+              type="number"
+              value={amount}
+              onChange={(e) => {
+                setAmount(e.target.value);
+                setError("");
+              }}
+              placeholder="مقدار طلا"
+              style={{
+                fontSize: "18px",
+                fontWeight: 600,
+                border: "none",
+                outline: "none",
+                textAlign: "right",
+                background: "transparent",
+                flex: 1,
+                color: "#1F2937",
+                marginRight: "12px",
+              }}
+            />
           </div>
         </div>
 
-        {/* Tabs */}
-        <div
-          style={{
-            display: "flex",
-            gap: "8px",
-            marginBottom: "20px",
-            overflowX: "auto",
-            padding: "4px",
-          }}
-        >
-          {[
-            { key: "all", label: "همه موارد" },
-            { key: "pending", label: "در حال بررسی" },
-            { key: "ready", label: "آماده دریافت" },
-            { key: "received", label: "دریافت شده" },
-            { key: "failed", label: "ناموفق" },
-          ].map((tab) => (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key as RequestStatus | "all")}
-              style={{
-                padding: "10px 16px",
-                background:
-                  activeTab === tab.key ? "var(--color-primary)" : "#FFFFFF",
-                border: "none",
-                borderRadius: "999px",
-                fontSize: "12px",
-                fontWeight: 600,
-                cursor: "pointer",
-                transition: "all 0.2s",
-                whiteSpace: "nowrap",
-              }}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Requests List */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-          {filteredRequests.length > 0 ? (
-            filteredRequests.map((request) => (
+        {/* Error Message */}
+        {error && (
+          <div
+            style={{
+              display: "flex",
+              alignItems: error === "این فیلد اجباری است" ? "center" : "flex-start",
+              justifyContent: error === "این فیلد اجباری است" ? "center" : "flex-start",
+              gap: "8px",
+              marginBottom: "16px",
+            }}
+          >
+            {error !== "این فیلد اجباری است" && (
               <div
-                key={request.id}
-                className="card"
                 style={{
-                  padding: "16px",
+                  width: "18px",
+                  height: "18px",
+                  borderRadius: "50%",
+                  background: "#EF4444",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "12px",
+                  fontWeight: 700,
+                  color: "#FFFFFF",
+                  flexShrink: 0,
+                  marginTop: "2px",
                 }}
               >
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    marginBottom: "12px",
-                  }}
-                >
-                  <div style={{ fontSize: "16px", fontWeight: 700 }}>
-                    {toPersianNumber(request.amount)} گرم
-                  </div>
-                  {getStatusBadge(request.status)}
-                </div>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    fontSize: "12px",
-                    color: "var(--color-muted)",
-                  }}
-                >
-                  <span>تاریخ درخواست</span>
-                  <span>{request.date}</span>
-                </div>
-
-                {request.status === "ready" && (
-                  <div
-                    style={{
-                      marginTop: "12px",
-                      padding: "12px",
-                      background: "rgba(16, 185, 129, 0.1)",
-                      borderRadius: "8px",
-                      fontSize: "12px",
-                      color: "#065F46",
-                      textAlign: "center",
-                    }}
-                  >
-                    آماده دریافت از شعبه طلابین
-                  </div>
-                )}
+                !
               </div>
-            ))
-          ) : (
-            <div
-              className="card"
+            )}
+            <span
               style={{
-                padding: "40px 20px",
-                textAlign: "center",
-                color: "var(--color-muted)",
+                fontSize: "13px",
+                color: "#DC2626",
+                lineHeight: "1.5",
+                flex: 1,
+                textAlign: error === "این فیلد اجباری است" ? "center" : "right",
               }}
             >
-              اطلاعاتی برای نمایش وجود ندارد.
-            </div>
-          )}
-        </div>
-
-        {/* Request Modal */}
-        {showRequestModal && (
-          <RequestModal
-            availableGold={availableForPhysical}
-            onClose={() => setShowRequestModal(false)}
-          />
+              {error}
+            </span>
+          </div>
         )}
 
-        {/* Instructions Modal */}
-        {showInstructionsModal && (
-          <InstructionsModal onClose={() => setShowInstructionsModal(false)} />
-        )}
-      </div>
-    </div>
-  );
-}
-
-// Request Modal Component
-function RequestModal({
-  availableGold,
-  onClose,
-}: {
-  availableGold: number;
-  onClose: () => void;
-}) {
-  const [amount, setAmount] = useState("");
-  const [error, setError] = useState("");
-
-  const toPersianNumber = (num: string) => {
-    const persianDigits = ["۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹"];
-    return num.replace(/\d/g, (digit) => persianDigits[parseInt(digit)]);
-  };
-
-  const handleSubmit = () => {
-    const numAmount = parseFloat(amount);
-
-    if (!amount) {
-      setError("این فیلد الزامی است");
-      return;
-    }
-
-    if (numAmount % 10 !== 0) {
-      setError("۱ باید مضربی از ۱۰ داشته باشد.");
-      return;
-    }
-
-    if (numAmount > availableGold) {
-      setError("مقدار وارد شده بیش از موجودی کیف طلای شما می‌باشد.");
-      return;
-    }
-
-    // API call here
-    alert("درخواست شما ثبت شد\n\nآدرس شعبه و زمان تحویل طلا به شما پیامک خواهد شد.");
-    onClose();
-  };
-
-  return (
-    <div
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: "rgba(0,0,0,0.5)",
-        display: "flex",
-        alignItems: "flex-end",
-        zIndex: 1000,
-      }}
-      onClick={onClose}
-    >
-      <div
-        className="slide-in-up"
-        style={{
-          background: "#FFFFFF",
-          borderRadius: "24px 24px 0 0",
-          padding: "24px",
-          width: "100%",
-          maxWidth: "600px",
-          margin: "0 auto",
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div
-          style={{
-            fontSize: "18px",
-            fontWeight: 700,
-            marginBottom: "16px",
-            textAlign: "center",
-          }}
-        >
-          ثبت درخواست
-        </div>
-
-        <div
-          style={{
-            padding: "16px",
-            background: "rgba(59, 130, 246, 0.1)",
-            borderRadius: "12px",
-            fontSize: "12px",
-            marginBottom: "16px",
-          }}
-        >
-          <div style={{ fontWeight: 600, marginBottom: "4px" }}>
-            ⓘ راهنمای تحویل فیزیکی
-          </div>
-          <div style={{ color: "var(--color-muted)" }}>
-            ۱ باید مضربی از ۱۰ داشته باشد.
-          </div>
-        </div>
-
-        <div style={{ marginBottom: "16px" }}>
-          <div
-            style={{
-              fontSize: "13px",
-              color: "var(--color-muted)",
-              marginBottom: "8px",
-            }}
-          >
-            موجودی کیف‌طلا: {toPersianNumber(availableGold.toString())} گرم
-          </div>
-        </div>
-
-        <div
-          style={{
-            padding: "16px",
-            border: "2px solid rgba(0,0,0,0.1)",
-            borderRadius: "16px",
-            marginBottom: "16px",
-          }}
-        >
-          <div
-            style={{
-              fontSize: "12px",
-              color: "var(--color-muted)",
-              marginBottom: "8px",
-            }}
-          >
-            مقدار طلا گرم
-          </div>
-          <input
-            type="text"
-            value={amount}
-            onChange={(e) => {
-              setAmount(e.target.value);
-              setError("");
-            }}
-            placeholder="..."
-            style={{
-              width: "100%",
-              fontSize: "20px",
-              fontWeight: 600,
-              border: "none",
-              outline: "none",
-              textAlign: "center",
-              background: "transparent",
-            }}
-          />
-        </div>
-
-        {/* Quick Amounts */}
+        {/* Quick Amount Buttons */}
         <div
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(3, 1fr)",
-            gap: "8px",
-            marginBottom: "16px",
+            gap: "12px",
+            marginBottom: "24px",
           }}
         >
-          {[10, 20, 30].map((quickAmount) => (
-            <button
-              key={quickAmount}
-              onClick={() => {
-                setAmount(quickAmount.toString());
-                setError("");
-              }}
+          {[
+            { value: 10, label: "۱۰" },
+            { value: 45, label: "۴۵" },
+            { value: 30, label: "۳۰" },
+          ].map((item) => (
+            <div
+              key={item.value}
               style={{
-                padding: "10px",
-                background: "rgba(0,0,0,0.04)",
-                border: "none",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                padding: "8px 12px",
+                background: "#FFFFFF",
+                border: "1px solid #E5E7EB",
                 borderRadius: "12px",
-                fontSize: "12px",
-                fontWeight: 600,
-                cursor: "pointer",
               }}
             >
-              {toPersianNumber(quickAmount.toString())} گرم
-            </button>
+              <button
+                onClick={() => decrementAmount(item.value)}
+                style={{
+                  width: "24px",
+                  height: "24px",
+                  borderRadius: "4px",
+                  background: "transparent",
+                  border: "none",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "18px",
+                  cursor: "pointer",
+                  color: "#6B7280",
+                  padding: 0,
+                }}
+              >
+                −
+              </button>
+              <button
+                onClick={() => handleQuickAmount(item.value)}
+                style={{
+                  padding: "0 8px",
+                  background: "transparent",
+                  border: "none",
+                  fontSize: "13px",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  color: "#1F2937",
+                }}
+              >
+                {item.label} گرم
+              </button>
+              <button
+                onClick={() => incrementAmount(item.value)}
+                style={{
+                  width: "24px",
+                  height: "24px",
+                  borderRadius: "4px",
+                  background: "transparent",
+                  border: "none",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "18px",
+                  cursor: "pointer",
+                  color: "#6B7280",
+                  padding: 0,
+                }}
+              >
+                +
+              </button>
+            </div>
           ))}
         </div>
 
-        {error && (
-          <div
-            style={{
-              padding: "12px",
-              background: "rgba(239, 68, 68, 0.1)",
-              color: "#DC2626",
-              borderRadius: "12px",
-              fontSize: "12px",
-              marginBottom: "16px",
-              textAlign: "center",
-            }}
-          >
-            {error}
-          </div>
-        )}
+        {/* Info Note */}
+        <div
+          style={{
+            fontSize: "12px",
+            color: "#9CA3AF",
+            textAlign: "center",
+            lineHeight: "1.6",
+            marginBottom: "120px",
+          }}
+        >
+          حداقل مقدار دریافت فیزیکی طلا ۱۰ گرم است و طلای فیزیکی مورد تقاضای شما
+          باید مضربی از ۱۰ داشته باشد.
+        </div>
 
-        <div style={{ display: "flex", gap: "12px" }}>
-          <button
-            onClick={onClose}
-            className="btn btn-outline"
-            style={{ flex: 1, padding: "14px", borderRadius: "12px" }}
-          >
-            انصراف
-          </button>
+        {/* Submit Button - Fixed at bottom */}
+        <div
+          style={{
+            position: "fixed",
+            bottom: "20px",
+            left: "16px",
+            right: "16px",
+            maxWidth: "568px",
+            margin: "0 auto",
+          }}
+        >
           <button
             onClick={handleSubmit}
-            className="btn btn-primary"
-            style={{ flex: 1, padding: "14px", borderRadius: "12px" }}
+            style={{
+              width: "100%",
+              padding: "16px",
+              background: "#1F2937",
+              color: "#FFFFFF",
+              border: "none",
+              borderRadius: "16px",
+              fontSize: "16px",
+              fontWeight: 700,
+              cursor: "pointer",
+            }}
           >
             ثبت درخواست
           </button>
@@ -538,164 +454,159 @@ function RequestModal({
   );
 }
 
-// Instructions Modal Component
-function InstructionsModal({ onClose }: { onClose: () => void }) {
+// Success Page Component
+function SuccessPage({ onClose }: { onClose: () => void }) {
   return (
     <div
+      className="min-h-screen"
       style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: "rgba(0,0,0,0.5)",
+        padding: "20px 16px",
+        background: "#FFFFFF",
         display: "flex",
-        alignItems: "flex-end",
-        zIndex: 1000,
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
       }}
-      onClick={onClose}
     >
-      <div
-        className="slide-in-up"
-        style={{
-          background: "#FFFFFF",
-          borderRadius: "24px 24px 0 0",
-          padding: "24px",
-          width: "100%",
-          maxWidth: "600px",
-          margin: "0 auto",
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div style={{ maxWidth: "600px", width: "100%", textAlign: "center" }}>
+        {/* Back Arrow */}
         <div
           style={{
-            fontSize: "18px",
-            fontWeight: 700,
-            marginBottom: "20px",
-            textAlign: "center",
+            position: "absolute",
+            top: "20px",
+            right: "16px",
           }}
         >
-          راهنمای تحویل فیزیکی
-        </div>
-
-        <div style={{ marginBottom: "20px" }}>
           <div
+            onClick={onClose}
             style={{
-              fontSize: "14px",
-              fontWeight: 600,
-              marginBottom: "12px",
+              width: "40px",
+              height: "40px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "24px",
+              cursor: "pointer",
+              color: "#1F2937",
             }}
           >
-            دریافت فیزیکی طلا در ۳ مرحله
-          </div>
-
-          <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-            <div style={{ display: "flex", gap: "12px" }}>
-              <div
-                style={{
-                  width: "32px",
-                  height: "32px",
-                  borderRadius: "50%",
-                  background: "var(--color-primary)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontWeight: 700,
-                  flexShrink: 0,
-                }}
-              >
-                ۱
-              </div>
-              <div>
-                <div style={{ fontWeight: 600, marginBottom: "4px" }}>
-                  ارائه کارت ملی معتبر به نماینده طلابین
-                </div>
-                <div style={{ fontSize: "13px", color: "var(--color-muted)" }}>
-                  لطفا کارت ملی خود را همراه داشته باشید
-                </div>
-              </div>
-            </div>
-
-            <div style={{ display: "flex", gap: "12px" }}>
-              <div
-                style={{
-                  width: "32px",
-                  height: "32px",
-                  borderRadius: "50%",
-                  background: "var(--color-primary)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontWeight: 700,
-                  flexShrink: 0,
-                }}
-              >
-                ۲
-              </div>
-              <div>
-                <div style={{ fontWeight: 600, marginBottom: "4px" }}>
-                  مراجعه به شعبه تحویل فیزیکی طلابین
-                </div>
-                <div style={{ fontSize: "13px", color: "var(--color-مuted)" }}>
-                  در زمان مشخص شده به شعبه مراجعه کنید
-                </div>
-              </div>
-            </div>
-
-            <div style={{ display: "flex", gap: "12px" }}>
-              <div
-                style={{
-                  width: "32px",
-                  height: "32px",
-                  borderRadius: "50%",
-                  background: "var(--color-primary)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontWeight: 700,
-                  flexShrink: 0,
-                }}
-              >
-                ۳
-              </div>
-              <div>
-                <div style={{ fontWeight: 600, marginBottom: "4px" }}>
-                  سنجش‌حصت و واریز به حساب کاربری شما
-                </div>
-                <div style={{ fontSize: "13px", color: "var(--color-muted)" }}>
-                  (جزئیات برداشت فیزیکی شما در تاریخچه ثبت شده است)
-                </div>
-              </div>
-            </div>
+            ←
           </div>
         </div>
 
+        {/* Success Badge */}
         <div
           style={{
-            padding: "16px",
-            background: "rgba(255, 200, 87, 0.1)",
-            borderRadius: "12px",
-            fontSize: "12px",
-            marginBottom: "20px",
+            display: "inline-block",
+            padding: "12px 32px",
+            background: "rgba(147, 197, 253, 0.3)",
+            borderRadius: "24px",
+            marginBottom: "40px",
           }}
         >
-          <div style={{ fontWeight: 600, marginBottom: "4px" }}>
-            شعبه تحویل فیزیکی طلابین
-          </div>
-          <div style={{ color: "var(--color-muted)" }}>
-            شعبه۱: آذربایجان شرقی، مراغه، ............
-            <br />
-            شنبه تا چهارشنبه ۰۰:۱۶ الی ۰۰:۲۰
-          </div>
+          <span
+            style={{
+              fontSize: "16px",
+              fontWeight: 700,
+              color: "#1E40AF",
+            }}
+          >
+            درخواست شما  ثبت شد
+          </span>
         </div>
 
-        <button
-          onClick={onClose}
-          className="btn btn-primary btn-block"
-          style={{ padding: "14px", borderRadius: "12px" }}
+        {/* Illustration */}
+        <div
+          style={{
+            marginBottom: "40px",
+            display: "flex",
+            justifyContent: "center",
+          }}
         >
-          متوجه شدم
-        </button>
+          <svg
+            width="300"
+            height="300"
+            viewBox="0 0 300 300"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            {/* Background Circle */}
+            <circle cx="150" cy="150" r="140" fill="#EFF6FF" opacity="0.5" />
+
+            {/* Blue geometric shapes */}
+            <path
+              d="M100 180 L140 220 L180 180 L220 220"
+              stroke="#3B82F6"
+              strokeWidth="4"
+              fill="none"
+            />
+            <rect x="80" y="140" width="60" height="80" fill="#3B82F6" rx="4" />
+            <rect x="160" y="140" width="60" height="80" fill="#3B82F6" rx="4" />
+
+            {/* People illustration simplified */}
+            <circle cx="110" cy="120" r="20" fill="#1F2937" />
+            <path d="M90 140 Q110 150 130 140" stroke="#1F2937" strokeWidth="3" fill="none" />
+
+            <circle cx="190" cy="120" r="20" fill="#1F2937" />
+            <path d="M170 140 Q190 150 210 140" stroke="#1F2937" strokeWidth="3" fill="none" />
+
+            {/* Gold/Hand icon in center */}
+            <rect x="130" y="100" width="40" height="30" fill="#FFFFFF" stroke="#1F2937" strokeWidth="2" rx="4" />
+            <path d="M140 110 L160 110 M140 115 L160 115" stroke="#FFC857" strokeWidth="2" />
+          </svg>
+        </div>
+
+        {/* Success Message */}
+        <h2
+          style={{
+            fontSize: "20px",
+            fontWeight: 700,
+            color: "#1F2937",
+            marginBottom: "12px",
+          }}
+        >
+          درخواست شما را دریافت کردیم
+        </h2>
+
+        <p
+          style={{
+            fontSize: "14px",
+            color: "#6B7280",
+            lineHeight: "1.6",
+            marginBottom: "60px",
+          }}
+        >
+          آدرس شعبه و زمان تحویل طلا به شما پیامک خواهد شد.
+        </p>
+
+        {/* Done Button - Fixed at bottom */}
+        <div
+          style={{
+            position: "fixed",
+            bottom: "20px",
+            left: "16px",
+            right: "16px",
+            maxWidth: "568px",
+            margin: "0 auto",
+          }}
+        >
+          <button
+            onClick={onClose}
+            style={{
+              width: "100%",
+              padding: "16px",
+              background: "#1F2937",
+              color: "#FFFFFF",
+              border: "none",
+              borderRadius: "16px",
+              fontSize: "16px",
+              fontWeight: 700,
+              cursor: "pointer",
+            }}
+          >
+            متوجه شدم
+          </button>
+        </div>
       </div>
     </div>
   );
