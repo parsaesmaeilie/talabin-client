@@ -109,7 +109,7 @@ export default function Navbar() {
             خرید و فروش
           </Link>
           <Link
-            href="/installment"
+            href="/dashboard/installment"
             className="transition-colors"
             style={{ color: 'rgba(28, 28, 28, 0.75)' }}
             onMouseEnter={(e) => e.currentTarget.style.color = '#1C1C1C'}
@@ -134,6 +134,21 @@ export default function Navbar() {
             onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(28, 28, 28, 0.75)'}
           >
             داشبورد
+          </Link>
+          <Link
+            href="/profile/support"
+            className="transition-colors flex items-center gap-1.5"
+            style={{ color: 'rgba(28, 28, 28, 0.75)' }}
+            onMouseEnter={(e) => e.currentTarget.style.color = '#1C1C1C'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(28, 28, 28, 0.75)'}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2C6.48 2 2 6.48 2 12C2 13.75 2.5 15.38 3.36 16.78L2 22L7.22 20.64C8.62 21.5 10.25 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+              <path d="M8 10.5C8.82843 10.5 9.5 9.82843 9.5 9C9.5 8.17157 8.82843 7.5 8 7.5C7.17157 7.5 6.5 8.17157 6.5 9C6.5 9.82843 7.17157 10.5 8 10.5Z" fill="currentColor"/>
+              <path d="M16 10.5C16.8284 10.5 17.5 9.82843 17.5 9C17.5 8.17157 16.8284 7.5 16 7.5C15.1716 7.5 14.5 8.17157 14.5 9C14.5 9.82843 15.1716 10.5 16 10.5Z" fill="currentColor"/>
+              <path d="M8.5 13.5C8.5 13.5 10 15.5 12 15.5C14 15.5 15.5 13.5 15.5 13.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            پشتیبانی
           </Link>
         </div>
 
@@ -332,6 +347,20 @@ export default function Navbar() {
               onClick={() => setIsOpen(false)}
             >
               داشبورد
+            </Link>
+            <Link
+              href="/profile/support"
+              className="px-4 py-2.5 rounded-lg transition-colors text-sm font-medium flex items-center gap-2"
+              style={{ color: 'rgba(28, 28, 28, 0.75)' }}
+              onClick={() => setIsOpen(false)}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2C6.48 2 2 6.48 2 12C2 13.75 2.5 15.38 3.36 16.78L2 22L7.22 20.64C8.62 21.5 10.25 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+                <path d="M8 10.5C8.82843 10.5 9.5 9.82843 9.5 9C9.5 8.17157 8.82843 7.5 8 7.5C7.17157 7.5 6.5 8.17157 6.5 9C6.5 9.82843 7.17157 10.5 8 10.5Z" fill="currentColor"/>
+                <path d="M16 10.5C16.8284 10.5 17.5 9.82843 17.5 9C17.5 8.17157 16.8284 7.5 16 7.5C15.1716 7.5 14.5 8.17157 14.5 9C14.5 9.82843 15.1716 10.5 16 10.5Z" fill="currentColor"/>
+                <path d="M8.5 13.5C8.5 13.5 10 15.5 12 15.5C14 15.5 15.5 13.5 15.5 13.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              پشتیبانی
             </Link>
 
             <div className="flex flex-col gap-2 mt-2 px-2">
