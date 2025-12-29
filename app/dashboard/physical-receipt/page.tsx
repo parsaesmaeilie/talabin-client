@@ -3,6 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { toPersianNumber } from "@/lib/utils/helpers";
+import { spacing, fontSize, colors, borderRadius, shadows } from "@/lib/utils/design-tokens";
 
 export default function PhysicalReceiptPage() {
   const router = useRouter();
@@ -13,11 +15,6 @@ export default function PhysicalReceiptPage() {
   // Mock data - replace with API call
   const walletGold = 102; // grams
   const availableForPhysical = 100; // grams
-
-  const toPersianNumber = (num: number | string) => {
-    const persianDigits = ["۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹"];
-    return num.toString().replace(/\d/g, (digit) => persianDigits[parseInt(digit)]);
-  };
 
   const handleQuickAmount = (value: number) => {
     setAmount(value.toString());
@@ -75,157 +72,151 @@ export default function PhysicalReceiptPage() {
   }
 
   return (
-    <div
-      className="min-h-screen"
-      style={{ padding: "20px 16px 100px", background: "#F5F5F5" }}
-    >
-      <div style={{ maxWidth: "600px", margin: "0 auto" }}>
+    <div style={{
+      minHeight: "100vh",
+      padding: `${spacing.md} ${spacing.md} 100px`,
+      background: "#F5F5F5",
+      paddingBottom: "100px"
+    }}>
+      <div style={{
+        maxWidth: "600px",
+        margin: "0 auto"
+      }}>
         {/* Header */}
-        <div
-          style={{
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: spacing.md,
+          paddingBottom: spacing.md,
+          borderBottom: `1px solid ${colors.border}`
+        }}>
+          {/* Info/Help Icon */}
+          <div style={{
+            width: "clamp(36px, 10vw, 40px)",
+            height: "clamp(36px, 10vw, 40px)",
+            borderRadius: "50%",
+            background: "#E5E5E5",
             display: "flex",
             alignItems: "center",
-            justifyContent: "space-between",
-            marginBottom: "20px",
-            paddingBottom: "16px",
-            borderBottom: "1px solid #E5E5E5",
-          }}
-        >
-          <div
-            style={{
-              width: "40px",
-              height: "40px",
-              borderRadius: "50%",
-              background: "#E5E5E5",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "pointer",
-            }}
-          >
+            justifyContent: "center",
+            cursor: "pointer"
+          }}>
             <svg
-              width="24"
-              height="24"
+              width="20"
+              height="20"
               viewBox="0 0 24 24"
               fill="none"
-              stroke="#6B7280"
-              strokeWidth="2"
             >
-              <circle cx="12" cy="12" r="10" />
-              <polyline points="12 6 12 12 16 14" />
+              <circle cx="12" cy="12" r="10" stroke="#6B7280" strokeWidth="1.5" />
+              <polyline points="12 6 12 12 16 14" stroke="#6B7280" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
 
-          <h1
-            style={{
-              fontSize: "18px",
-              fontWeight: 700,
-              margin: 0,
-              color: "#1F2937",
-            }}
-          >
+          <h1 style={{
+            fontSize: fontSize.lg,
+            fontWeight: 700,
+            margin: 0,
+            color: colors.dark
+          }}>
             دریافت فیزیکی
           </h1>
 
+          {/* Back Arrow */}
           <Link
             href="/dashboard/services"
             style={{
-              width: "40px",
-              height: "40px",
+              width: "clamp(36px, 10vw, 40px)",
+              height: "clamp(36px, 10vw, 40px)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              fontSize: "24px",
               cursor: "pointer",
-              textDecoration: "none",
-              color: "#1F2937",
+              textDecoration: "none"
             }}
           >
-            ←
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M15 19L8 12L15 5" stroke={colors.dark} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
           </Link>
         </div>
 
         {/* Info Banner */}
-        <div
-          style={{
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          gap: spacing.xs,
+          padding: `${spacing.sm} ${spacing.md}`,
+          background: "rgba(251, 191, 36, 0.15)",
+          borderRadius: borderRadius.md,
+          marginBottom: spacing.md
+        }}>
+          <div style={{
+            width: "clamp(18px, 5vw, 20px)",
+            height: "clamp(18px, 5vw, 20px)",
+            borderRadius: "50%",
+            background: colors.primary,
             display: "flex",
             alignItems: "center",
-            gap: "8px",
-            padding: "10px 16px",
-            background: "rgba(251, 191, 36, 0.15)",
-            borderRadius: "12px",
-            marginBottom: "20px",
-          }}
-        >
-          <div
-            style={{
-              width: "20px",
-              height: "20px",
-              borderRadius: "50%",
-              background: "#FDB022",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: "12px",
-              fontWeight: 700,
-              color: "#FFFFFF",
-              flexShrink: 0,
-            }}
-          >
+            justifyContent: "center",
+            fontSize: fontSize.xs,
+            fontWeight: 700,
+            color: colors.card,
+            flexShrink: 0
+          }}>
             i
           </div>
-          <span
-            style={{
-              fontSize: "13px",
-              fontWeight: 600,
-              color: "#D97706",
-            }}
-          >
+          <span style={{
+            fontSize: fontSize.sm,
+            fontWeight: 600,
+            color: "#D97706"
+          }}>
             راهنمای تحویل فیزیکی
           </span>
         </div>
 
         {/* Balance Card */}
-        <div
-          style={{
-            padding: "20px",
-            background: "#E8E4DD",
-            borderRadius: "16px",
-            marginBottom: "20px",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              marginBottom: "12px",
-            }}
-          >
-            <div style={{ textAlign: "right" }}>
-              <div
-                style={{
-                  fontSize: "13px",
-                  color: "#6B7280",
-                  marginBottom: "4px",
-                }}
-              >
+        <div style={{
+          padding: spacing.md,
+          background: "#E8E4DD",
+          borderRadius: borderRadius.lg,
+          marginBottom: spacing.md,
+          boxShadow: shadows.xs
+        }}>
+          <div style={{
+            display: "flex",
+            justifyContent: "space-between",
+            gap: spacing.sm
+          }}>
+            <div style={{ textAlign: "right", flex: 1 }}>
+              <div style={{
+                fontSize: fontSize.sm,
+                color: colors.muted,
+                marginBottom: "4px"
+              }}>
                 موجودی کیف طلا:
               </div>
-              <div style={{ fontSize: "18px", fontWeight: 700, color: "#1F2937" }}>
+              <div style={{
+                fontSize: fontSize.lg,
+                fontWeight: 700,
+                color: colors.dark
+              }}>
                 {toPersianNumber(walletGold)} گرم
               </div>
             </div>
-            <div style={{ textAlign: "left" }}>
-              <div
-                style={{
-                  fontSize: "13px",
-                  color: "#6B7280",
-                  marginBottom: "4px",
-                }}
-              >
+            <div style={{ textAlign: "left", flex: 1 }}>
+              <div style={{
+                fontSize: fontSize.sm,
+                color: colors.muted,
+                marginBottom: "4px"
+              }}>
                 موجودی قابل دریافت فیزیکی:
               </div>
-              <div style={{ fontSize: "18px", fontWeight: 700, color: "#1F2937" }}>
+              <div style={{
+                fontSize: fontSize.lg,
+                fontWeight: 700,
+                color: colors.dark
+              }}>
                 {toPersianNumber(availableForPhysical)} گرم
               </div>
             </div>
@@ -233,28 +224,22 @@ export default function PhysicalReceiptPage() {
         </div>
 
         {/* Amount Input */}
-        <div
-          style={{
-            padding: "20px",
-            border: "1px solid #D1D5DB",
-            borderRadius: "16px",
-            marginBottom: "12px",
-            background: "#FFFFFF",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <span
-              style={{
-                fontSize: "14px",
-                color: "#6B7280",
-              }}
-            >
+        <div style={{
+          padding: spacing.md,
+          border: `1px solid ${colors.border}`,
+          borderRadius: borderRadius.lg,
+          marginBottom: spacing.sm,
+          background: colors.card
+        }}>
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between"
+          }}>
+            <span style={{
+              fontSize: fontSize.sm,
+              color: colors.muted
+            }}>
               گرم
             </span>
             <input
@@ -266,15 +251,15 @@ export default function PhysicalReceiptPage() {
               }}
               placeholder="مقدار طلا"
               style={{
-                fontSize: "18px",
+                fontSize: fontSize.lg,
                 fontWeight: 600,
                 border: "none",
                 outline: "none",
                 textAlign: "right",
                 background: "transparent",
                 flex: 1,
-                color: "#1F2937",
-                marginRight: "12px",
+                color: colors.dark,
+                marginRight: spacing.sm
               }}
             />
           </div>
@@ -282,58 +267,39 @@ export default function PhysicalReceiptPage() {
 
         {/* Error Message */}
         {error && (
-          <div
-            style={{
-              display: "flex",
-              alignItems: error === "این فیلد اجباری است" ? "center" : "flex-start",
-              justifyContent: error === "این فیلد اجباری است" ? "center" : "flex-start",
-              gap: "8px",
-              marginBottom: "16px",
-            }}
-          >
+          <div style={{
+            display: "flex",
+            alignItems: error === "این فیلد اجباری است" ? "center" : "flex-start",
+            justifyContent: error === "این فیلد اجباری است" ? "center" : "flex-start",
+            gap: spacing.xs,
+            marginBottom: spacing.md
+          }}>
             {error !== "این فیلد اجباری است" && (
-              <div
-                style={{
-                  width: "18px",
-                  height: "18px",
-                  borderRadius: "50%",
-                  background: "#EF4444",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: "12px",
-                  fontWeight: 700,
-                  color: "#FFFFFF",
-                  flexShrink: 0,
-                  marginTop: "2px",
-                }}
-              >
-                !
-              </div>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0, marginTop: "2px" }}>
+                <circle cx="12" cy="12" r="10" fill={colors.danger} />
+                <path d="M12 8V12" stroke="white" strokeWidth="2" strokeLinecap="round" />
+                <path d="M12 16H12.01" stroke="white" strokeWidth="2" strokeLinecap="round" />
+              </svg>
             )}
-            <span
-              style={{
-                fontSize: "13px",
-                color: "#DC2626",
-                lineHeight: "1.5",
-                flex: 1,
-                textAlign: error === "این فیلد اجباری است" ? "center" : "right",
-              }}
-            >
+            <span style={{
+              fontSize: fontSize.sm,
+              color: colors.danger,
+              lineHeight: "1.5",
+              flex: 1,
+              textAlign: error === "این فیلد اجباری است" ? "center" : "right"
+            }}>
               {error}
             </span>
           </div>
         )}
 
         {/* Quick Amount Buttons */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap: "12px",
-            marginBottom: "24px",
-          }}
-        >
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(3, 1fr)",
+          gap: spacing.sm,
+          marginBottom: spacing.lg
+        }}>
           {[
             { value: 10, label: "۱۰" },
             { value: 45, label: "۴۵" },
@@ -345,27 +311,27 @@ export default function PhysicalReceiptPage() {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-                padding: "8px 12px",
-                background: "#FFFFFF",
-                border: "1px solid #E5E7EB",
-                borderRadius: "12px",
+                padding: `${spacing.xs} ${spacing.sm}`,
+                background: colors.card,
+                border: `1px solid ${colors.border}`,
+                borderRadius: borderRadius.md
               }}
             >
               <button
                 onClick={() => decrementAmount(item.value)}
                 style={{
-                  width: "24px",
-                  height: "24px",
-                  borderRadius: "4px",
+                  width: "clamp(20px, 6vw, 24px)",
+                  height: "clamp(20px, 6vw, 24px)",
+                  borderRadius: borderRadius.xs,
                   background: "transparent",
                   border: "none",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontSize: "18px",
+                  fontSize: fontSize.lg,
                   cursor: "pointer",
-                  color: "#6B7280",
-                  padding: 0,
+                  color: colors.muted,
+                  padding: 0
                 }}
               >
                 −
@@ -373,13 +339,13 @@ export default function PhysicalReceiptPage() {
               <button
                 onClick={() => handleQuickAmount(item.value)}
                 style={{
-                  padding: "0 8px",
+                  padding: `0 ${spacing.xs}`,
                   background: "transparent",
                   border: "none",
-                  fontSize: "13px",
+                  fontSize: fontSize.sm,
                   fontWeight: 600,
                   cursor: "pointer",
-                  color: "#1F2937",
+                  color: colors.dark
                 }}
               >
                 {item.label} گرم
@@ -387,18 +353,18 @@ export default function PhysicalReceiptPage() {
               <button
                 onClick={() => incrementAmount(item.value)}
                 style={{
-                  width: "24px",
-                  height: "24px",
-                  borderRadius: "4px",
+                  width: "clamp(20px, 6vw, 24px)",
+                  height: "clamp(20px, 6vw, 24px)",
+                  borderRadius: borderRadius.xs,
                   background: "transparent",
                   border: "none",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontSize: "18px",
+                  fontSize: fontSize.lg,
                   cursor: "pointer",
-                  color: "#6B7280",
-                  padding: 0,
+                  color: colors.muted,
+                  padding: 0
                 }}
               >
                 +
@@ -408,42 +374,40 @@ export default function PhysicalReceiptPage() {
         </div>
 
         {/* Info Note */}
-        <div
-          style={{
-            fontSize: "12px",
-            color: "#9CA3AF",
-            textAlign: "center",
-            lineHeight: "1.6",
-            marginBottom: "120px",
-          }}
-        >
+        <div style={{
+          fontSize: fontSize.xs,
+          color: "#9CA3AF",
+          textAlign: "center",
+          lineHeight: "1.6",
+          marginBottom: "clamp(100px, 30vw, 120px)"
+        }}>
           حداقل مقدار دریافت فیزیکی طلا ۱۰ گرم است و طلای فیزیکی مورد تقاضای شما
           باید مضربی از ۱۰ داشته باشد.
         </div>
 
         {/* Submit Button - Fixed at bottom */}
-        <div
-          style={{
-            position: "fixed",
-            bottom: "20px",
-            left: "16px",
-            right: "16px",
-            maxWidth: "568px",
-            margin: "0 auto",
-          }}
-        >
+        <div style={{
+          position: "fixed",
+          bottom: spacing.md,
+          left: spacing.md,
+          right: spacing.md,
+          maxWidth: "568px",
+          margin: "0 auto"
+        }}>
           <button
             onClick={handleSubmit}
             style={{
               width: "100%",
-              padding: "16px",
-              background: "#1F2937",
-              color: "#FFFFFF",
+              padding: spacing.md,
+              background: colors.dark,
+              color: colors.card,
               border: "none",
-              borderRadius: "16px",
-              fontSize: "16px",
+              borderRadius: borderRadius.lg,
+              fontSize: fontSize.lg,
               fontWeight: 700,
               cursor: "pointer",
+              boxShadow: shadows.lg,
+              transition: "all 0.2s"
             }}
           >
             ثبت درخواست
@@ -457,75 +421,69 @@ export default function PhysicalReceiptPage() {
 // Success Page Component
 function SuccessPage({ onClose }: { onClose: () => void }) {
   return (
-    <div
-      className="min-h-screen"
-      style={{
-        padding: "20px 16px",
-        background: "#FFFFFF",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <div style={{ maxWidth: "600px", width: "100%", textAlign: "center" }}>
+    <div style={{
+      minHeight: "100vh",
+      padding: spacing.md,
+      background: colors.card,
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center"
+    }}>
+      <div style={{
+        maxWidth: "600px",
+        width: "100%",
+        textAlign: "center"
+      }}>
         {/* Back Arrow */}
-        <div
-          style={{
-            position: "absolute",
-            top: "20px",
-            right: "16px",
-          }}
-        >
+        <div style={{
+          position: "absolute",
+          top: spacing.md,
+          right: spacing.md
+        }}>
           <div
             onClick={onClose}
             style={{
-              width: "40px",
-              height: "40px",
+              width: "clamp(36px, 10vw, 40px)",
+              height: "clamp(36px, 10vw, 40px)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              fontSize: "24px",
-              cursor: "pointer",
-              color: "#1F2937",
+              cursor: "pointer"
             }}
           >
-            ←
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M15 19L8 12L15 5" stroke={colors.dark} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
           </div>
         </div>
 
         {/* Success Badge */}
-        <div
-          style={{
-            display: "inline-block",
-            padding: "12px 32px",
-            background: "rgba(147, 197, 253, 0.3)",
-            borderRadius: "24px",
-            marginBottom: "40px",
-          }}
-        >
-          <span
-            style={{
-              fontSize: "16px",
-              fontWeight: 700,
-              color: "#1E40AF",
-            }}
-          >
+        <div style={{
+          display: "inline-block",
+          padding: `${spacing.sm} ${spacing['2xl']}`,
+          background: "rgba(147, 197, 253, 0.3)",
+          borderRadius: borderRadius.xl,
+          marginBottom: spacing['2xl']
+        }}>
+          <span style={{
+            fontSize: fontSize.lg,
+            fontWeight: 700,
+            color: "#1E40AF"
+          }}>
             درخواست شما  ثبت شد
           </span>
         </div>
 
         {/* Illustration */}
-        <div
-          style={{
-            marginBottom: "40px",
-            display: "flex",
-            justifyContent: "center",
-          }}
-        >
+        <div style={{
+          marginBottom: spacing['2xl'],
+          display: "flex",
+          justifyContent: "center"
+        }}>
           <svg
-            width="300"
-            height="300"
+            width="clamp(250px, 70vw, 300px)"
+            height="clamp(250px, 70vw, 300px)"
             viewBox="0 0 300 300"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
@@ -557,51 +515,47 @@ function SuccessPage({ onClose }: { onClose: () => void }) {
         </div>
 
         {/* Success Message */}
-        <h2
-          style={{
-            fontSize: "20px",
-            fontWeight: 700,
-            color: "#1F2937",
-            marginBottom: "12px",
-          }}
-        >
+        <h2 style={{
+          fontSize: fontSize.xl,
+          fontWeight: 700,
+          color: colors.dark,
+          marginBottom: spacing.sm
+        }}>
           درخواست شما را دریافت کردیم
         </h2>
 
-        <p
-          style={{
-            fontSize: "14px",
-            color: "#6B7280",
-            lineHeight: "1.6",
-            marginBottom: "60px",
-          }}
-        >
+        <p style={{
+          fontSize: fontSize.sm,
+          color: colors.muted,
+          lineHeight: "1.6",
+          marginBottom: "clamp(50px, 15vw, 60px)"
+        }}>
           آدرس شعبه و زمان تحویل طلا به شما پیامک خواهد شد.
         </p>
 
         {/* Done Button - Fixed at bottom */}
-        <div
-          style={{
-            position: "fixed",
-            bottom: "20px",
-            left: "16px",
-            right: "16px",
-            maxWidth: "568px",
-            margin: "0 auto",
-          }}
-        >
+        <div style={{
+          position: "fixed",
+          bottom: spacing.md,
+          left: spacing.md,
+          right: spacing.md,
+          maxWidth: "568px",
+          margin: "0 auto"
+        }}>
           <button
             onClick={onClose}
             style={{
               width: "100%",
-              padding: "16px",
-              background: "#1F2937",
-              color: "#FFFFFF",
+              padding: spacing.md,
+              background: colors.dark,
+              color: colors.card,
               border: "none",
-              borderRadius: "16px",
-              fontSize: "16px",
+              borderRadius: borderRadius.lg,
+              fontSize: fontSize.lg,
               fontWeight: 700,
               cursor: "pointer",
+              boxShadow: shadows.lg,
+              transition: "all 0.2s"
             }}
           >
             متوجه شدم
