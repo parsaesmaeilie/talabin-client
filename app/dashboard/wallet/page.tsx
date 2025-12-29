@@ -132,6 +132,10 @@ export default function WalletPage() {
     />
   );
 
+  const goldValueInToman = wallet && currentGoldPrice
+    ? parseFloat(wallet.available_gold_balance) * currentGoldPrice
+    : 0;
+
   return (
     <>
       <style jsx>{`
@@ -139,35 +143,67 @@ export default function WalletPage() {
           0% { background-position: 200% 0; }
           100% { background-position: -200% 0; }
         }
+
+        @keyframes slideInUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .wallet-card {
+          animation: slideInUp 0.4s ease-out;
+        }
+
+        @media (hover: hover) {
+          .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+          }
+        }
+
+        .action-btn:active {
+          transform: scale(0.98);
+        }
+
+        @media (hover: hover) {
+          .transaction-item:hover {
+            background: #F5F5F5 !important;
+          }
+        }
       `}</style>
 
-      <div style={{ minHeight: "100vh", background: "#FAFAFA", paddingBottom: "120px" }} className="fade-in">
+      <div style={{ minHeight: "100vh", background: "#FAFAFA", paddingBottom: "100px" }}>
         {/* Header */}
         <div
           style={{
             background: "#FFFFFF",
-            padding: "clamp(12px, 3vw, 16px)",
+            padding: "clamp(14px, 4vw, 16px)",
             display: "flex",
             alignItems: "center",
-            gap: "12px",
+            gap: "clamp(10px, 3vw, 12px)",
             boxShadow: "0 2px 8px rgba(0, 0, 0, 0.04)",
             position: "sticky",
             top: 0,
             zIndex: 10,
-            transition: "all 0.3s ease",
           }}
         >
           <Link href="/dashboard">
             <div
               style={{
-                width: "40px",
-                height: "40px",
+                width: "clamp(38px, 10vw, 40px)",
+                height: "clamp(38px, 10vw, 40px)",
                 borderRadius: "12px",
                 background: "#F5F5F5",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 cursor: "pointer",
+                transition: "all 0.2s ease",
               }}
             >
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -181,45 +217,50 @@ export default function WalletPage() {
               </svg>
             </div>
           </Link>
-          <h1 style={{ fontSize: "18px", fontWeight: 600, flex: 1, color: "#1F1F1F" }}>
-            کیف پول
-          </h1>
+          <div style={{ flex: 1 }}>
+            <h1 style={{ fontSize: "clamp(16px, 4.5vw, 18px)", fontWeight: 700, color: "#1F1F1F", margin: 0 }}>
+              کیف پول
+            </h1>
+            <p style={{ fontSize: "clamp(10px, 2.5vw, 11px)", color: "#6B7280", margin: "2px 0 0" }}>
+              مدیریت موجودی و دارایی‌ها
+            </p>
+          </div>
         </div>
 
         {/* Content */}
-        <div style={{ padding: "clamp(12px, 3vw, 16px)", maxWidth: "800px", margin: "0 auto" }}>
+        <div style={{ padding: "clamp(12px, 4vw, 16px)", maxWidth: "600px", margin: "0 auto" }}>
           {/* Error Message */}
           {error && (
             <div
-              className="slide-in-down"
               style={{
-                padding: "12px 16px",
-                marginBottom: "16px",
-                borderRadius: "12px",
+                padding: "14px 18px",
+                marginBottom: "clamp(12px, 4vw, 16px)",
+                borderRadius: "16px",
                 background: "#FEE2E2",
+                border: "1px solid #FCA5A5",
                 color: "#DC2626",
-                fontSize: "clamp(13px, 3vw, 14px)",
+                fontSize: "clamp(13px, 3.5vw, 14px)",
                 textAlign: "center",
                 fontWeight: 600,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-                transition: "all 0.3s ease",
+                gap: "8px",
+                flexWrap: "wrap",
               }}
             >
-              <span>{error}</span>
+              <span>⚠️ {error}</span>
               <button
                 onClick={fetchWalletData}
                 style={{
-                  background: "transparent",
+                  background: "#DC2626",
+                  color: "#FFFFFF",
                   border: "none",
-                  color: "#DC2626",
+                  padding: "6px 14px",
+                  borderRadius: "8px",
                   cursor: "pointer",
-                  fontSize: "clamp(11px, 2.5vw, 12px)",
+                  fontSize: "clamp(11px, 3vw, 12px)",
                   fontWeight: 600,
-                  textDecoration: "underline",
-                  minHeight: "44px",
-                  touchAction: "manipulation",
                 }}
               >
                 تلاش مجدد
@@ -229,135 +270,131 @@ export default function WalletPage() {
 
           {/* Total Balance Card */}
           <div
-            className="scale-in"
+            className="wallet-card"
             style={{
-              background: "linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%)",
-              borderRadius: "clamp(16px, 4vw, 20px)",
-              padding: "clamp(20px, 5vw, 24px)",
-              marginBottom: "16px",
-              boxShadow: "0 8px 20px rgba(251, 191, 36, 0.25)",
+              background: "linear-gradient(135deg, #1F2937 0%, #111827 100%)",
+              borderRadius: "clamp(20px, 5vw, 24px)",
+              padding: "clamp(22px, 6vw, 28px) clamp(20px, 5vw, 24px)",
+              marginBottom: "clamp(12px, 4vw, 16px)",
+              boxShadow: "0 8px 24px rgba(0, 0, 0, 0.15)",
               color: "#FFFFFF",
-              transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-              transform: "translateZ(0)",
+              position: "relative",
+              overflow: "hidden",
             }}
           >
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M18.04 13.55C17.62 13.96 17.38 14.55 17.44 15.18C17.53 16.26 18.52 17.05 19.6 17.05H21.5V18.24C21.5 20.31 19.81 22 17.74 22H6.26C4.19 22 2.5 20.31 2.5 18.24V11.51C2.5 9.44001 4.19 7.75 6.26 7.75H17.74C19.81 7.75 21.5 9.44001 21.5 11.51V12.95H19.48C18.92 12.95 18.41 13.17 18.04 13.55Z"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M2.5 12.4101V7.8401C2.5 6.6501 3.23 5.59006 4.34 5.17006L12.28 2.17006C13.52 1.70006 14.85 2.62009 14.85 3.95009V7.75008"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M22.5588 13.9702V16.0302C22.5588 16.5802 22.1188 17.0302 21.5588 17.0502H19.5988C18.5188 17.0502 17.5288 16.2602 17.4388 15.1802C17.3788 14.5502 17.6188 13.9602 18.0388 13.5502C18.4088 13.1702 18.9188 12.9502 19.4788 12.9502H21.5588C22.1188 12.9702 22.5588 13.4202 22.5588 13.9702Z"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M7 12H14"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              <h3 style={{ fontSize: "15px", fontWeight: 600, margin: 0, opacity: 0.9 }}>
-                ارزش کل دارایی
-              </h3>
+            {/* Background decoration */}
+            <div
+              style={{
+                position: "absolute",
+                top: "-40px",
+                left: "-40px",
+                width: "150px",
+                height: "150px",
+                borderRadius: "50%",
+                background: "rgba(253, 176, 34, 0.15)",
+                filter: "blur(40px)",
+              }}
+            />
+
+            <div style={{ position: "relative", zIndex: 1 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "clamp(10px, 3vw, 12px)" }}>
+                <div style={{ fontSize: "clamp(20px, 6vw, 24px)" }}>💼</div>
+                <h3 style={{ fontSize: "clamp(13px, 3.5vw, 15px)", fontWeight: 600, margin: 0, opacity: 0.9 }}>
+                  ارزش کل دارایی
+                </h3>
+              </div>
+
+              {loading ? (
+                <>
+                  <ShimmerBox height="clamp(44px, 13vw, 52px)" borderRadius="12px" width="75%" />
+                  <div style={{ height: "10px" }} />
+                  <ShimmerBox height="clamp(20px, 5vw, 24px)" borderRadius="8px" width="60%" />
+                </>
+              ) : wallet ? (
+                <>
+                  <div style={{ display: "flex", alignItems: "baseline", gap: "clamp(6px, 2vw, 8px)", marginBottom: "clamp(10px, 3vw, 12px)", flexWrap: "wrap" }}>
+                    <span style={{ fontSize: "clamp(32px, 10vw, 42px)", fontWeight: 800, lineHeight: 1 }}>
+                      {toPersianNumber(wallet.total_value_irr.toLocaleString("fa-IR"))}
+                    </span>
+                    <span style={{ fontSize: "clamp(15px, 4.5vw, 18px)", fontWeight: 600, opacity: 0.9 }}>تومان</span>
+                  </div>
+
+                  <div
+                    style={{
+                      padding: "clamp(8px, 2.5vw, 10px) clamp(12px, 3.5vw, 14px)",
+                      background: "rgba(255, 255, 255, 0.15)",
+                      borderRadius: "12px",
+                      fontSize: "clamp(11px, 3vw, 12px)",
+                      backdropFilter: "blur(10px)",
+                      border: "1px solid rgba(255, 255, 255, 0.1)",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "6px",
+                    }}
+                  >
+                    <span>✨</span>
+                    شامل طلای دیجیتال و موجودی نقدی
+                  </div>
+                </>
+              ) : null}
             </div>
-
-            {loading ? (
-              <>
-                <ShimmerBox height="48px" borderRadius="12px" width="70%" />
-                <div style={{ height: "8px" }} />
-                <ShimmerBox height="20px" borderRadius="8px" width="50%" />
-              </>
-            ) : wallet ? (
-              <>
-                <div style={{ display: "flex", alignItems: "baseline", gap: "8px", marginBottom: "8px" }}>
-                  <span style={{ fontSize: "36px", fontWeight: 700 }}>
-                    {toPersianNumber(wallet.total_value_irr.toLocaleString("fa-IR"))}
-                  </span>
-                  <span style={{ fontSize: "16px", opacity: 0.9 }}>تومان</span>
-                </div>
-
-                <div
-                  style={{
-                    padding: "10px 14px",
-                    background: "rgba(255, 255, 255, 0.2)",
-                    borderRadius: "12px",
-                    fontSize: "12px",
-                    opacity: 0.95,
-                    backdropFilter: "blur(10px)",
-                  }}
-                >
-                  شامل طلای دیجیتال و موجودی نقدی
-                </div>
-              </>
-            ) : null}
           </div>
 
           {/* Balance Cards */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "12px", marginBottom: "16px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(clamp(140px, 45vw, 160px), 1fr))", gap: "clamp(10px, 3vw, 12px)", marginBottom: "clamp(12px, 4vw, 16px)" }}>
             {/* Gold Balance */}
             <div
+              className="wallet-card"
               style={{
                 background: "#FFFFFF",
-                borderRadius: "20px",
-                padding: "20px",
-                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
+                borderRadius: "clamp(18px, 5vw, 20px)",
+                padding: "clamp(18px, 5vw, 20px)",
+                boxShadow: "0 2px 12px rgba(0, 0, 0, 0.06)",
                 position: "relative",
                 overflow: "hidden",
+                animationDelay: "0.1s",
               }}
             >
               <div
                 style={{
                   position: "absolute",
-                  top: "-10px",
-                  right: "-10px",
-                  fontSize: "60px",
-                  opacity: 0.1,
+                  top: "-15px",
+                  right: "-15px",
+                  fontSize: "clamp(50px, 16vw, 64px)",
+                  opacity: 0.08,
                 }}
               >
                 🪙
               </div>
               {loading ? (
                 <>
-                  <ShimmerBox height="16px" width="60%" borderRadius="6px" />
-                  <div style={{ height: "12px" }} />
-                  <ShimmerBox height="28px" width="80%" borderRadius="8px" />
+                  <ShimmerBox height="clamp(14px, 4vw, 16px)" width="65%" borderRadius="6px" />
+                  <div style={{ height: "clamp(10px, 3vw, 12px)" }} />
+                  <ShimmerBox height="clamp(24px, 7vw, 28px)" width="85%" borderRadius="8px" />
                 </>
               ) : wallet ? (
                 <>
-                  <div style={{ fontSize: "12px", color: "#6B7280", marginBottom: "8px", fontWeight: 500 }}>
-                    💎 طلای دیجیتال
+                  <div style={{ fontSize: "clamp(11px, 3vw, 12px)", color: "#6B7280", marginBottom: "clamp(6px, 2vw, 8px)", fontWeight: 500, display: "flex", alignItems: "center", gap: "4px" }}>
+                    <span>💎</span> طلای دیجیتال
                   </div>
-                  <div style={{ display: "flex", alignItems: "baseline", gap: "4px", marginBottom: "6px" }}>
-                    <span style={{ fontSize: "22px", fontWeight: 700, color: "#1F1F1F" }}>
+                  <div style={{ display: "flex", alignItems: "baseline", gap: "4px", marginBottom: "clamp(4px, 1.5vw, 6px)", flexWrap: "wrap" }}>
+                    <span style={{ fontSize: "clamp(20px, 6.5vw, 24px)", fontWeight: 700, color: "#1F1F1F" }}>
                       {toPersianNumber(parseFloat(wallet.available_gold_balance).toFixed(4))}
                     </span>
-                    <span style={{ fontSize: "13px", color: "#6B7280" }}>گرم</span>
+                    <span style={{ fontSize: "clamp(12px, 3.2vw, 13px)", color: "#6B7280" }}>گرم</span>
+                  </div>
+                  <div style={{ fontSize: "clamp(10px, 2.8vw, 11px)", color: "#9CA3AF", marginTop: "4px" }}>
+                    ≈ {toPersianNumber(Math.floor(goldValueInToman).toLocaleString("fa-IR"))} تومان
                   </div>
                   {parseFloat(wallet.frozen_gold_balance) > 0 && (
                     <div
                       style={{
-                        fontSize: "10px",
+                        fontSize: "clamp(9px, 2.5vw, 10px)",
                         color: "#F59E0B",
                         background: "#FEF3C7",
-                        padding: "4px 8px",
+                        padding: "clamp(3px, 1vw, 4px) clamp(6px, 2vw, 8px)",
                         borderRadius: "6px",
-                        marginTop: "6px",
+                        marginTop: "clamp(6px, 2vw, 8px)",
                         display: "inline-block",
                       }}
                     >
@@ -370,52 +407,57 @@ export default function WalletPage() {
 
             {/* IRR Balance */}
             <div
+              className="wallet-card"
               style={{
                 background: "#FFFFFF",
-                borderRadius: "20px",
-                padding: "20px",
-                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
+                borderRadius: "clamp(18px, 5vw, 20px)",
+                padding: "clamp(18px, 5vw, 20px)",
+                boxShadow: "0 2px 12px rgba(0, 0, 0, 0.06)",
                 position: "relative",
                 overflow: "hidden",
+                animationDelay: "0.2s",
               }}
             >
               <div
                 style={{
                   position: "absolute",
-                  top: "-10px",
-                  right: "-10px",
-                  fontSize: "60px",
-                  opacity: 0.1,
+                  top: "-15px",
+                  right: "-15px",
+                  fontSize: "clamp(50px, 16vw, 64px)",
+                  opacity: 0.08,
                 }}
               >
                 💰
               </div>
               {loading ? (
                 <>
-                  <ShimmerBox height="16px" width="60%" borderRadius="6px" />
-                  <div style={{ height: "12px" }} />
-                  <ShimmerBox height="28px" width="80%" borderRadius="8px" />
+                  <ShimmerBox height="clamp(14px, 4vw, 16px)" width="65%" borderRadius="6px" />
+                  <div style={{ height: "clamp(10px, 3vw, 12px)" }} />
+                  <ShimmerBox height="clamp(24px, 7vw, 28px)" width="85%" borderRadius="8px" />
                 </>
               ) : wallet ? (
                 <>
-                  <div style={{ fontSize: "12px", color: "#6B7280", marginBottom: "8px", fontWeight: 500 }}>
-                    💵 موجودی تومان
+                  <div style={{ fontSize: "clamp(11px, 3vw, 12px)", color: "#6B7280", marginBottom: "clamp(6px, 2vw, 8px)", fontWeight: 500, display: "flex", alignItems: "center", gap: "4px" }}>
+                    <span>💵</span> موجودی تومان
                   </div>
-                  <div style={{ display: "flex", alignItems: "baseline", gap: "4px", marginBottom: "6px" }}>
-                    <span style={{ fontSize: "22px", fontWeight: 700, color: "#1F1F1F" }}>
+                  <div style={{ display: "flex", alignItems: "baseline", gap: "4px", marginBottom: "clamp(4px, 1.5vw, 6px)", flexWrap: "wrap" }}>
+                    <span style={{ fontSize: "clamp(20px, 6.5vw, 24px)", fontWeight: 700, color: "#1F1F1F" }}>
                       {toPersianNumber(parseFloat(wallet.available_balance_irr).toLocaleString("fa-IR"))}
                     </span>
-                    <span style={{ fontSize: "11px", color: "#6B7280" }}>تومان</span>
+                    <span style={{ fontSize: "clamp(10px, 2.8vw, 11px)", color: "#6B7280" }}>تومان</span>
+                  </div>
+                  <div style={{ fontSize: "clamp(10px, 2.8vw, 11px)", color: "#9CA3AF", marginTop: "4px" }}>
+                    آماده برای استفاده
                   </div>
                   {parseFloat(wallet.frozen_balance_irr) > 0 && (
                     <div
                       style={{
-                        fontSize: "10px",
+                        fontSize: "clamp(9px, 2.5vw, 10px)",
                         color: "#F59E0B",
                         background: "#FEF3C7",
-                        padding: "4px 8px",
+                        padding: "clamp(3px, 1vw, 4px) clamp(6px, 2vw, 8px)",
                         borderRadius: "6px",
-                        marginTop: "6px",
+                        marginTop: "clamp(6px, 2vw, 8px)",
                         display: "inline-block",
                       }}
                     >
@@ -428,25 +470,26 @@ export default function WalletPage() {
           </div>
 
           {/* Action Buttons */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "12px", marginBottom: "16px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "clamp(10px, 3vw, 12px)", marginBottom: "clamp(16px, 5vw, 20px)" }}>
             <Link href="/dashboard/wallet/deposit" style={{ textDecoration: "none" }}>
               <button
+                className="action-btn"
                 style={{
                   width: "100%",
-                  padding: "18px",
-                  fontSize: "16px",
+                  padding: "clamp(16px, 4.5vw, 18px)",
+                  fontSize: "clamp(14px, 4vw, 16px)",
                   fontWeight: 700,
                   color: "#FFFFFF",
-                  background: "linear-gradient(135deg, #10B981 0%, #059669 100%)",
+                  background: "#1F1F1F",
                   border: "none",
-                  borderRadius: "16px",
+                  borderRadius: "clamp(14px, 4vw, 16px)",
                   cursor: "pointer",
-                  boxShadow: "0 4px 12px rgba(16, 185, 129, 0.3)",
+                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  gap: "8px",
-                  transition: "all 0.2s",
+                  gap: "clamp(6px, 2vw, 8px)",
+                  transition: "all 0.2s ease",
                 }}
               >
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -463,21 +506,22 @@ export default function WalletPage() {
             </Link>
             <Link href="/dashboard/wallet/withdraw" style={{ textDecoration: "none" }}>
               <button
+                className="action-btn"
                 style={{
                   width: "100%",
-                  padding: "18px",
-                  fontSize: "16px",
+                  padding: "clamp(16px, 4.5vw, 18px)",
+                  fontSize: "clamp(14px, 4vw, 16px)",
                   fontWeight: 700,
                   color: "#1F1F1F",
                   background: "#FFFFFF",
                   border: "2px solid #E5E7EB",
-                  borderRadius: "16px",
+                  borderRadius: "clamp(14px, 4vw, 16px)",
                   cursor: "pointer",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  gap: "8px",
-                  transition: "all 0.2s",
+                  gap: "clamp(6px, 2vw, 8px)",
+                  transition: "all 0.2s ease",
                 }}
               >
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -496,11 +540,13 @@ export default function WalletPage() {
 
           {/* Recent Transactions */}
           <div
+            className="wallet-card"
             style={{
               background: "#FFFFFF",
-              borderRadius: "20px",
-              padding: "20px",
-              boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
+              borderRadius: "clamp(18px, 5vw, 20px)",
+              padding: "clamp(18px, 5vw, 20px)",
+              boxShadow: "0 2px 12px rgba(0, 0, 0, 0.06)",
+              animationDelay: "0.3s",
             }}
           >
             <div
@@ -508,19 +554,24 @@ export default function WalletPage() {
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
-                marginBottom: "16px",
+                marginBottom: "clamp(14px, 4vw, 16px)",
+                gap: "8px",
+                flexWrap: "wrap",
               }}
             >
-              <h3 style={{ fontSize: "15px", fontWeight: 600, color: "#1F1F1F", margin: 0 }}>
-                📋 تراکنش‌های اخیر
+              <h3 style={{ fontSize: "clamp(14px, 4vw, 15px)", fontWeight: 700, color: "#1F1F1F", margin: 0, display: "flex", alignItems: "center", gap: "6px" }}>
+                <span>📋</span> تراکنش‌های اخیر
               </h3>
               <Link
                 href="/dashboard/wallet/history"
                 style={{
-                  fontSize: "12px",
-                  color: "#F59E0B",
+                  fontSize: "clamp(11px, 3vw, 12px)",
+                  color: "#FDB022",
                   fontWeight: 600,
                   textDecoration: "none",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "4px",
                 }}
               >
                 مشاهده همه ←
@@ -528,75 +579,77 @@ export default function WalletPage() {
             </div>
 
             {loading ? (
-              <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "clamp(10px, 3vw, 12px)" }}>
                 {[1, 2, 3].map((i) => (
-                  <div key={i} style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-                    <ShimmerBox width="40px" height="40px" borderRadius="12px" />
+                  <div key={i} style={{ display: "flex", gap: "clamp(10px, 3vw, 12px)", alignItems: "center" }}>
+                    <ShimmerBox width="clamp(38px, 11vw, 44px)" height="clamp(38px, 11vw, 44px)" borderRadius="12px" />
                     <div style={{ flex: 1 }}>
-                      <ShimmerBox height="16px" width="60%" borderRadius="6px" />
+                      <ShimmerBox height="clamp(14px, 4vw, 16px)" width="60%" borderRadius="6px" />
                       <div style={{ height: "6px" }} />
-                      <ShimmerBox height="12px" width="40%" borderRadius="6px" />
+                      <ShimmerBox height="clamp(11px, 3vw, 12px)" width="40%" borderRadius="6px" />
                     </div>
                   </div>
                 ))}
               </div>
             ) : transactions.length > 0 ? (
-              <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "clamp(8px, 2.5vw, 10px)" }}>
                 {transactions.map((transaction) => {
                   const badgeColors = getTransactionBadgeColor(transaction.status);
                   return (
                     <div
                       key={transaction.id}
+                      className="transaction-item"
                       style={{
                         display: "flex",
-                        gap: "12px",
-                        padding: "12px",
+                        gap: "clamp(10px, 3vw, 12px)",
+                        padding: "clamp(10px, 3vw, 12px)",
                         background: "#FAFAFA",
-                        borderRadius: "12px",
+                        borderRadius: "clamp(12px, 3.5vw, 14px)",
                         alignItems: "center",
+                        transition: "all 0.2s ease",
                       }}
                     >
                       <div
                         style={{
-                          width: "44px",
-                          height: "44px",
+                          width: "clamp(38px, 11vw, 44px)",
+                          height: "clamp(38px, 11vw, 44px)",
                           borderRadius: "12px",
                           background: "#FFFFFF",
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
-                          fontSize: "20px",
+                          fontSize: "clamp(18px, 5.5vw, 20px)",
                           flexShrink: 0,
                         }}
                       >
                         {getTransactionIcon(transaction.transaction_type)}
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: "13px", fontWeight: 600, color: "#1F1F1F", marginBottom: "4px" }}>
+                        <div style={{ fontSize: "clamp(12px, 3.5vw, 13px)", fontWeight: 600, color: "#1F1F1F", marginBottom: "4px" }}>
                           {getTransactionTypeText(transaction.transaction_type)}
                         </div>
-                        <div style={{ fontSize: "11px", color: "#6B7280", marginBottom: "2px" }}>
+                        <div style={{ fontSize: "clamp(10px, 2.8vw, 11px)", color: "#6B7280", marginBottom: "2px" }}>
                           {transaction.amount_irr && parseFloat(transaction.amount_irr) > 0
                             ? `${toPersianNumber(parseFloat(transaction.amount_irr).toLocaleString("fa-IR"))} تومان`
                             : transaction.amount_gold && parseFloat(transaction.amount_gold) > 0
                             ? `${toPersianNumber(parseFloat(transaction.amount_gold).toFixed(4))} گرم`
                             : ""}
                         </div>
-                        <div style={{ fontSize: "10px", color: "#9CA3AF" }}>
-                          {new Date(transaction.created_at).toLocaleDateString("fa-IR", {
+                        <div style={{ fontSize: "clamp(9px, 2.5vw, 10px)", color: "#9CA3AF" }}>
+                          {toPersianNumber(new Date(transaction.created_at).toLocaleDateString("fa-IR", {
                             year: "numeric",
                             month: "short",
                             day: "numeric",
-                          })}
+                          }))}
                         </div>
                       </div>
                       <div
                         style={{
-                          padding: "6px 12px",
+                          padding: "clamp(5px, 1.5vw, 6px) clamp(10px, 3vw, 12px)",
                           background: badgeColors.bg,
                           color: badgeColors.color,
                           borderRadius: "8px",
-                          fontSize: "11px",
+                          fontSize: "clamp(10px, 2.8vw, 11px)",
                           fontWeight: 600,
                           flexShrink: 0,
                         }}
@@ -611,12 +664,12 @@ export default function WalletPage() {
               <div
                 style={{
                   textAlign: "center",
-                  padding: "40px 20px",
+                  padding: "clamp(32px, 10vw, 40px) clamp(16px, 5vw, 20px)",
                   color: "#6B7280",
-                  fontSize: "13px",
+                  fontSize: "clamp(12px, 3.5vw, 13px)",
                 }}
               >
-                <div style={{ fontSize: "48px", marginBottom: "12px" }}>📭</div>
+                <div style={{ fontSize: "clamp(40px, 12vw, 48px)", marginBottom: "clamp(10px, 3vw, 12px)" }}>📭</div>
                 <div>هیچ تراکنشی یافت نشد</div>
               </div>
             )}
