@@ -388,11 +388,12 @@ export default function PhysicalReceiptPage() {
         {/* Submit Button - Fixed at bottom */}
         <div style={{
           position: "fixed",
-          bottom: spacing.md,
+          bottom: "80px",
           left: spacing.md,
           right: spacing.md,
           maxWidth: "568px",
-          margin: "0 auto"
+          margin: "0 auto",
+          zIndex: 10
         }}>
           <button
             onClick={handleSubmit}
@@ -536,11 +537,12 @@ function SuccessPage({ onClose }: { onClose: () => void }) {
         {/* Done Button - Fixed at bottom */}
         <div style={{
           position: "fixed",
-          bottom: spacing.md,
+          bottom: "80px",
           left: spacing.md,
           right: spacing.md,
           maxWidth: "568px",
-          margin: "0 auto"
+          margin: "0 auto",
+          zIndex: 10
         }}>
           <button
             onClick={onClose}
