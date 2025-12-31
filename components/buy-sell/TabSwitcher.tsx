@@ -12,20 +12,21 @@ export const TabSwitcher: React.FC<TabSwitcherProps> = ({ activeTab, onTabChange
     <div
       style={{
         display: "flex",
-        gap: "12px",
+        gap: "4px",
         justifyContent: "center",
       }}
     >
+      <div style={{borderRadius:"24px",background:"#F3F3F3",padding:"4px"}}>
       <button
         onClick={() => onTabChange("buy")}
         style={{
-          padding: "12px 32px",
+          padding: "10px",
           fontSize: "15px",
           fontWeight: 600,
           color: activeTab === "buy" ? "#1F1F1F" : "#6B7280",
-          background: activeTab === "buy" ? "#FFC857" : "#F5F5F5",
+          background: activeTab === "buy" ? "#FFC857" : "#F3F3F3",
           border: "none",
-          borderRadius: "24px",
+          borderRadius: "20px",
           cursor: "pointer",
           transition: "all 0.2s ease",
           minWidth: "120px",
@@ -36,13 +37,13 @@ export const TabSwitcher: React.FC<TabSwitcherProps> = ({ activeTab, onTabChange
       <button
         onClick={() => onTabChange("sell")}
         style={{
-          padding: "12px 32px",
+          padding: "10px",
           fontSize: "15px",
           fontWeight: 600,
-          color: activeTab === "sell" ? "#FFFFFF" : "#6B7280",
-          background: activeTab === "sell" ? "#EF8B8B" : "#F5F5F5",
+          color: activeTab === "sell" ? "#1F1F1F" : "#6B7280",
+          background: activeTab === "sell" ? "#FFC857" : "#F3F3F3",
           border: "none",
-          borderRadius: "24px",
+          borderRadius: "20px",
           cursor: "pointer",
           transition: "all 0.2s ease",
           minWidth: "120px",
@@ -50,6 +51,7 @@ export const TabSwitcher: React.FC<TabSwitcherProps> = ({ activeTab, onTabChange
       >
         فروش
       </button>
+      </div>
     </div>
   );
 };
