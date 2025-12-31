@@ -8,10 +8,10 @@ interface NumberPadProps {
 }
 
 const keys = [
-  "۱", "۲", "۳",
-  "۴", "۵", "۶",
-  "۷", "۸", "۹",
-  ".", "۰", "⌫",
+  "۳", "۲", "۱",
+  "۶", "۵", "۴",
+  "۹", "۸", "۷",
+  "⌫", "۰", ".",
 ];
 
 export const NumberPad: React.FC<NumberPadProps> = ({
@@ -62,7 +62,6 @@ export const NumberPad: React.FC<NumberPadProps> = ({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
             cursor: "pointer",
           }}
         >

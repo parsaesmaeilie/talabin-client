@@ -176,6 +176,7 @@ export default function BuySell() {
         {/* Inputs */}
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           <InputCard
+    
             label={
               amount
                 ? `${toFa(isBuy ? fmt(+amount) : amount)} ${
@@ -267,7 +268,7 @@ function InputCard({ label }: { label: string }) {
         padding: "12px 14px",
         borderRadius: 12,
         background: "#FFF",
-        border: "1px solid #E5E7EB",
+        border: "1px solid #0a0a0aff",
         fontSize: 13,
         textAlign: "right",
       }}
