@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { TabSwitcher } from "@/components/buy-sell/TabSwitcher";
 import { NumberPad } from "@/components/buy-sell/NumberPad";
 import { tradingService, OrderPreview } from "@/lib/api/trading";
@@ -189,65 +188,107 @@ export default function BuySell() {
   const isValidAmount = amount && !isNaN(parseFloat(amount)) && parseFloat(amount) > 0 && tomanAmount >= 100000;
 
   return (
-    <div style={{ minHeight: "100vh", background: "#FAFAFA", paddingBottom: "120px", paddingTop: "clamp(16px, 4vw, 20px)" }} className="fade-in">
+    <div style={{ minHeight: "100vh", background: "#FAFAFA", overflow: "auto", display: "flex", flexDirection: "column", position: "relative" }} className="fade-in">
       {/* Content */}
-      <div style={{ padding: "clamp(12px, 3vw, 16px)", maxWidth: "600px", margin: "0 auto" }}>
+      <div style={{ flex: 1, padding: "20px 16px", maxWidth: "400px", margin: "0 auto", width: "100%", display: "flex", flexDirection: "column", paddingBottom: "32px" }}>
         {/* Tab Switcher */}
-        <div style={{ marginBottom: "20px" }}>
+        <div style={{ marginBottom: "12px" }}>
           <TabSwitcher activeTab={activeTab} onTabChange={setActiveTab} />
         </div>
+
+        {/* Error Message */}
+        {error && (
+          <div
+            style={{
+              width: "100%",
+              padding: "12px 16px",
+              background: "#FEE2E2",
+              border: "1px solid #EF4444",
+              borderRadius: "12px",
+              color: "#DC2626",
+              fontSize: "13px",
+              fontWeight: 500,
+              marginBottom: "12px",
+              textAlign: "center",
+            }}
+          >
+            {error}
+          </div>
+        )}
+
+        {/* Success Message */}
+        {success && (
+          <div
+            style={{
+              width: "100%",
+              padding: "12px 16px",
+              background: "#D1FAE5",
+              border: "1px solid #10B981",
+              borderRadius: "12px",
+              color: "#047857",
+              fontSize: "13px",
+              fontWeight: 500,
+              marginBottom: "12px",
+              textAlign: "center",
+            }}
+          >
+            {success}
+          </div>
+        )}
 
         {/* Current Price Card */}
         <div
           className="scale-in"
           style={{
-            background: "#F8F9FA",
-            borderRadius: "clamp(16px, 4vw, 20px)",
-            padding: "clamp(20px, 5vw, 24px)",
+            width: "100%",
+            height: "70px",
+            background: "#FFFFFF",
+            borderRadius: "18px",
             marginBottom: "16px",
             textAlign: "center",
-            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.06)",
-            transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-            transform: "translateZ(0)",
+            border: "none",
+            boxShadow: "0 2px 12px rgba(0, 0, 0, 0.06)",
+            transition: "all 0.3s ease",
             position: "relative",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
           <div
             style={{
               position: "absolute",
-              top: "20px",
-              right: "20px",
-              background: "#10B981",
-              color: "#FFFFFF",
-              padding: "6px 12px",
-              borderRadius: "12px",
-              fontSize: "11px",
+              top: "6px",
+              right: "10px",
+              padding: "4px 10px",
+              background: "#C5FFD1",
+              color: "#000000",
+              borderRadius: "6px",
+              fontSize: "10px",
               fontWeight: 600,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
             قیمت لحظه‌ای
           </div>
-          <div style={{ fontSize: "clamp(13px, 3vw, 14px)", marginBottom: "8px", color: "#6B7280", fontWeight: 500 }}>
-            هر گرم طلا ۱۸ عیار
-          </div>
-          <div style={{ fontSize: "clamp(28px, 8vw, 36px)", fontWeight: 700, lineHeight: 1.2, color: "#1F1F1F" }}>
+          <div style={{ fontSize: "26px", fontWeight: 700, lineHeight: 1, color: "#242424" }}>
             {currentPrice
               ? toPersianNumber(
                   formatNumber(activeTab === "buy" ? currentPrice.sell_price : currentPrice.buy_price)
                 )
               : "..."}
           </div>
-          <div style={{ fontSize: "clamp(13px, 3vw, 14px)", marginTop: "4px", color: "#6B7280" }}>
-            تومان
-          </div>
         </div>
 
         {/* Recommended Prices */}
-        <div style={{ marginBottom: "20px" }}>
+        <div style={{ marginBottom: "16px" }}>
           <div
             style={{
               display: "flex",
-              gap: "8px",
+              gap: "6px",
               justifyContent: "center",
               flexWrap: "wrap",
             }}
@@ -259,16 +300,17 @@ export default function BuySell() {
                   key={value}
                   onClick={() => handleQuickAmount(value)}
                   style={{
-                    padding: "10px 18px",
-                    background: amount === value.toString() ? "#FFC857" : "#FFFFFF",
-                    border: `2px solid ${amount === value.toString() ? "#FFC857" : "#E5E7EB"}`,
-                    borderRadius: "20px",
+                    padding: "9px 16px",
+                    background: amount === value.toString() ? "#FDB022" : "#FFFFFF",
+                    border: `2px solid ${amount === value.toString() ? "#FDB022" : "#E5E7EB"}`,
+                    borderRadius: "12px",
                     fontSize: "13px",
-                    fontWeight: 600,
-                    color: amount === value.toString() ? "#1F1F1F" : "#6B7280",
+                    fontWeight: 700,
+                    color: amount === value.toString() ? "#FFFFFF" : "#6B7280",
                     cursor: "pointer",
                     transition: "all 0.2s ease",
                     touchAction: "manipulation",
+                    boxShadow: amount === value.toString() ? "0 4px 12px rgba(253, 176, 34, 0.25)" : "0 2px 8px rgba(0, 0, 0, 0.04)",
                   }}
                   onMouseEnter={(e) => {
                     if (amount !== value.toString()) {
@@ -293,16 +335,17 @@ export default function BuySell() {
                   key={value}
                   onClick={() => handleQuickAmount(value)}
                   style={{
-                    padding: "10px 18px",
+                    padding: "9px 16px",
                     background: amount === value.toString() ? "#EF8B8B" : "#FFFFFF",
                     border: `2px solid ${amount === value.toString() ? "#EF8B8B" : "#E5E7EB"}`,
-                    borderRadius: "20px",
+                    borderRadius: "12px",
                     fontSize: "13px",
-                    fontWeight: 600,
-                    color: amount === value.toString() ? "#1F1F1F" : "#6B7280",
+                    fontWeight: 700,
+                    color: amount === value.toString() ? "#FFFFFF" : "#6B7280",
                     cursor: "pointer",
                     transition: "all 0.2s ease",
                     touchAction: "manipulation",
+                    boxShadow: amount === value.toString() ? "0 4px 12px rgba(239, 139, 139, 0.3)" : "0 2px 8px rgba(0, 0, 0, 0.04)",
                   }}
                   onMouseEnter={(e) => {
                     if (amount !== value.toString()) {
@@ -328,7 +371,7 @@ export default function BuySell() {
             marginBottom: "16px",
             display: "flex",
             flexDirection: "column",
-            gap: "12px",
+            gap: "10px",
           }}
         >
           {/* First Input - Order depends on buy/sell */}
@@ -337,14 +380,20 @@ export default function BuySell() {
               {/* Amount in Toman Input - User enters this */}
               <div
                 style={{
-                  padding: "18px 20px",
-                  border: "2px solid #E5E7EB",
-                  borderRadius: "16px",
+                  width: "100%",
+                  height: "52px",
+                  border: "2px solid #1F1F1F",
+                  borderRadius: "14px",
                   background: "#FFFFFF",
                   textAlign: "right",
+                  display: "flex",
+                  alignItems: "center",
+                  padding: "0 16px",
+                  boxShadow: amount ? "0 0 0 3px rgba(31, 31, 31, 0.1)" : "none",
+                  transition: "all 0.2s ease",
                 }}
               >
-                <div style={{ fontSize: "14px", color: amount ? "#1F1F1F" : "#9CA3AF", fontWeight: 500 }}>
+                <div style={{ fontSize: "14px", color: amount ? "#1F1F1F" : "#9CA3AF", fontWeight: 600, width: "100%" }}>
                   {amount ? toPersianNumber(formatNumber(amount)) + " تومان" : "مبلغ پرداختی به تومان"}
                 </div>
               </div>
@@ -352,14 +401,18 @@ export default function BuySell() {
               {/* Gold Amount Display - Calculated */}
               <div
                 style={{
-                  padding: "18px 20px",
+                  width: "100%",
+                  height: "52px",
                   border: "2px solid #E5E7EB",
-                  borderRadius: "16px",
-                  background: "#FFFFFF",
+                  borderRadius: "14px",
+                  background: "#F8F9FA",
                   textAlign: "right",
+                  display: "flex",
+                  alignItems: "center",
+                  padding: "0 16px",
                 }}
               >
-                <div style={{ fontSize: "14px", color: goldAmount > 0 ? "#1F1F1F" : "#9CA3AF", fontWeight: 500 }}>
+                <div style={{ fontSize: "14px", color: goldAmount > 0 ? "#000000" : "#9CA3AF", fontWeight: 500, width: "100%" }}>
                   {goldAmount > 0 ? toPersianNumber(goldAmount.toFixed(4)) + " گرم" : "مقدار طلا به گرم"}
                 </div>
               </div>
@@ -369,14 +422,20 @@ export default function BuySell() {
               {/* Gold Amount Input for Sell - User enters this */}
               <div
                 style={{
-                  padding: "18px 20px",
-                  border: "2px solid #E5E7EB",
-                  borderRadius: "16px",
+                  width: "100%",
+                  height: "52px",
+                  border: "2px solid #1F1F1F",
+                  borderRadius: "14px",
                   background: "#FFFFFF",
                   textAlign: "right",
+                  display: "flex",
+                  alignItems: "center",
+                  padding: "0 16px",
+                  boxShadow: amount ? "0 0 0 3px rgba(31, 31, 31, 0.1)" : "none",
+                  transition: "all 0.2s ease",
                 }}
               >
-                <div style={{ fontSize: "14px", color: amount ? "#1F1F1F" : "#9CA3AF", fontWeight: 500 }}>
+                <div style={{ fontSize: "14px", color: amount ? "#1F1F1F" : "#9CA3AF", fontWeight: 600, width: "100%" }}>
                   {amount ? toPersianNumber(amount) + " گرم" : "مقدار طلا به گرم"}
                 </div>
               </div>
@@ -384,14 +443,18 @@ export default function BuySell() {
               {/* Amount in Toman Display - Calculated */}
               <div
                 style={{
-                  padding: "18px 20px",
+                  width: "100%",
+                  height: "52px",
                   border: "2px solid #E5E7EB",
-                  borderRadius: "16px",
-                  background: "#FFFFFF",
+                  borderRadius: "14px",
+                  background: "#F8F9FA",
                   textAlign: "right",
+                  display: "flex",
+                  alignItems: "center",
+                  padding: "0 16px",
                 }}
               >
-                <div style={{ fontSize: "14px", color: tomanAmount > 0 ? "#1F1F1F" : "#9CA3AF", fontWeight: 500 }}>
+                <div style={{ fontSize: "14px", color: tomanAmount > 0 ? "#000000" : "#9CA3AF", fontWeight: 500, width: "100%" }}>
                   {tomanAmount > 0 ? toPersianNumber(formatNumber(tomanAmount)) + " تومان" : "مبلغ دریافتی به تومان"}
                 </div>
               </div>
@@ -399,20 +462,27 @@ export default function BuySell() {
           )}
         </div>
 
-        {/* Fee Display */}
-        <div
-          style={{
-            marginBottom: "16px",
-            textAlign: "center",
-            fontSize: "13px",
-            color: "#6B7280",
-          }}
-        >
-          کارمزد: {preview ? toPersianNumber(formatNumber(preview.fee)) : "۱۰,۰۰۰"} تومان
-        </div>
+        {/* Number Pad with Fee */}
+        <div style={{
+          marginBottom: "24px",
+          background: "#FFFFFF",
+          borderRadius: "20px",
+          padding: "20px 16px",
+          boxShadow: "0 2px 12px rgba(0, 0, 0, 0.06)"
+        }}>
+          {/* Fee Display */}
+          <div
+            style={{
+              marginBottom: "24px",
+              textAlign: "center",
+              fontSize: "13px",
+              color: "#6B7280",
+              fontWeight: 500,
+            }}
+          >
+            کارمزد: {preview ? toPersianNumber(formatNumber(preview.fee)) : "۱۰,۰۰۰"} تومان
+          </div>
 
-        {/* Number Pad */}
-        <div style={{ marginBottom: "16px" }}>
           <NumberPad onNumberClick={handleNumberClick} onBackspace={handleBackspace} />
         </div>
 
@@ -422,26 +492,30 @@ export default function BuySell() {
           disabled={loading || !isValidAmount}
           style={{
             width: "100%",
-            padding: "clamp(16px, 4vw, 20px)",
-            fontSize: "clamp(16px, 4vw, 18px)",
+            height: "54px",
+            fontSize: "16px",
             fontWeight: 700,
             color: "#FFFFFF",
             background: loading
               ? "#9CA3AF"
               : !isValidAmount
-              ? "#9CA3AF"
+              ? "#D1D5DB"
               : activeTab === "buy"
               ? "#1F1F1F"
               : "#EF8B8B",
             border: "none",
-            borderRadius: "clamp(20px, 5vw, 24px)",
+            borderRadius: "18px",
             cursor: loading || !isValidAmount ? "not-allowed" : "pointer",
-            transition: "all 0.3s ease",
-            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
-            display: "block",
-            position: "relative",
-            minHeight: "56px",
+            transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
             touchAction: "manipulation",
+            boxShadow: isValidAmount && !loading
+              ? activeTab === "buy"
+                ? "0 4px 16px rgba(31, 31, 31, 0.2)"
+                : "0 4px 16px rgba(239, 139, 139, 0.3)"
+              : "none",
           }}
           onMouseEnter={(e) => {
             if (isValidAmount && !loading) {
@@ -475,6 +549,7 @@ export default function BuySell() {
           )}
         </button>
       </div>
+
     </div>
   );
 }

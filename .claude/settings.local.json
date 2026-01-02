@@ -71,7 +71,11 @@
       "Bash(flutter --version:*)",
       "Bash(copy \"C:\\\\Users\\\\Lotus\\\\.claude\\\\plans\\\\cheeky-snuggling-river.md\" \"E:\\\\داشبورد\\\\talabin-client\\\\FLUTTER_APP_PLAN.md\")",
       "Bash(if not exist \"public\\\\assets\" mkdir \"public\\\\assets\")",
-      "Bash(if not exist \"public\\\\assets\\\\illustrations\" mkdir \"public\\\\assets\\\\illustrations\")"
+      "Bash(if not exist \"public\\\\assets\\\\illustrations\" mkdir \"public\\\\assets\\\\illustrations\")",
+      "Bash(del \".next\\\\dev\\\\lock\")",
+      "Bash(python manage.py runserver:*)",
+      "Bash(pip install:*)",
+      "Bash(git restore:*)"
     ]
   }
 }

@@ -11,7 +11,7 @@ const persianNumbers = ["۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹", "�
 const numbers = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];
 
 export const NumberPad: React.FC<NumberPadProps> = ({ onNumberClick, onBackspace }) => {
-  // Layout: 3-2-1, 6-5-4, 9-8-7, X-0-. (RTL Persian layout)
+  // Layout: 3-2-1, 6-5-4, 9-8-7, .-0-← (RTL Persian layout)
   const padLayout = [
     [3, 2, 1],
     [6, 5, 4],
@@ -23,11 +23,14 @@ export const NumberPad: React.FC<NumberPadProps> = ({ onNumberClick, onBackspace
       style={{
         display: "grid",
         gridTemplateColumns: "repeat(3, 1fr)",
-        gap: "1px",
-        background: "#E5E7EB",
-        borderRadius: "12px",
-        overflow: "hidden",
-        padding: "1px",
+        gap: "0",
+        background: "transparent",
+        borderRadius: "0",
+        overflow: "visible",
+        padding: "0",
+        maxWidth: "100%",
+        width: "100%",
+        margin: "0 auto",
       }}
     >
       {padLayout.flat().map((num) => (
@@ -35,27 +38,34 @@ export const NumberPad: React.FC<NumberPadProps> = ({ onNumberClick, onBackspace
           key={num}
           onClick={() => onNumberClick(num.toString())}
           style={{
-            aspectRatio: "1",
+            height: "70px",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontSize: "24px",
-            fontWeight: 600,
-            color: "#1F1F1F",
-            background: "#FFFFFF",
+            fontSize: "28px",
+            fontWeight: 400,
+            color: "#000000",
+            background: "transparent",
             border: "none",
             borderRadius: "0",
             cursor: "pointer",
-            transition: "all 0.15s ease",
+            transition: "opacity 0.15s ease",
+            touchAction: "manipulation",
           }}
           onMouseDown={(e) => {
-            e.currentTarget.style.background = "#F5F5F5";
+            e.currentTarget.style.opacity = "0.5";
           }}
           onMouseUp={(e) => {
-            e.currentTarget.style.background = "#FFFFFF";
+            e.currentTarget.style.opacity = "1";
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.background = "#FFFFFF";
+            e.currentTarget.style.opacity = "1";
+          }}
+          onTouchStart={(e) => {
+            e.currentTarget.style.opacity = "0.5";
+          }}
+          onTouchEnd={(e) => {
+            e.currentTarget.style.opacity = "1";
           }}
         >
           {persianNumbers[num - 1]}
@@ -66,27 +76,34 @@ export const NumberPad: React.FC<NumberPadProps> = ({ onNumberClick, onBackspace
       <button
         onClick={() => onNumberClick(".")}
         style={{
-          aspectRatio: "1",
+          height: "70px",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          fontSize: "24px",
-          fontWeight: 600,
-          color: "#1F1F1F",
-          background: "#FFFFFF",
+          fontSize: "36px",
+          fontWeight: 400,
+          color: "#000000",
+          background: "transparent",
           border: "none",
           borderRadius: "0",
           cursor: "pointer",
-          transition: "all 0.15s ease",
+          transition: "opacity 0.15s ease",
+          touchAction: "manipulation",
         }}
         onMouseDown={(e) => {
-          e.currentTarget.style.background = "#F5F5F5";
+          e.currentTarget.style.opacity = "0.5";
         }}
         onMouseUp={(e) => {
-          e.currentTarget.style.background = "#FFFFFF";
+          e.currentTarget.style.opacity = "1";
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.background = "#FFFFFF";
+          e.currentTarget.style.opacity = "1";
+        }}
+        onTouchStart={(e) => {
+          e.currentTarget.style.opacity = "0.5";
+        }}
+        onTouchEnd={(e) => {
+          e.currentTarget.style.opacity = "1";
         }}
       >
         .
@@ -96,27 +113,34 @@ export const NumberPad: React.FC<NumberPadProps> = ({ onNumberClick, onBackspace
       <button
         onClick={() => onNumberClick("0")}
         style={{
-          aspectRatio: "1",
+          height: "70px",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          fontSize: "24px",
-          fontWeight: 600,
-          color: "#1F1F1F",
-          background: "#FFFFFF",
+          fontSize: "28px",
+          fontWeight: 400,
+          color: "#000000",
+          background: "transparent",
           border: "none",
           borderRadius: "0",
           cursor: "pointer",
-          transition: "all 0.15s ease",
+          transition: "opacity 0.15s ease",
+          touchAction: "manipulation",
         }}
         onMouseDown={(e) => {
-          e.currentTarget.style.background = "#F5F5F5";
+          e.currentTarget.style.opacity = "0.5";
         }}
         onMouseUp={(e) => {
-          e.currentTarget.style.background = "#FFFFFF";
+          e.currentTarget.style.opacity = "1";
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.background = "#FFFFFF";
+          e.currentTarget.style.opacity = "1";
+        }}
+        onTouchStart={(e) => {
+          e.currentTarget.style.opacity = "0.5";
+        }}
+        onTouchEnd={(e) => {
+          e.currentTarget.style.opacity = "1";
         }}
       >
         {persianNumbers[9]}
@@ -126,38 +150,39 @@ export const NumberPad: React.FC<NumberPadProps> = ({ onNumberClick, onBackspace
       <button
         onClick={onBackspace}
         style={{
-          aspectRatio: "1",
+          height: "70px",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          fontSize: "24px",
-          color: "#1F1F1F",
-          background: "#FFFFFF",
+          fontSize: "28px",
+          color: "#000000",
+          background: "transparent",
           border: "none",
           borderRadius: "0",
           cursor: "pointer",
-          transition: "all 0.15s ease",
+          transition: "opacity 0.15s ease",
+          touchAction: "manipulation",
         }}
         onMouseDown={(e) => {
-          e.currentTarget.style.background = "#F5F5F5";
+          e.currentTarget.style.opacity = "0.5";
         }}
         onMouseUp={(e) => {
-          e.currentTarget.style.background = "#FFFFFF";
+          e.currentTarget.style.opacity = "1";
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.background = "#FFFFFF";
+          e.currentTarget.style.opacity = "1";
+        }}
+        onTouchStart={(e) => {
+          e.currentTarget.style.opacity = "0.5";
+        }}
+        onTouchEnd={(e) => {
+          e.currentTarget.style.opacity = "1";
         }}
       >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-          <path
-            d="M9 3h11a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H9l-7-9 7-9z"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <line x1="15" y1="9" x2="9" y2="15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-          <line x1="9" y1="9" x2="15" y2="15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+          <path d="M21 5H9l-7 7 7 7h12a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2z" />
+          <line x1="15" y1="9" x2="9" y2="15" />
+          <line x1="9" y1="9" x2="15" y2="15" />
         </svg>
       </button>
     </div>
