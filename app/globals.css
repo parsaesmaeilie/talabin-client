@@ -1528,3 +1528,53 @@ a:focus {
     transition-duration: 200ms;
   }
 }
+
+/* ============================================
+   Responsive Desktop Container
+   ============================================ */
+
+/* Mobile App Simulation on Desktop */
+.desktop-shadow {
+  box-shadow: none;
+}
+
+@media (min-width: 429px) {
+  .desktop-shadow {
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05);
+    border-left: 1px solid rgba(0, 0, 0, 0.05);
+    border-right: 1px solid rgba(0, 0, 0, 0.05);
+  }
+}
+
+/* Responsive App Container - Centers content like mobile app on desktop */
+.app-container {
+  width: 100%;
+  max-width: 428px;
+  margin: 0 auto;
+  position: relative;
+  background: #FAFAFA;
+  min-height: 100vh;
+}
+
+@media (min-width: 429px) {
+  .app-container {
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.12);
+  }
+}
+
+/* Mobile-first padding with desktop adjustments */
+.responsive-padding {
+  padding: 16px;
+}
+
+@media (min-width: 768px) {
+  .responsive-padding {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 374px) {
+  .responsive-padding {
+    padding: 12px;
+  }
+}

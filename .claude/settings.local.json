@@ -75,7 +75,9 @@
       "Bash(del \".next\\\\dev\\\\lock\")",
       "Bash(python manage.py runserver:*)",
       "Bash(pip install:*)",
-      "Bash(git restore:*)"
+      "Bash(git restore:*)",
+      "Bash(if not exist \"public\\\\assets\\\\wallet\" mkdir \"public\\\\assets\\\\wallet\")",
+      "WebFetch(domain:www.figma.com)"
     ]
   }
 }

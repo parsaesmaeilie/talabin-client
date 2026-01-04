@@ -74,14 +74,23 @@ export default function DashboardPage() {
 
   return (
     <div style={{ minHeight: "100vh", background: "#EDEDED", paddingBottom: "100px" }}>
-      {/* Header */}
+      {/* Responsive Container for Desktop */}
       <div style={{
+        maxWidth: "428px",
+        margin: "0 auto",
         background: "#EDEDED",
-        padding: spacing.md,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between"
-      }}>
+        minHeight: "100vh",
+        position: "relative"
+      }}
+      className="desktop-shadow">
+        {/* Header */}
+        <div style={{
+          background: "#EDEDED",
+          padding: spacing.md,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between"
+        }}>
         {/* Notification Bell */}
         <div style={{ position: "relative", cursor: "pointer" }}>
           <div style={{
@@ -169,18 +178,93 @@ export default function DashboardPage() {
         maxWidth: "600px",
         margin: "0 auto"
       }}>
-        {/* Balance Card */}
+        {/* اولین خرید طلا Card - FIRST CARD */}
+        <Link href="/dashboard/buy-sell" style={{ textDecoration: "none" }}>
+          <div style={{
+            background: "#FFFFFF",
+            borderRadius: borderRadius.xl,
+            padding: spacing.lg,
+            marginBottom: spacing.md,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            boxShadow: shadows.sm,
+            cursor: "pointer",
+            transition: "all 0.2s"
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = "translateY(-2px)";
+            e.currentTarget.style.boxShadow = "0 8px 20px rgba(0, 0, 0, 0.1)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = "translateY(0)";
+            e.currentTarget.style.boxShadow = shadows.sm;
+          }}>
+            {/* Gold Coin Icon */}
+            <div style={{
+              width: "64px",
+              height: "64px",
+              borderRadius: "50%",
+              background: "linear-gradient(135deg, #FDB022 0%, #F59E0B 100%)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+              boxShadow: "0 4px 12px rgba(253, 176, 34, 0.3)"
+            }}>
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                <circle cx="16" cy="16" r="14" fill="#1C1C1C"/>
+                <circle cx="16" cy="16" r="10" fill="#FDB022"/>
+                <path d="M16 10V22M12 16H20" stroke="#1C1C1C" strokeWidth="2.5" strokeLinecap="round"/>
+              </svg>
+            </div>
+
+            {/* Text + Button */}
+            <div style={{
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "flex-end",
+              gap: spacing.sm,
+              paddingRight: spacing.md
+            }}>
+              <div style={{
+                fontSize: fontSize.lg,
+                fontWeight: 700,
+                color: colors.dark,
+                textAlign: "right"
+              }}>
+                اولین خرید طلا
+              </div>
+              <div style={{
+                width: "100%",
+                padding: "10px 20px",
+                background: colors.dark,
+                color: "#FFFFFF",
+                borderRadius: borderRadius.lg,
+                fontSize: fontSize.md,
+                fontWeight: 700,
+                textAlign: "center",
+                boxShadow: "0 4px 12px rgba(28, 28, 28, 0.2)"
+              }}>
+                خرید طلا
+              </div>
+            </div>
+          </div>
+        </Link>
+
+        {/* Balance Card - Updated to match Figma */}
         <div style={{
-          background: colors.card,
+          background: "#FFFFFF",
           borderRadius: borderRadius.xl,
           padding: spacing.lg,
           marginBottom: spacing.md,
           display: "flex",
           alignItems: "flex-start",
-          gap: spacing.sm,
+          justifyContent: "space-between",
           boxShadow: shadows.sm
         }}>
-          {/* Icon */}
+          {/* Receipt Icon - LEFT SIDE */}
           <div style={{
             width: "48px",
             height: "48px",
@@ -192,14 +276,24 @@ export default function DashboardPage() {
             flexShrink: 0
           }}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#FDB022"/>
-              <path d="M2 17L12 22L22 17" stroke="#FDB022" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M2 12L12 17L22 12" stroke="#FDB022" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M8 2V5" stroke="#FDB022" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M16 2V5" stroke="#FDB022" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M3.5 9.08997H20.5" stroke="#FDB022" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M21 8.5V17C21 20 19.5 22 16 22H8C4.5 22 3 20 3 17V8.5C3 5.5 4.5 3.5 8 3.5H16C19.5 3.5 21 5.5 21 8.5Z" stroke="#FDB022" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M11.9955 13.7H12.0045" stroke="#FDB022" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M8.29431 13.7H8.30329" stroke="#FDB022" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M8.29431 16.7H8.30329" stroke="#FDB022" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </div>
 
-          {/* Text Content */}
-          <div style={{ flex: 1 }}>
+          {/* Text Content - RIGHT SIDE */}
+          <div style={{
+            flex: 1,
+            paddingRight: spacing.md,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "flex-end"
+          }}>
             <div style={{
               fontSize: fontSize.lg,
               fontWeight: 600,
@@ -213,16 +307,15 @@ export default function DashboardPage() {
               display: "flex",
               alignItems: "baseline",
               gap: spacing.xs,
-              marginBottom: "4px",
-              justifyContent: "flex-end"
+              marginBottom: "4px"
             }}>
               <span style={{ fontSize: fontSize.sm, color: colors.muted }}>گرم</span>
               <span style={{
-                fontSize: fontSize['3xl'],
+                fontSize: fontSize['2xl'],
                 fontWeight: 700,
                 color: colors.dark
               }}>
-                {wallet ? toPersianNumber(parseFloat(wallet.gold_balance).toFixed(1)) : toPersianNumber("0")}
+                {wallet ? toPersianNumber(parseFloat(wallet.gold_balance).toFixed(1)) : toPersianNumber("۰")}
               </span>
             </div>
             <div style={{
@@ -230,7 +323,15 @@ export default function DashboardPage() {
               color: colors.muted,
               textAlign: "right"
             }}>
-              معادل <span style={{ fontWeight: 600 }}>{formatCurrencyPersian(Math.floor(goldValueInToman))}</span> تومان
+              معادل
+            </div>
+            <div style={{
+              fontSize: fontSize.md,
+              fontWeight: 600,
+              color: colors.dark,
+              textAlign: "right"
+            }}>
+              {formatCurrencyPersian(Math.floor(goldValueInToman))} تومان
             </div>
           </div>
         </div>
@@ -624,6 +725,8 @@ export default function DashboardPage() {
             </div>
           </Link>
         </div>
+      </div>
+      {/* Close Responsive Container */}
       </div>
     </div>
   );

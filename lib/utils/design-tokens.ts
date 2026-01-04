@@ -13,16 +13,17 @@ export const spacing = {
   '2xl': 'clamp(32px, 8vw, 48px)',
 };
 
-// Responsive Font Sizes
+// Responsive Font Sizes (Mobile-first: smaller min, larger max for desktop)
 export const fontSize = {
-  xs: 'clamp(11px, 2.8vw, 13px)',
-  sm: 'clamp(13px, 3.2vw, 14px)',
+  xs: 'clamp(10px, 2.5vw, 12px)',
+  sm: 'clamp(12px, 3vw, 14px)',
   base: 'clamp(14px, 3.5vw, 16px)',
-  lg: 'clamp(16px, 4vw, 18px)',
-  xl: 'clamp(18px, 4.5vw, 20px)',
-  '2xl': 'clamp(20px, 5vw, 24px)',
-  '3xl': 'clamp(24px, 6vw, 32px)',
-  '4xl': 'clamp(32px, 8vw, 48px)',
+  md: 'clamp(15px, 3.75vw, 17px)',
+  lg: 'clamp(16px, 4vw, 20px)',
+  xl: 'clamp(18px, 4.5vw, 24px)',
+  '2xl': 'clamp(20px, 5vw, 28px)',
+  '3xl': 'clamp(24px, 6vw, 36px)',
+  '4xl': 'clamp(28px, 7vw, 48px)',
 };
 
 // Color Palette (from UI mockups)
@@ -74,12 +75,14 @@ export const breakpoints = {
   desktopXl: '1920px',
 };
 
-// Container Max Widths
+// Container Max Widths (Mobile-first approach)
 export const containers = {
   mobile: '100%',
-  tablet: 'clamp(100%, 90vw, 768px)',
-  desktop: 'clamp(600px, 85vw, 1200px)',
-  narrow: 'clamp(100%, 90vw, 600px)',
+  mobileApp: '428px', // Max width for mobile app simulation on desktop
+  tablet: '768px',
+  desktop: '1024px',
+  narrow: '600px', // For forms, modals, etc.
+  wide: '1200px',
 };
 
 // Z-index Scale
