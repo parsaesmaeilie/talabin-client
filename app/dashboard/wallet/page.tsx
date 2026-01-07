@@ -128,7 +128,7 @@ export default function WalletPage() {
             marginBottom: "12px",
           }}>
             <div style={{
-              color: "#FDB022",
+              color: "#FFC857",
               fontSize: "12px",
               fontWeight: 500,
               marginBottom: "2px",
@@ -136,7 +136,7 @@ export default function WalletPage() {
               موجودی طلا
             </div>
             <div style={{
-              color: "#FDB022",
+              color: "#FFC857",
               fontSize: "18px",
               fontWeight: 700,
               marginBottom: "8px",
@@ -216,7 +216,7 @@ export default function WalletPage() {
                 width: "52px",
                 height: "52px",
                 borderRadius: "50%",
-                background: "#FDB022",
+                background: "#FFC857",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",

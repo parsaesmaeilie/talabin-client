@@ -8,7 +8,7 @@ interface NavItem {
   href: string;
   icon: string;
   activeIcon: string; // حالت فعال (رنگی)
-  label: string; // برچسب متنی
+  label: string; // برای alt text
 }
 
 export function BottomNav() {
@@ -37,13 +37,13 @@ export function BottomNav() {
         right: 12,
         background: "#1F1F1F",
         borderRadius: "24px",
-        padding: "12px 16px 16px 16px",
+        padding: "8px 12px 12px 12px",
         boxShadow: "0 8px 20px rgba(0, 0, 0, 0.25)",
         zIndex: 1000,
         display: "flex",
         justifyContent: "space-around",
         alignItems: "center",
-        gap: "8px",
+        gap: "4px",
         backdropFilter: "blur(10px)",
       }}
     >
@@ -55,11 +55,9 @@ export function BottomNav() {
             href={item.href}
             style={{
               display: "flex",
-              flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
               flex: 1,
-              gap: "4px",
               textDecoration: "none",
             }}
           >
@@ -67,23 +65,14 @@ export function BottomNav() {
               src={active ? item.activeIcon : item.icon}
               alt={item.label}
               style={{
-                width: 24,
-                height: 24,
+                height: "48px",
+                width: "auto",
+                maxWidth: "75px",
                 transition: "all 0.2s ease",
-                transform: active ? "scale(1.1)" : "scale(1)",
+                transform: active ? "scale(1.05)" : "scale(1)",
+                objectFit: "contain",
               }}
             />
-            <span
-              style={{
-                fontSize: "10px",
-                fontWeight: active ? 600 : 500,
-                color: active ? "#FFC857" : "#9CA3AF",
-                transition: "all 0.2s ease",
-                whiteSpace: "nowrap",
-              }}
-            >
-              {item.label}
-            </span>
           </Link>
         );
       })}
