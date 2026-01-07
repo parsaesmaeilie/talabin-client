@@ -60,7 +60,8 @@ export default function TransactionHistoryPage() {
     } else if (mainTab === "payment") {
       filtered = filtered.filter((t) => t.transaction_type === "withdraw");
     } else if (mainTab === "installment") {
-      filtered = filtered.filter((t) => t.transaction_type === "installment");
+      // No specific transaction type for installment yet
+      filtered = [];
     }
 
     return filtered;
@@ -197,11 +198,8 @@ export default function TransactionHistoryPage() {
                 const isBuy = transaction.transaction_type === "buy_gold";
                 const isDeposit = transaction.transaction_type === "deposit";
                 const isWithdraw = transaction.transaction_type === "withdraw";
-                const isInstallment = transaction.transaction_type === "installment";
                 const amount = isDeposit || isWithdraw
                   ? (transaction.amount_irr || "15000000")
-                  : isInstallment
-                  ? (transaction.amount_gold || "10")
                   : (transaction.amount_gold || "12");
 
                 return (
@@ -240,9 +238,7 @@ export default function TransactionHistoryPage() {
                             justifyContent: "center",
                           }}
                         >
-                          {isInstallment ? (
-                            <div style={{ fontSize: "24px" }}>📅</div>
-                          ) : isWithdraw ? (
+                          {isWithdraw ? (
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                               <path d="M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" fill="#FDB022"/>
                               <path d="M12 17V7M12 7L15 10M12 7L9 10" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -306,7 +302,7 @@ export default function TransactionHistoryPage() {
                               marginBottom: "4px",
                             }}
                           >
-                            {isInstallment ? "خرید قسطی" : isDeposit ? "واریز موفق به کیف پول" : isWithdraw ? "برداشت موفق از کیف پول" : (isBuy ? "خرید طلا" : "فروش طلا")}
+                            {isDeposit ? "واریز موفق به کیف پول" : isWithdraw ? "برداشت موفق از کیف پول" : (isBuy ? "خرید طلا" : "فروش طلا")}
                           </div>
                           <div style={{ fontSize: "12px", color: "#9CA3AF" }}>
                             ۱۴۰۴/۱۰/۲۵
@@ -330,12 +326,7 @@ export default function TransactionHistoryPage() {
 
       {/* Transaction Detail Modal */}
       {selectedTransaction && (
-        selectedTransaction.transaction_type === "installment" ? (
-          <InstallmentDetailModal
-            transaction={selectedTransaction}
-            onClose={() => setSelectedTransaction(null)}
-          />
-        ) : selectedTransaction.transaction_type === "deposit" ? (
+        selectedTransaction.transaction_type === "deposit" ? (
           <DepositDetailModal
             transaction={selectedTransaction}
             onClose={() => setSelectedTransaction(null)}

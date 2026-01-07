@@ -8,548 +8,305 @@ import { tradingService, OrderPreview } from "@/lib/api/trading";
 import { pricesService, GoldPrice } from "@/lib/api/prices";
 import { walletService, Wallet } from "@/lib/api/wallet";
 
+const isMobile =
+  typeof window !== "undefined" && window.innerWidth < 480;
+
 export default function BuySell() {
   const router = useRouter();
+
   const [activeTab, setActiveTab] = useState<"buy" | "sell">("buy");
   const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
   const [preview, setPreview] = useState<OrderPreview | null>(null);
   const [currentPrice, setCurrentPrice] = useState<GoldPrice | null>(null);
   const [wallet, setWallet] = useState<Wallet | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+
+  const isBuy = activeTab === "buy";
 
   useEffect(() => {
     fetchData();
   }, []);
 
   useEffect(() => {
-    // Clear amount when switching tabs
     setAmount("");
     setPreview(null);
   }, [activeTab]);
 
   useEffect(() => {
-    if (amount) {
-      fetchPreview();
-    } else {
-      setPreview(null);
-    }
+    if (amount) fetchPreview();
+    else setPreview(null);
   }, [amount]);
 
   const fetchData = async () => {
     try {
-      const [priceResponse, walletResponse] = await Promise.all([
+      const [priceRes, walletRes] = await Promise.all([
         pricesService.getCurrentPrice(),
         walletService.getBalance(),
       ]);
-
-      if (priceResponse.success && priceResponse.data) {
-        setCurrentPrice(priceResponse.data);
-      }
-
-      if (walletResponse.success && walletResponse.data) {
-        setWallet(walletResponse.data);
-      }
-    } catch (err) {
-      console.error("Error fetching data:", err);
-    }
+      if (priceRes.success) setCurrentPrice(priceRes.data!);
+      if (walletRes.success) setWallet(walletRes.data!);
+    } catch {}
   };
 
-  const fetchPreview = async () => {
-    if (!amount) return;
-
-    // Calculate toman amount for preview
-    const { tomanAmount: previewToman } = (() => {
-      if (!currentPrice) return { tomanAmount: 0 };
-      const amountNum = parseFloat(amount);
-      if (activeTab === "buy") {
-        return { tomanAmount: amountNum };
-      } else {
-        const price = parseFloat(currentPrice.buy_price);
-        return { tomanAmount: amountNum * price };
-      }
-    })();
-
-    if (previewToman < 100000) return;
-
-    try {
-      const response = await tradingService.previewOrder({
-        order_type: activeTab,
-        amount_irr: previewToman,
-      });
-
-      if (response.success && response.data) {
-        setPreview(response.data);
-      }
-    } catch (err) {
-      console.error("Error fetching preview:", err);
-    }
-  };
-
-  const handleSubmit = async () => {
-    setError(null);
-    setSuccess(null);
-
-    // Validate input
-    if (!amount || parseFloat(amount) <= 0) {
-      setError(activeTab === "buy" ? "لطفا مبلغ را وارد کنید" : "لطفا مقدار طلا را وارد کنید");
-      return;
-    }
-
-    // Validate minimum toman amount (100k)
-    if (tomanAmount < 100000) {
-      setError("حداقل مبلغ معامله 100,000 تومان است");
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      const response = await tradingService.placeOrder({
-        order_type: activeTab,
-        amount_irr: tomanAmount, // Always send toman amount to API
-      });
-
-      if (response.success) {
-        setSuccess(
-          activeTab === "buy"
-            ? "✅ خرید با موفقیت انجام شد!"
-            : "✅ فروش با موفقیت انجام شد!"
-        );
-        setAmount("");
-        setPreview(null);
-        await fetchData();
-        setTimeout(() => {
-          router.push("/dashboard/wallet");
-        }, 2000);
-      } else {
-        setError(response.error?.message || "خطا در انجام عملیات");
-      }
-    } catch (err: any) {
-      console.error("Error placing order:", err);
-      setError(err.message || "خطا در ارتباط با سرور");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleNumberClick = (num: string) => {
-    setAmount((prev) => prev + num);
-  };
-
-  const handleBackspace = () => {
-    setAmount((prev) => prev.slice(0, -1));
-  };
-
-  const handleQuickAmount = (value: number) => {
-    setAmount(value.toString());
-  };
-
-  const toPersianNumber = (num: string) => {
-    const persianDigits = ["۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹"];
-    return num.replace(/\d/g, (digit) => persianDigits[parseInt(digit)]);
-  };
-
-  const formatNumber = (value: number | string): string => {
-    if (!value && value !== 0) return "";
-    const numValue = typeof value === "string" ? parseFloat(value) : value;
-    if (isNaN(numValue)) return "";
-    return numValue.toLocaleString("fa-IR");
-  };
-
-  // Calculate conversions in real-time
   const getCalculatedValues = () => {
     if (!amount || !currentPrice) return { tomanAmount: 0, goldAmount: 0 };
+    const val = parseFloat(amount);
+    if (isNaN(val)) return { tomanAmount: 0, goldAmount: 0 };
 
-    const amountNum = parseFloat(amount);
-    if (isNaN(amountNum)) return { tomanAmount: 0, goldAmount: 0 };
-
-    if (activeTab === "buy") {
-      // Buy mode: user enters toman, calculate gold
-      const price = parseFloat(currentPrice.sell_price);
+    if (isBuy) {
       return {
-        tomanAmount: amountNum,
-        goldAmount: amountNum / price,
-      };
-    } else {
-      // Sell mode: user enters gold grams, calculate toman
-      const price = parseFloat(currentPrice.buy_price);
-      return {
-        tomanAmount: amountNum * price,
-        goldAmount: amountNum,
+        tomanAmount: val,
+        goldAmount: val / parseFloat(currentPrice.sell_price),
       };
     }
+
+    return {
+      goldAmount: val,
+      tomanAmount: val * parseFloat(currentPrice.buy_price),
+    };
   };
 
   const { tomanAmount, goldAmount } = getCalculatedValues();
+  const isValid = tomanAmount >= 100000 && parseFloat(amount) > 0;
 
-  // Validation: check if toman amount is >= 100k and amount is entered
-  const isValidAmount = amount && !isNaN(parseFloat(amount)) && parseFloat(amount) > 0 && tomanAmount >= 100000;
+  const fetchPreview = async () => {
+    if (tomanAmount < 100000) return;
+    const res = await tradingService.previewOrder({
+      order_type: activeTab,
+      amount_irr: tomanAmount,
+    });
+    if (res.success) setPreview(res.data!);
+  };
+
+  const handleSubmit = async () => {
+    if (!isValid) return;
+
+    setLoading(true);
+    const res = await tradingService.placeOrder({
+      order_type: activeTab,
+      amount_irr: tomanAmount,
+    });
+
+    if (res.success) {
+      setAmount("");
+      await fetchData();
+      setTimeout(() => router.push("/dashboard/wallet"), 1500);
+    }
+    setLoading(false);
+  };
+
+  const toFa = (n: number | string) =>
+    n.toString().replace(/\d/g, (d) => "۰۱۲۳۴۵۶۷۸۹"[+d]);
+
+  const fmt = (n: number) => n.toLocaleString("fa-IR");
 
   return (
-    <div style={{ minHeight: "100vh", background: "#FAFAFA", overflow: "auto", display: "flex", flexDirection: "column", position: "relative" }} className="fade-in">
-      {/* Content */}
-      <div style={{ flex: 1, padding: "20px 16px", maxWidth: "400px", margin: "0 auto", width: "100%", display: "flex", flexDirection: "column", paddingBottom: "32px" }}>
-        {/* Tab Switcher */}
-        <div style={{ marginBottom: "12px" }}>
-          <TabSwitcher activeTab={activeTab} onTabChange={setActiveTab} />
-        </div>
-
-        {/* Error Message */}
-        {error && (
-          <div
-            style={{
-              width: "100%",
-              padding: "12px 16px",
-              background: "#FEE2E2",
-              border: "1px solid #EF4444",
-              borderRadius: "12px",
-              color: "#DC2626",
-              fontSize: "13px",
-              fontWeight: 500,
-              marginBottom: "12px",
-              textAlign: "center",
-            }}
-          >
-            {error}
-          </div>
-        )}
-
-        {/* Success Message */}
-        {success && (
-          <div
-            style={{
-              width: "100%",
-              padding: "12px 16px",
-              background: "#D1FAE5",
-              border: "1px solid #10B981",
-              borderRadius: "12px",
-              color: "#047857",
-              fontSize: "13px",
-              fontWeight: 500,
-              marginBottom: "12px",
-              textAlign: "center",
-            }}
-          >
-            {success}
-          </div>
-        )}
-
-        {/* Current Price Card */}
+    <div
+      style={{
+        minHeight: "100dvh",
+        background: "#FAFAFA",
+        paddingInline: isMobile ? 4 : 0,
+        paddingTop: 12,
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      <div style={{
+        width: "100%",
+        maxWidth: isMobile ? "100%" : 520,
+        margin: isMobile ? "0" : "0 auto",
+        paddingInline: isMobile ? 0 : 12,
+        display: "flex",
+        flexDirection: "column",
+        flex: 1,
+      }}>
+        {/* Price Card */}
         <div
-          className="scale-in"
           style={{
-            width: "100%",
-            height: "70px",
-            background: "#FFFFFF",
-            borderRadius: "18px",
-            marginBottom: "16px",
+            background: "#F3F3F3",
+            borderRadius: 12,
+            padding: "12px 14px",
+            margin: "12px 0",
             textAlign: "center",
-            border: "none",
-            boxShadow: "0 2px 12px rgba(0, 0, 0, 0.06)",
-            transition: "all 0.3s ease",
-            position: "relative",
             display: "flex",
             flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
+            gap: 6,
           }}
         >
+          {/* Top row */}
           <div
             style={{
-              position: "absolute",
-              top: "6px",
-              right: "10px",
-              padding: "4px 10px",
-              background: "#C5FFD1",
-              color: "#000000",
-              borderRadius: "6px",
-              fontSize: "10px",
-              fontWeight: 600,
               display: "flex",
+              justifyContent: "space-between",
               alignItems: "center",
-              justifyContent: "center",
             }}
           >
-            قیمت لحظه‌ای
+            <div style={{ fontSize: 12, color: "#1F1F1F", direction: "rtl" }}>
+              هر گرم طلا ۱۸ عیار
+            </div>
+            <div
+              style={{
+                fontSize: 10,
+                background: "#C5FFD1",
+                color: "#218E00",
+                padding: "2px 6px",
+                borderRadius: 6,
+              }}
+            >
+              قیمت لحظه‌ای
+            </div>
           </div>
-          <div style={{ fontSize: "26px", fontWeight: 700, lineHeight: 1, color: "#242424" }}>
+
+          {/* Bottom row */}
+          <div style={{ fontSize: 22, fontWeight: 700, color: "#1F1F1F" }}>
             {currentPrice
-              ? toPersianNumber(
-                  formatNumber(activeTab === "buy" ? currentPrice.sell_price : currentPrice.buy_price)
+              ? toFa(
+                  fmt(
+                    parseFloat(isBuy ? currentPrice.sell_price : currentPrice.buy_price)
+                  )
                 )
-              : "..."}
+              : "..."}{" "}
+            تومان
           </div>
         </div>
 
-        {/* Recommended Prices */}
-        <div style={{ marginBottom: "16px" }}>
-          <div
-            style={{
-              display: "flex",
-              gap: "6px",
-              justifyContent: "center",
-              flexWrap: "wrap",
-            }}
-          >
-            {activeTab === "buy" ? (
-              // Buy mode: show toman amounts
-              [500000, 1000000, 2000000, 5000000].map((value) => (
-                <button
-                  key={value}
-                  onClick={() => handleQuickAmount(value)}
-                  style={{
-                    padding: "9px 16px",
-                    background: amount === value.toString() ? "#FDB022" : "#FFFFFF",
-                    border: `2px solid ${amount === value.toString() ? "#FDB022" : "#E5E7EB"}`,
-                    borderRadius: "12px",
-                    fontSize: "13px",
-                    fontWeight: 700,
-                    color: amount === value.toString() ? "#FFFFFF" : "#6B7280",
-                    cursor: "pointer",
-                    transition: "all 0.2s ease",
-                    touchAction: "manipulation",
-                    boxShadow: amount === value.toString() ? "0 4px 12px rgba(253, 176, 34, 0.25)" : "0 2px 8px rgba(0, 0, 0, 0.04)",
-                  }}
-                  onMouseEnter={(e) => {
-                    if (amount !== value.toString()) {
-                      e.currentTarget.style.borderColor = "#9CA3AF";
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (amount !== value.toString()) {
-                      e.currentTarget.style.borderColor = "#E5E7EB";
-                    }
-                  }}
-                >
-                  {value >= 1000000
-                    ? `${toPersianNumber((value / 1000000).toString())}M`
-                    : `${toPersianNumber((value / 1000).toString())}K`}
-                </button>
-              ))
-            ) : (
-              // Sell mode: show gold amounts
-              [0.5, 1, 2, 5].map((value) => (
-                <button
-                  key={value}
-                  onClick={() => handleQuickAmount(value)}
-                  style={{
-                    padding: "9px 16px",
-                    background: amount === value.toString() ? "#EF8B8B" : "#FFFFFF",
-                    border: `2px solid ${amount === value.toString() ? "#EF8B8B" : "#E5E7EB"}`,
-                    borderRadius: "12px",
-                    fontSize: "13px",
-                    fontWeight: 700,
-                    color: amount === value.toString() ? "#FFFFFF" : "#6B7280",
-                    cursor: "pointer",
-                    transition: "all 0.2s ease",
-                    touchAction: "manipulation",
-                    boxShadow: amount === value.toString() ? "0 4px 12px rgba(239, 139, 139, 0.3)" : "0 2px 8px rgba(0, 0, 0, 0.04)",
-                  }}
-                  onMouseEnter={(e) => {
-                    if (amount !== value.toString()) {
-                      e.currentTarget.style.borderColor = "#9CA3AF";
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (amount !== value.toString()) {
-                      e.currentTarget.style.borderColor = "#E5E7EB";
-                    }
-                  }}
-                >
-                  {toPersianNumber(value.toString())} گرم
-                </button>
-              ))
-            )}
-          </div>
+        <TabSwitcher activeTab={activeTab} onTabChange={setActiveTab} />
+
+        {/* Inputs */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 16 }}>
+          <InputCard
+            label={
+              amount
+                ? `${toFa(isBuy ? fmt(+amount) : amount)} ${
+                    isBuy ? "تومان" : "گرم"
+                  }`
+                : isBuy
+                ? "مبلغ (تومان)"
+                : "مقدار طلا (گرم)"
+            }
+            active={true}
+          />
+          <InputCard
+            label={
+              tomanAmount > 0
+                ? `${toFa(fmt(tomanAmount))} تومان`
+                : "مبلغ نهایی"
+            }
+            active={false}
+          />
         </div>
 
-        {/* Input Fields */}
+        {/* Quick amounts */}
         <div
           style={{
-            marginBottom: "16px",
             display: "flex",
-            flexDirection: "column",
-            gap: "10px",
+            gap: 8,
+            justifyContent: "center",
+            marginTop: "24px",
+            marginBottom: "16px",
+            flexWrap: "wrap",
           }}
         >
-          {/* First Input - Order depends on buy/sell */}
-          {activeTab === "buy" ? (
-            <>
-              {/* Amount in Toman Input - User enters this */}
-              <div
-                style={{
-                  width: "100%",
-                  height: "52px",
-                  border: "2px solid #1F1F1F",
-                  borderRadius: "14px",
-                  background: "#FFFFFF",
-                  textAlign: "right",
-                  display: "flex",
-                  alignItems: "center",
-                  padding: "0 16px",
-                  boxShadow: amount ? "0 0 0 3px rgba(31, 31, 31, 0.1)" : "none",
-                  transition: "all 0.2s ease",
-                }}
-              >
-                <div style={{ fontSize: "14px", color: amount ? "#1F1F1F" : "#9CA3AF", fontWeight: 600, width: "100%" }}>
-                  {amount ? toPersianNumber(formatNumber(amount)) + " تومان" : "مبلغ پرداختی به تومان"}
-                </div>
-              </div>
-
-              {/* Gold Amount Display - Calculated */}
-              <div
-                style={{
-                  width: "100%",
-                  height: "52px",
-                  border: "2px solid #E5E7EB",
-                  borderRadius: "14px",
-                  background: "#F8F9FA",
-                  textAlign: "right",
-                  display: "flex",
-                  alignItems: "center",
-                  padding: "0 16px",
-                }}
-              >
-                <div style={{ fontSize: "14px", color: goldAmount > 0 ? "#000000" : "#9CA3AF", fontWeight: 500, width: "100%" }}>
-                  {goldAmount > 0 ? toPersianNumber(goldAmount.toFixed(4)) + " گرم" : "مقدار طلا به گرم"}
-                </div>
-              </div>
-            </>
-          ) : (
-            <>
-              {/* Gold Amount Input for Sell - User enters this */}
-              <div
-                style={{
-                  width: "100%",
-                  height: "52px",
-                  border: "2px solid #1F1F1F",
-                  borderRadius: "14px",
-                  background: "#FFFFFF",
-                  textAlign: "right",
-                  display: "flex",
-                  alignItems: "center",
-                  padding: "0 16px",
-                  boxShadow: amount ? "0 0 0 3px rgba(31, 31, 31, 0.1)" : "none",
-                  transition: "all 0.2s ease",
-                }}
-              >
-                <div style={{ fontSize: "14px", color: amount ? "#1F1F1F" : "#9CA3AF", fontWeight: 600, width: "100%" }}>
-                  {amount ? toPersianNumber(amount) + " گرم" : "مقدار طلا به گرم"}
-                </div>
-              </div>
-
-              {/* Amount in Toman Display - Calculated */}
-              <div
-                style={{
-                  width: "100%",
-                  height: "52px",
-                  border: "2px solid #E5E7EB",
-                  borderRadius: "14px",
-                  background: "#F8F9FA",
-                  textAlign: "right",
-                  display: "flex",
-                  alignItems: "center",
-                  padding: "0 16px",
-                }}
-              >
-                <div style={{ fontSize: "14px", color: tomanAmount > 0 ? "#000000" : "#9CA3AF", fontWeight: 500, width: "100%" }}>
-                  {tomanAmount > 0 ? toPersianNumber(formatNumber(tomanAmount)) + " تومان" : "مبلغ دریافتی به تومان"}
-                </div>
-              </div>
-            </>
-          )}
+          {(isBuy ? [500000, 1000000, 2000000] : [0.5, 1, 2]).map((v) => (
+            <button
+              key={v}
+              onClick={() => setAmount(v.toString())}
+              style={{
+                padding: "8px 16px",
+                borderRadius: 12,
+                fontSize: 13,
+                fontWeight: 600,
+                border: amount === v.toString() ? "2px solid #FFC857" : "1px solid #E5E7EB",
+                background: amount === v.toString() ? "#FFF9E6" : "#FFF",
+                color: amount === v.toString() ? "#1F1F1F" : "#6B7280",
+                cursor: "pointer",
+                transition: "all 0.2s ease",
+              }}
+            >
+              {isBuy ? toFa(fmt(v)) : toFa(v)} {isBuy ? "تومان" : "گرم"}
+            </button>
+          ))}
         </div>
 
-        {/* Number Pad with Fee */}
-        <div style={{
-          marginBottom: "24px",
-          background: "#FFFFFF",
-          borderRadius: "20px",
-          padding: "20px 16px",
-          boxShadow: "0 2px 12px rgba(0, 0, 0, 0.06)"
-        }}>
-          {/* Fee Display */}
-          <div
-            style={{
-              marginBottom: "24px",
-              textAlign: "center",
-              fontSize: "13px",
-              color: "#6B7280",
-              fontWeight: 500,
-            }}
-          >
-            کارمزد: {preview ? toPersianNumber(formatNumber(preview.fee)) : "۱۰,۰۰۰"} تومان
-          </div>
-
-          <NumberPad onNumberClick={handleNumberClick} onBackspace={handleBackspace} />
+        <div
+          style={{
+            textAlign: "center",
+            fontSize: 13,
+            color: "#6B7280",
+            margin: "12px 0 16px",
+            fontWeight: 500,
+          }}
+        >
+          کارمزد: {preview ? toFa(fmt(preview.fee)) : "۱۰,۰۰۰"} تومان
         </div>
 
-        {/* Submit Button - ALWAYS VISIBLE */}
+        <NumberPad
+          onNumberClick={(n) => setAmount((p) => p + n)}
+          onBackspace={() => setAmount((p) => p.slice(0, -1))}
+        />
+
         <button
           onClick={handleSubmit}
-          disabled={loading || !isValidAmount}
+          disabled={!isValid || loading}
           style={{
             width: "100%",
-            height: "54px",
-            fontSize: "16px",
+            marginTop: 16,
+            height: 52,
+            borderRadius: 14,
+            fontSize: 16,
             fontWeight: 700,
             color: "#FFFFFF",
             background: loading
               ? "#9CA3AF"
-              : !isValidAmount
+              : !isValid
               ? "#D1D5DB"
-              : activeTab === "buy"
-              ? "#1F1F1F"
-              : "#EF8B8B",
+              : isBuy
+              ? "#1C1C1C"
+              : "#EF4444",
             border: "none",
-            borderRadius: "18px",
-            cursor: loading || !isValidAmount ? "not-allowed" : "pointer",
-            transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            touchAction: "manipulation",
-            boxShadow: isValidAmount && !loading
-              ? activeTab === "buy"
-                ? "0 4px 16px rgba(31, 31, 31, 0.2)"
-                : "0 4px 16px rgba(239, 139, 139, 0.3)"
-              : "none",
+            cursor: !isValid || loading ? "not-allowed" : "pointer",
+            boxShadow: isValid && !loading ? "0 4px 12px rgba(0, 0, 0, 0.15)" : "none",
+            transition: "all 0.2s ease",
           }}
           onMouseEnter={(e) => {
-            if (isValidAmount && !loading) {
-              e.currentTarget.style.transform = "translateY(-2px)";
+            if (isValid && !loading) {
+              e.currentTarget.style.transform = "translateY(-1px)";
               e.currentTarget.style.boxShadow = "0 6px 16px rgba(0, 0, 0, 0.2)";
             }
           }}
           onMouseLeave={(e) => {
-            if (isValidAmount && !loading) {
+            if (isValid && !loading) {
               e.currentTarget.style.transform = "translateY(0)";
               e.currentTarget.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.15)";
             }
           }}
-          onTouchStart={(e) => {
-            if (isValidAmount && !loading) {
-              e.currentTarget.style.transform = "scale(0.98)";
-            }
-          }}
-          onTouchEnd={(e) => {
-            if (isValidAmount && !loading) {
-              e.currentTarget.style.transform = "scale(1)";
-            }
-          }}
         >
-          {loading ? (
-            <span>در حال پردازش...</span>
-          ) : activeTab === "buy" ? (
-            <span>خرید طلا</span>
-          ) : (
-            <span>فروش طلا</span>
-          )}
+          {loading ? "در حال پردازش..." : isBuy ? "خرید طلا" : "فروش طلا"}
         </button>
       </div>
+    </div>
+  );
+}
 
+function InputCard({ label, active }: { label: string; active: boolean }) {
+  return (
+    <div
+      style={{
+        padding: "14px 16px",
+        borderRadius: 12,
+        background: "#FFF",
+        border: active ? "2px solid #1F1F1F" : "1px solid #E5E7EB",
+        fontSize: 14,
+        fontWeight: active ? 600 : 500,
+        textAlign: "right",
+        color: label.includes("مبلغ") || label.includes("مقدار") ? "#9CA3AF" : "#1F1F1F",
+        minHeight: "50px",
+        display: "flex",
+        alignItems: "center",
+        transition: "all 0.2s ease",
+      }}
+    >
+      {label}
     </div>
   );
 }

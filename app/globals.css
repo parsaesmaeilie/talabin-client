@@ -928,6 +928,25 @@ input:checked + .slider:before {
   }
 }
 
+/* Smooth fade-only transitions (mobile-optimized) */
+@keyframes pageFadeEnter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pageFadeExit {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
 .page-transition {
   animation: pageEnter 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }

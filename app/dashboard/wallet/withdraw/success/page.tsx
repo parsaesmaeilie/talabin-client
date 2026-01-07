@@ -1,11 +1,11 @@
 "use client";
 
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { Suspense } from "react";
 
-export default function WithdrawSuccessPage() {
+function WithdrawSuccessContent() {
   const searchParams = useSearchParams();
-  const router = useRouter();
 
   const amount = searchParams.get("amount") || "15,000,000";
   const fee = searchParams.get("fee") || "1355";
@@ -280,5 +280,13 @@ export default function WithdrawSuccessPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function WithdrawSuccessPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <WithdrawSuccessContent />
+    </Suspense>
   );
 }

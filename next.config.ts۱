@@ -1,0 +1,11 @@
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  output: 'export', // فعال کردن خروجی استاتیک
+  images: {
+    unoptimized: true, // اگر از Image استفاده می‌کنید
+  },
+  // اگر از لینک‌های دینامیک استفاده می‌کنید:
+  trailingSlash: true,
+}
+
+module.exports = nextConfig
