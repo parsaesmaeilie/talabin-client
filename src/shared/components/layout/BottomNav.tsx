@@ -7,18 +7,18 @@ interface NavItem {
   id: string;
   href: string;
   icon: string;
-    activeIcon: string; // حالت فعال (رنگی)
-
+  activeIcon: string; // حالت فعال (رنگی)
+  label: string; // برچسب متنی
 }
 
 export function BottomNav() {
   const pathname = usePathname();
 
   const navItems: NavItem[] = [
-    { id: "home", href: "/dashboard", icon: "/icons/home.svg",activeIcon: "/icons/home-active.svg" },
-    { id: "easy-buy", href: "/dashboard/buy-sell", icon: "/icons/buy.svg",activeIcon: "/icons/buy-active.svg" },
-    { id: "services", href: "/dashboard/services", icon: "/icons/service.svg" ,activeIcon: "/icons/service-active.svg"},
-    { id: "wallet", href: "/dashboard/wallet", icon: "/icons/wallet.svg" ,activeIcon: "/icons/wallet-active.svg"},
+    { id: "home", href: "/dashboard", icon: "/icons/home.svg", activeIcon: "/icons/home-active.svg", label: "خانه" },
+    { id: "easy-buy", href: "/dashboard/buy-sell", icon: "/icons/buy.svg", activeIcon: "/icons/buy-active.svg", label: "خریدآسان" },
+    { id: "services", href: "/dashboard/services", icon: "/icons/service.svg", activeIcon: "/icons/service-active.svg", label: "خدمات" },
+    { id: "wallet", href: "/dashboard/wallet", icon: "/icons/wallet.svg", activeIcon: "/icons/wallet-active.svg", label: "کیف‌پول" },
   ];
 
   const isActive = (href: string) => {
@@ -55,22 +55,35 @@ export function BottomNav() {
             href={item.href}
             style={{
               display: "flex",
+              flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
               flex: 1,
+              gap: "4px",
+              textDecoration: "none",
             }}
           >
             <img
-              src={active ? item.activeIcon:item.icon}
-              alt=""
+              src={active ? item.activeIcon : item.icon}
+              alt={item.label}
               style={{
-                width: 75,
-                height: 60,
-  
-                transition: "transform 0.2s ease",
-                transform: active ? "scale(1.2)" : "scale(1)",
+                width: 24,
+                height: 24,
+                transition: "all 0.2s ease",
+                transform: active ? "scale(1.1)" : "scale(1)",
               }}
             />
+            <span
+              style={{
+                fontSize: "10px",
+                fontWeight: active ? 600 : 500,
+                color: active ? "#FFC857" : "#9CA3AF",
+                transition: "all 0.2s ease",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {item.label}
+            </span>
           </Link>
         );
       })}

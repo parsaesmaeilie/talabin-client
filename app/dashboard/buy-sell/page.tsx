@@ -113,7 +113,7 @@ export default function BuySell() {
     >
       <div style={{
         width: "100%",
-        maxWidth: isMobile ? "100%" : 520,
+        maxWidth: isMobile ? "100%" : 428,
         margin: isMobile ? "0" : "0 auto",
         paddingInline: isMobile ? 0 : 12,
         display: "flex",

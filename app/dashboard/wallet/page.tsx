@@ -53,7 +53,7 @@ export default function WalletPage() {
       background: "#FFFFFF",
       paddingBottom: "100px",
       fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
-      maxWidth: "375px",
+      maxWidth: "428px",
       margin: "0 auto",
     }}>
       {/* Header */}
@@ -232,7 +232,7 @@ export default function WalletPage() {
                 textAlign: "center",
                 fontWeight: 500,
               }}>
-                واریز طلا
+                واریز تومان
               </div>
             </Link>
 
