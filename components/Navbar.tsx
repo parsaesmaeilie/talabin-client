@@ -325,7 +325,7 @@ export default function Navbar() {
               خرید و فروش
             </Link>
             <Link
-              href="/installment"
+              href="dashboard/installment"
               className="px-4 py-2.5 rounded-lg transition-colors text-sm font-medium"
               style={{ color: 'rgba(28, 28, 28, 0.75)' }}
               onClick={() => setIsOpen(false)}

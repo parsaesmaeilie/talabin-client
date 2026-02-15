@@ -5,183 +5,216 @@ import Image from "next/image";
 
 const services = [
   {
-    id: 'installment',
-    title: 'خرید قسطی طلا',
-    illustration: '/assets/illustrations/IMG_7814 1-008.png',
-    href: '/dashboard/installment',
+    id: "installment",
+    title: "خرید قسطی طلا",
+    illustration: "/assets/illustrations/installment.png",
+    href: "/dashboard/installment",
   },
   {
-    id: 'physical-receipt',
-    title: 'دریافت فیزیکی طلا',
-    illustration: '/assets/illustrations/IMG_7820 1-002.png',
-    href: '/dashboard/physical-receipt',
+    id: "physical-receipt",
+    title: "دریافت فیزیکی طلا",
+    illustration: "/assets/illustrations/phisici.png",
+    href: "/dashboard/physical-receipt",
   },
   {
-    id: 'savings',
-    title: 'پس‌انداز',
-    illustration: '/assets/illustrations/IMG_7882 1-004.png',
-    href: '/dashboard/savings',
+    id: "savings",
+    title: "پس‌انداز",
+    illustration: "/assets/illustrations/saving.png",
+    href: "/dashboard/savings",
   },
   {
-    id: 'physical-charge',
-    title: 'شارژ فیزیکی',
-    illustration: '/assets/illustrations/IMG_7818 2-003.png',
-    href: '/dashboard/physical-charge',
+    id: "physical-charge",
+    title: "شارژ فیزیکی",
+    illustration: "/assets/illustrations/chargePhisici.png",
+    href: "/dashboard/physical-charge",
   },
   {
-    id: 'gift',
-    title: 'کارت هدیه',
-    illustration: '/assets/illustrations/Rectangle 974-012.png',
-    href: '/dashboard/gift',
-    badge: 'بزودی',
+    id: "gift",
+    title: "کارت هدیه",
+    href: "#",
+    badge: "بزودی",
   },
 ];
 
 export default function ServicesPage() {
   return (
-    <div style={{
-      minHeight: "100vh",
-      background: "#EDEDED",
-      fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
-    }}>
-      {/* Hero Banner */}
-      <div style={{
-        background: "linear-gradient(135deg, #FFF7E6 0%, #FFFBF0 100%)",
-        borderRadius: "0 0 24px 24px",
-        padding: "24px 16px",
-        marginBottom: "16px",
-        display: "flex",
-        alignItems: "center",
-        gap: "16px",
-        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.04)"
-      }}>
-        <div style={{
-          width: "100px",
-          height: "100px",
-          flexShrink: 0
-        }}>
-          <Image
-            src="/assets/illustrations/Rectangle 975-010.png"
-            alt="Vault"
-            width={100}
-            height={100}
-            style={{ objectFit: "contain" }}
-          />
-        </div>
-        <div style={{ flex: 1 }}>
-          <div style={{
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "#f5f5f5",
+        fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
+      }}
+    >
+      {/* Hero */}
+      <div
+        style={{
+          background: "linear-gradient(135deg, #FFF7E6 0%, #FFFBF0 100%)",
+          borderRadius: "0 0 28px 28px",
+          padding: "28px 16px",
+          marginBottom: "24px",
+          display: "flex",
+          alignItems: "center",
+          gap: "16px",
+          boxShadow: "0 6px 20px rgba(0, 0, 0, 0.05)",
+        }}
+      >
+        <Image
+          src="/assets/illustrations/Rectangle 975-010.png"
+          alt="Vault"
+          width={100}
+          height={100}
+          style={{ objectFit: "contain" }}
+        />
+
+        <div
+          style={{
             fontSize: "18px",
             fontWeight: 700,
             color: "#1C1C1C",
-            lineHeight: 1.6,
-            textAlign: "right"
-          }}>
-            <span style={{ color: "#FDB022" }}>طلابین</span> پلتفرم امن خرید و فروش طلای آب‌شده
-          </div>
+            lineHeight: 1.7,
+            textAlign: "right",
+          }}
+        >
+          <span style={{ color: "#FDB022" }}>طلابین</span> پلتفرم امن خرید و فروش
+          طلای آب‌شده
         </div>
       </div>
 
-      {/* Services List */}
-      <div style={{
-        padding: "0 16px",
-        display: "flex",
-        flexDirection: "column",
-        gap: "12px"
-      }}>
-        {services.map((service) => (
-          <Link
-            key={service.id}
-            href={service.href}
-            style={{ textDecoration: "none" }}
-          >
-            <div style={{
-              background: "#F5F5F5",
-              borderRadius: "20px",
-              padding: "16px",
-              display: "flex",
-              alignItems: "center",
-              gap: "16px",
-              transition: "all 0.3s",
-              cursor: "pointer",
-              border: "1px solid transparent",
-              position: "relative"
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = "#FFFFFF";
-              e.currentTarget.style.borderColor = "rgba(255, 200, 87, 0.3)";
-              e.currentTarget.style.transform = "translateY(-2px)";
-              e.currentTarget.style.boxShadow = "0 8px 20px rgba(0, 0, 0, 0.08)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = "#F5F5F5";
-              e.currentTarget.style.borderColor = "transparent";
-              e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.boxShadow = "none";
-            }}>
-              {/* Illustration */}
-              <div style={{
-                width: "80px",
-                height: "80px",
-                flexShrink: 0,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center"
-              }}>
-                <Image
-                  src={service.illustration}
-                  alt={service.title}
-                  width={80}
-                  height={80}
-                  style={{ objectFit: "contain" }}
-                />
-              </div>
+      {/* Services */}
+      <div
+        style={{
+          padding: "0 16px 40px 16px",
+          display: "flex",
+          flexDirection: "column",
+          gap: "28px",
+        }}
+      >
+        {services.map((service) => {
+          const isGift = service.id === "gift";
+
+          return (
+            <Link
+              key={service.id}
+              href={isGift ? "#" : service.href}
+              style={{
+                textDecoration: "none",
+                pointerEvents: isGift ? "none" : "auto",
+              }}
+            >
+              <div
+                style={{
+                  position: "relative",
+                  height: "95px",
+                  background: isGift ? "#F8F3E8" : "#F2EEE5",
+                  borderRadius: "26px",
+                  display: "flex",
+                  alignItems: "center",
+                  padding: "0 18px",
+                  transition: "all 0.3s ease",
+                  boxShadow: "0 6px 18px rgba(0,0,0,0.04)",
+                }}
+                onMouseEnter={(e) => {
+                  if (!isGift) {
+                    e.currentTarget.style.transform = "translateY(-4px)";
+                    e.currentTarget.style.boxShadow =
+                      "0 12px 25px rgba(0,0,0,0.08)";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow =
+                    "0 6px 18px rgba(0,0,0,0.04)";
+                }}
+              >
+                {/* Floating Image */}
+                {/* Floating Image */}
+              {!isGift && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "-28px",
+                    right: "18px", // ← این تغییر کرد
+                    width: "110px",
+                    height: "110px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    zIndex: 2,
+                  }}
+                >
+                  <Image
+                    src={service.illustration}
+                    alt={service.title}
+                    width={110}
+                    height={110}
+                    style={{
+                      objectFit: "contain",
+                      filter: "drop-shadow(0 10px 18px rgba(0,0,0,0.15))",
+                      transition: "transform 0.3s ease",
+                    }}
+                  />
+                </div>
+              )}
 
               {/* Title */}
-              <div style={{
-                flex: 1,
-                fontSize: "16px",
-                fontWeight: 600,
-                color: "#1C1C1C",
-                textAlign: "right"
-              }}>
+              <div
+                style={{
+                  flex: 1,
+                  fontSize: "17px",
+                  fontWeight: 600,
+                  color: "#1C1C1C",
+                  textAlign: "right",
+                  paddingRight: isGift ? "0" : "120px", // ← این هم راست شد
+                }}
+              >
                 {service.title}
               </div>
 
-              {/* Arrow */}
-              <div style={{
-                width: "32px",
-                height: "32px",
-                borderRadius: "50%",
-                background: "rgba(0,0,0,0.04)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                flexShrink: 0
-              }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                  <path d="M15 19L8 12L15 5" stroke="#1C1C1C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </div>
 
-              {/* Badge */}
-              {service.badge && (
-                <div style={{
-                  position: "absolute",
-                  top: "12px",
-                  left: "12px",
-                  background: "#FFC857",
-                  color: "#1C1C1C",
-                  fontSize: "10px",
-                  fontWeight: 600,
-                  padding: "4px 8px",
-                  borderRadius: "999px"
-                }}>
-                  {service.badge}
-                </div>
-              )}
-            </div>
-          </Link>
-        ))}
+                {/* Arrow */}
+                {!isGift && (
+                  <div
+                    style={{
+                      width: "34px",
+                      height: "34px",
+                      borderRadius: "50%",
+                      background: "rgba(0,0,0,0.05)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                      <path
+                        d="M15 19L8 12L15 5"
+                        stroke="#1C1C1C"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </div>
+                )}
+
+                {/* Coming Soon */}
+                {isGift && (
+                  <div
+                    style={{
+                      background: "#FFC857",
+                      color: "#1C1C1C",
+                      fontSize: "12px",
+                      fontWeight: 700,
+                      padding: "6px 14px",
+                      borderRadius: "999px",
+                    }}
+                  >
+                    بزودی
+                  </div>
+                )}
+              </div>
+            </Link>
+          );
+        })}
       </div>
     </div>
   );

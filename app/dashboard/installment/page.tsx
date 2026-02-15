@@ -29,8 +29,8 @@ export default function InstallmentPage() {
       <div style={{
         minHeight: "100vh",
         background: colors.card,
-        padding: `${spacing.md} ${spacing.md} 100px`,
-        paddingBottom: "100px"
+        padding: `${spacing.md} ${spacing.md} 10px`,
+        paddingBottom: "10px"
       }}>
         <div style={{
           maxWidth: "600px",
@@ -257,10 +257,10 @@ export default function InstallmentPage() {
 
   return (
     <div style={{
-      minHeight: "100vh",
+      minHeight: "10vh",
       background: "#F5F5F5",
-      padding: `${spacing.md} ${spacing.md} 100px`,
-      paddingBottom: "100px"
+      padding: `${spacing.md} ${spacing.md} 10px`,
+      paddingBottom: "10px"
     }}>
       <div style={{
         maxWidth: "600px",
@@ -398,7 +398,7 @@ export default function InstallmentPage() {
             <div style={{ position: "relative", display: "flex", justifyContent: "space-between", alignItems: "center", pointerEvents: "none" }}>
               {[5, 4, 3, 2, 1, 0].map((i) => {
                 const dotValue = minAmount + (i * (maxAmount - minAmount) / 5);
-                const currentIndex = Math.round(((amount - minAmount) / (maxAmount - minAmount)) * 5);
+                const currentIndex = Math.floor(((amount - minAmount) / (maxAmount - minAmount)) * 5);
                 const isActive = i >= (5 - currentIndex);
 
                 return (

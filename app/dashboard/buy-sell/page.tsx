@@ -10,8 +10,7 @@ import { walletService, Wallet } from "@/lib/api/wallet";
 const isMobile =
   typeof window !== "undefined" && window.innerWidth < 480;
 
-const isMobile =
-  typeof window !== "undefined" && window.innerWidth < 480;
+
 
 export default function BuySell() {
   const router = useRouter();

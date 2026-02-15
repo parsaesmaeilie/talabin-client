@@ -356,7 +356,13 @@ function EmptyState() {
         textAlign: "center",
       }}
     >
+      <div style={{display:"flex" ,textAlign: "center",}}>
       <svg
+      style={{
+  margin: "0 auto",
+  display: "block"
+}
+}
         width="200"
         height="200"
         viewBox="0 0 200 200"
@@ -377,7 +383,7 @@ function EmptyState() {
         <line x1="90" y1="115" x2="110" y2="115" stroke="#92400E" strokeWidth="1" />
         <line x1="90" y1="120" x2="105" y2="120" stroke="#92400E" strokeWidth="1" />
       </svg>
-
+</div>
       <div
         style={{
           fontSize: "14px",
