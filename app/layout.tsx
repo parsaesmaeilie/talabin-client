@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import SupportButton from "@/components/SupportButton";
 
 export const metadata: Metadata = {
   title: "طلابین – خرید و فروش طلای دیجیتال با پشتوانه واقعی",
@@ -9,8 +10,8 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 5,
-  userScalable: true,
+  maximumScale: 1,
+  userScalable: false,
   themeColor: "#FDB022",
 };
 
@@ -28,7 +29,10 @@ export default function RootLayout({
         />
       </head>
       <body style={{ fontFamily: '"Vazirmatn", system-ui, -apple-system, BlinkMacSystemFont, sans-serif' }}>
-        <div className="select-none page-transition">{children}</div>
+        <div className="select-none page-transition">
+          {children}
+          <SupportButton />
+        </div>
       </body>
     </html>
   );

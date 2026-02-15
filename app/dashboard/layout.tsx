@@ -1,4 +1,5 @@
 import { BottomNav } from "@/src/shared/components/layout/BottomNav";
+import { PageTransition } from "@/components/PageTransition";
 
 export default function DashboardLayout({
   children,
@@ -24,7 +25,7 @@ export default function DashboardLayout({
           maxWidth: 420,
         }}
       >
-        {children}
+        <PageTransition>{children}</PageTransition>
       </div>
 
       <BottomNav />

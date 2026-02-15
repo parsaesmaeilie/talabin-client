@@ -14,6 +14,7 @@ export const TabSwitcher: React.FC<TabSwitcherProps> = ({ activeTab, onTabChange
         display: "flex",
         gap: "4px",
         justifyContent: "center",
+        marginBottom: 8,
       }}
     >
       <div style={{borderRadius:"24px",background:"#F3F3F3",padding:"4px"}}>

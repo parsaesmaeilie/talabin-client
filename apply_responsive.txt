@@ -1,0 +1,19 @@
+Pages to update:
+1. ✅ Onboarding - DONE
+2. ✅ Login - DONE  
+3. Register
+4. Wallet
+5. Buy/Sell
+6. Services
+7. Savings
+8. Installment
+9. Physical pages
+10. Profile
+
+Pattern:
+Wrap main return div with:
+<div style={{ minHeight: "100vh", background: "#FAFAFA" }}>
+  <div className="app-container desktop-shadow">
+    ... existing content ...
+  </div>
+</div>

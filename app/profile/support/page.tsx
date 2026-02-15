@@ -137,7 +137,7 @@ export default function SupportPage() {
               padding: `${spacing.xs} ${spacing.sm}`,
               background: colors.success,
               color: colors.card,
-              borderRadius: borderRadius.full,
+              borderRadius: borderRadius.pill,
               fontSize: fontSize.xs,
               fontWeight: 600,
             }}>
@@ -295,7 +295,7 @@ export default function SupportPage() {
                 padding: `${spacing.xs} ${spacing.sm}`,
                 background: "rgba(245, 158, 11, 0.1)",
                 color: "#F59E0B",
-                borderRadius: borderRadius.full,
+                borderRadius: borderRadius.pill,
                 fontSize: fontSize.xs,
                 fontWeight: 600,
               }}>

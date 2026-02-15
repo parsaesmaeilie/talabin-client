@@ -12,6 +12,17 @@
   --color-primary-light: #FFD666;
   --color-primary-dark: #E6A700;
   --color-bg: #FAF9F6;
+
+  /* Figma-sampled palette for Services page */
+  --color-hero-start: #4C4C63;
+  --color-hero-end: #3C3B4D;
+  --color-gold: #FFC857;
+  --color-card-beige: #F7F3EE;
+  --color-accent-orange: #FDB022;
+  --color-accent-green: #10B981;
+  --color-accent-blue: #3B82F6;
+  --color-accent-purple: #8B5CF6;
+  --color-accent-red: #EF4444;
   --color-soft: #FFF4E1;
   --color-card: #FFFFFF;
   --color-border: #E3DFD4;
@@ -92,8 +103,28 @@
 }
 
 html {
+  font-size: 16px;
   scroll-behavior: smooth;
   -webkit-tap-highlight-color: transparent;
+}
+
+/* Responsive base font size for better scaling */
+@media (max-width: 374px) {
+  html {
+    font-size: 14px;
+  }
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+@media (min-width: 1440px) {
+  html {
+    font-size: 18px;
+  }
 }
 
 html, body {
@@ -111,7 +142,40 @@ html, body {
 
 body {
   min-height: 100vh;
+  font-size: 1rem;
+  line-height: 1.5;
 }
+
+/* Prevent excessive text scaling on mobile */
+@media (max-width: 767px) {
+  body {
+    text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+    -moz-text-size-adjust: 100%;
+  }
+}
+
+/* Standardized spacing units for consistency */
+.spacing-xs { padding: 8px; }
+.spacing-sm { padding: 12px; }
+.spacing-md { padding: 16px; }
+.spacing-lg { padding: 20px; }
+.spacing-xl { padding: 24px; }
+
+.gap-xs { gap: 8px; }
+.gap-sm { gap: 12px; }
+.gap-md { gap: 16px; }
+.gap-lg { gap: 20px; }
+
+/* Standardized font sizes */
+.text-xs { font-size: 10px; }
+.text-sm { font-size: 12px; }
+.text-base { font-size: 14px; }
+.text-md { font-size: 16px; }
+.text-lg { font-size: 18px; }
+.text-xl { font-size: 20px; }
+.text-2xl { font-size: 24px; }
+.text-3xl { font-size: 28px; }
 
 a {
   color: inherit;
@@ -864,6 +928,25 @@ input:checked + .slider:before {
   }
 }
 
+/* Smooth fade-only transitions (mobile-optimized) */
+@keyframes pageFadeEnter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pageFadeExit {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
 .page-transition {
   animation: pageEnter 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -1462,5 +1545,55 @@ a:focus {
 
   a, button {
     transition-duration: 200ms;
+  }
+}
+
+/* ============================================
+   Responsive Desktop Container
+   ============================================ */
+
+/* Mobile App Simulation on Desktop */
+.desktop-shadow {
+  box-shadow: none;
+}
+
+@media (min-width: 429px) {
+  .desktop-shadow {
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05);
+    border-left: 1px solid rgba(0, 0, 0, 0.05);
+    border-right: 1px solid rgba(0, 0, 0, 0.05);
+  }
+}
+
+/* Responsive App Container - Centers content like mobile app on desktop */
+.app-container {
+  width: 100%;
+  max-width: 428px;
+  margin: 0 auto;
+  position: relative;
+  background: #FAFAFA;
+  min-height: 100vh;
+}
+
+@media (min-width: 429px) {
+  .app-container {
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.12);
+  }
+}
+
+/* Mobile-first padding with desktop adjustments */
+.responsive-padding {
+  padding: 16px;
+}
+
+@media (min-width: 768px) {
+  .responsive-padding {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 374px) {
+  .responsive-padding {
+    padding: 12px;
   }
 }
