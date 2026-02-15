@@ -7,25 +7,25 @@ const services = [
   {
     id: "installment",
     title: "خرید قسطی طلا",
-    illustration: "/assets/illustrations/installment.png",
+    illustration: "/assets/illustrations/installment.svg",
     href: "/dashboard/installment",
   },
   {
     id: "physical-receipt",
     title: "دریافت فیزیکی طلا",
-    illustration: "/assets/illustrations/phisici.png",
+    illustration: "/assets/illustrations/phisici.svg",
     href: "/dashboard/physical-receipt",
   },
   {
     id: "savings",
     title: "پس‌انداز",
-    illustration: "/assets/illustrations/saving.png",
+    illustration: "/assets/illustrations/saving.svg",
     href: "/dashboard/savings",
   },
   {
     id: "physical-charge",
     title: "شارژ فیزیکی",
-    illustration: "/assets/illustrations/chargePhisici.png",
+    illustration: "/assets/illustrations/chargePhisici.svg",
     href: "/dashboard/physical-charge",
   },
   {
