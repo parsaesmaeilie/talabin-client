@@ -31,24 +31,24 @@ services:
     networks:
       - talabin_network
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD-SHELL", "redis-cli -a ${REDIS_PASSWORD} ping | grep PONG"]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  # Django Backend
+  # Django Backend (internal only - nginx proxies to it)
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile.production
     restart: always
-    command: gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 4 --worker-class sync --timeout 60 --access-logfile - --error-logfile -
+    command: gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers ${GUNICORN_WORKERS:-4} --worker-class sync --timeout 120 --access-logfile - --error-logfile -
     volumes:
-      - ./backend/media:/app/media
-      - ./backend/staticfiles:/app/staticfiles
-      - ./backend/logs:/app/logs
-    ports:
-      - "8000:8000"
+      - backend_static:/app/staticfiles
+      - backend_media:/app/media
+      - backend_logs:/app/logs
+    expose:
+      - "8000"
     env_file:
       - ./backend/.env.production
     environment:
@@ -68,14 +68,16 @@ services:
       retries: 3
       start_period: 40s
 
-  # Next.js Frontend
+  # Next.js Frontend (internal only - nginx proxies to it)
   frontend:
     build:
       context: .
       dockerfile: Dockerfile.production
+      args:
+        - NEXT_PUBLIC_API_URL=${FRONTEND_API_URL:-https://api.yourdomain.com}
     restart: always
-    ports:
-      - "3000:3000"
+    expose:
+      - "3000"
     environment:
       - NODE_ENV=production
       - NEXT_PUBLIC_API_URL=${FRONTEND_API_URL:-https://api.yourdomain.com}
@@ -84,7 +86,7 @@ services:
     networks:
       - talabin_network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/"]
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -100,20 +102,32 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/conf.d:/etc/nginx/conf.d:ro
-      - ./backend/staticfiles:/usr/share/nginx/html/static:ro
-      - ./backend/media:/usr/share/nginx/html/media:ro
+      - backend_static:/usr/share/nginx/html/static:ro
+      - backend_media:/usr/share/nginx/html/media:ro
       - ./nginx/ssl:/etc/nginx/ssl:ro
-      - ./nginx/logs:/var/log/nginx
+      - nginx_logs:/var/log/nginx
+      - certbot_www:/var/www/certbot:ro
+      - certbot_conf:/etc/letsencrypt:ro
     depends_on:
       - backend
       - frontend
     networks:
       - talabin_network
     healthcheck:
-      test: ["CMD", "nginx", "-t"]
+      test: ["CMD-SHELL", "wget -q --spider http://localhost/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
+
+  # Certbot for SSL certificates
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - certbot_www:/var/www/certbot
+      - certbot_conf:/etc/letsencrypt
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    networks:
+      - talabin_network
 
   # Celery Worker (for background tasks)
   celery:
@@ -121,10 +135,10 @@ services:
       context: ./backend
       dockerfile: Dockerfile.production
     restart: always
-    command: celery -A config worker -l info --max-tasks-per-child=1000
+    command: celery -A config worker -l info --max-tasks-per-child=1000 --concurrency=${CELERY_CONCURRENCY:-4}
     volumes:
-      - ./backend/media:/app/media
-      - ./backend/logs:/app/logs
+      - backend_media:/app/media
+      - backend_logs:/app/logs
     env_file:
       - ./backend/.env.production
     environment:
@@ -146,7 +160,7 @@ services:
     restart: always
     command: celery -A config beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
     volumes:
-      - ./backend/logs:/app/logs
+      - backend_logs:/app/logs
     env_file:
       - ./backend/.env.production
     environment:
@@ -168,4 +182,16 @@ volumes:
   postgres_data:
     driver: local
   redis_data:
+    driver: local
+  backend_static:
+    driver: local
+  backend_media:
+    driver: local
+  backend_logs:
+    driver: local
+  nginx_logs:
+    driver: local
+  certbot_www:
+    driver: local
+  certbot_conf:
     driver: local
